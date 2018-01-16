@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		3C17CCBD1FEA2B5100BE0474 /* Calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C17CCBB1FEA2B5100BE0474 /* Calculator.cpp */; };
+		3C8E3BB1200DBC38004DFF87 /* Token.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB0200DBC38004DFF87 /* Token.cpp */; };
+		3C8E3BB4200DBC7F004DFF87 /* Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB2200DBC7F004DFF87 /* Lexer.cpp */; };
+		3C8E3BB8200DBE10004DFF87 /* ast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB6200DBE10004DFF87 /* ast.cpp */; };
+		3C8E3BBB200DBFAA004DFF87 /* Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB9200DBFAA004DFF87 /* Parser.cpp */; };
+		3C8E3BBE200DC1BC004DFF87 /* Interpreter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BBC200DC1BC004DFF87 /* Interpreter.cpp */; };
 		3CF2B62D1FE635250039F40B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2B62C1FE635250039F40B /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +31,17 @@
 /* Begin PBXFileReference section */
 		3C17CCBB1FEA2B5100BE0474 /* Calculator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Calculator.cpp; sourceTree = "<group>"; };
 		3C17CCBC1FEA2B5100BE0474 /* Calculator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Calculator.hpp; sourceTree = "<group>"; };
+		3C8E3BAF200DBBBE004DFF87 /* Token.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Token.hpp; sourceTree = "<group>"; };
+		3C8E3BB0200DBC38004DFF87 /* Token.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Token.cpp; sourceTree = "<group>"; };
+		3C8E3BB2200DBC7F004DFF87 /* Lexer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Lexer.cpp; sourceTree = "<group>"; };
+		3C8E3BB3200DBC7F004DFF87 /* Lexer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Lexer.hpp; sourceTree = "<group>"; };
+		3C8E3BB5200DBDD8004DFF87 /* Visitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Visitor.h; sourceTree = "<group>"; };
+		3C8E3BB6200DBE10004DFF87 /* ast.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ast.cpp; sourceTree = "<group>"; };
+		3C8E3BB7200DBE10004DFF87 /* ast.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ast.hpp; sourceTree = "<group>"; };
+		3C8E3BB9200DBFAA004DFF87 /* Parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Parser.cpp; sourceTree = "<group>"; };
+		3C8E3BBA200DBFAA004DFF87 /* Parser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Parser.hpp; sourceTree = "<group>"; };
+		3C8E3BBC200DC1BC004DFF87 /* Interpreter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Interpreter.cpp; sourceTree = "<group>"; };
+		3C8E3BBD200DC1BC004DFF87 /* Interpreter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Interpreter.hpp; sourceTree = "<group>"; };
 		3CF2B6291FE635250039F40B /* exp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exp; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CF2B62C1FE635250039F40B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -63,6 +79,17 @@
 				3CF2B62C1FE635250039F40B /* main.cpp */,
 				3C17CCBB1FEA2B5100BE0474 /* Calculator.cpp */,
 				3C17CCBC1FEA2B5100BE0474 /* Calculator.hpp */,
+				3C8E3BAF200DBBBE004DFF87 /* Token.hpp */,
+				3C8E3BB0200DBC38004DFF87 /* Token.cpp */,
+				3C8E3BB2200DBC7F004DFF87 /* Lexer.cpp */,
+				3C8E3BB3200DBC7F004DFF87 /* Lexer.hpp */,
+				3C8E3BB5200DBDD8004DFF87 /* Visitor.h */,
+				3C8E3BB6200DBE10004DFF87 /* ast.cpp */,
+				3C8E3BB7200DBE10004DFF87 /* ast.hpp */,
+				3C8E3BB9200DBFAA004DFF87 /* Parser.cpp */,
+				3C8E3BBA200DBFAA004DFF87 /* Parser.hpp */,
+				3C8E3BBC200DC1BC004DFF87 /* Interpreter.cpp */,
+				3C8E3BBD200DC1BC004DFF87 /* Interpreter.hpp */,
 			);
 			path = exp;
 			sourceTree = "<group>";
@@ -124,7 +151,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C8E3BB1200DBC38004DFF87 /* Token.cpp in Sources */,
+				3C8E3BB8200DBE10004DFF87 /* ast.cpp in Sources */,
 				3CF2B62D1FE635250039F40B /* main.cpp in Sources */,
+				3C8E3BB4200DBC7F004DFF87 /* Lexer.cpp in Sources */,
+				3C8E3BBB200DBFAA004DFF87 /* Parser.cpp in Sources */,
+				3C8E3BBE200DC1BC004DFF87 /* Interpreter.cpp in Sources */,
 				3C17CCBD1FEA2B5100BE0474 /* Calculator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -238,7 +270,7 @@
 		3CF2B6311FE635250039F40B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WSG985FR47;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -249,7 +281,7 @@
 		3CF2B6321FE635250039F40B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WSG985FR47;
 				PRODUCT_NAME = "$(TARGET_NAME)";
