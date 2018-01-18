@@ -1,11 +1,12 @@
-//
 //  main.cpp
 
 #include "Calculator.hpp"
 #include "Codegen.hpp"
 #include "Lexer.hpp"
 #include "Parser.hpp"
+
 #include <iostream>
+#include <fstream>
 
 void do_codegen(std::string exp)
 {
@@ -13,7 +14,14 @@ void do_codegen(std::string exp)
 	Parser parser(std::make_shared<Lexer>(lex));
 	auto ast = parser.parse();
 	Codegen generator(ast);
-	std::cout << generator.getCode() << std::endl;
+	
+	std::string code = generator.getCode();
+	std::cout << code << std::endl;
+	
+	// output assembly to file
+	std::ofstream outputStream("test/compute.s");
+	outputStream << code;
+	outputStream.close();
 }
 
 void do_calculate(std::string exp)

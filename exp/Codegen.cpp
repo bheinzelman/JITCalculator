@@ -50,8 +50,8 @@ std::string Codegen::getCode()
 
 void Codegen::initCodegen()
 {
-	code += "\t.globl _test\n";
-	code += "_test:\n";
+	code += "\t.globl _compute\n";
+	code += "_compute:\n";
 	code += "\tpushq %rbp\n";
 	code += "\tmovq %rsp, %rbp\n";
 }
