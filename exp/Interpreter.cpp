@@ -1,6 +1,7 @@
 //  Interpreter.cpp
 
 #include <memory>
+#include <iostream>
 
 #include "Interpreter.hpp"
 #include "ast.hpp"
@@ -25,7 +26,6 @@ void Interpreter::visit(BinaryExpression *expression)
 {
 	expression->getLeft()->accept(this);
 	int left = lastValue;
-	
 	Token op = expression->getOperator();
 	
 	expression->getRight()->accept(this);
@@ -47,6 +47,5 @@ void Interpreter::visit(BinaryExpression *expression)
 		default:
 			return;
 	}
-	
 }
 

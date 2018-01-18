@@ -13,6 +13,7 @@
 		3C8E3BB8200DBE10004DFF87 /* ast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB6200DBE10004DFF87 /* ast.cpp */; };
 		3C8E3BBB200DBFAA004DFF87 /* Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB9200DBFAA004DFF87 /* Parser.cpp */; };
 		3C8E3BBE200DC1BC004DFF87 /* Interpreter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BBC200DC1BC004DFF87 /* Interpreter.cpp */; };
+		3C8E3BC1200DC3A6004DFF87 /* Codegen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BBF200DC3A6004DFF87 /* Codegen.cpp */; };
 		3CF2B62D1FE635250039F40B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2B62C1FE635250039F40B /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +43,8 @@
 		3C8E3BBA200DBFAA004DFF87 /* Parser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Parser.hpp; sourceTree = "<group>"; };
 		3C8E3BBC200DC1BC004DFF87 /* Interpreter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Interpreter.cpp; sourceTree = "<group>"; };
 		3C8E3BBD200DC1BC004DFF87 /* Interpreter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Interpreter.hpp; sourceTree = "<group>"; };
+		3C8E3BBF200DC3A6004DFF87 /* Codegen.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Codegen.cpp; sourceTree = "<group>"; };
+		3C8E3BC0200DC3A6004DFF87 /* Codegen.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Codegen.hpp; sourceTree = "<group>"; };
 		3CF2B6291FE635250039F40B /* exp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exp; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CF2B62C1FE635250039F40B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -90,6 +93,8 @@
 				3C8E3BBA200DBFAA004DFF87 /* Parser.hpp */,
 				3C8E3BBC200DC1BC004DFF87 /* Interpreter.cpp */,
 				3C8E3BBD200DC1BC004DFF87 /* Interpreter.hpp */,
+				3C8E3BBF200DC3A6004DFF87 /* Codegen.cpp */,
+				3C8E3BC0200DC3A6004DFF87 /* Codegen.hpp */,
 			);
 			path = exp;
 			sourceTree = "<group>";
@@ -152,6 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3C8E3BB1200DBC38004DFF87 /* Token.cpp in Sources */,
+				3C8E3BC1200DC3A6004DFF87 /* Codegen.cpp in Sources */,
 				3C8E3BB8200DBE10004DFF87 /* ast.cpp in Sources */,
 				3CF2B62D1FE635250039F40B /* main.cpp in Sources */,
 				3C8E3BB4200DBC7F004DFF87 /* Lexer.cpp in Sources */,
