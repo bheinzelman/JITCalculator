@@ -64,16 +64,13 @@ void Codegen::finalizeCodegen()
 
 void Codegen::visit(BasicExpression *expression)
 {
-	Operand op;
-	op.value = "$" + std::to_string(expression->getValue());
-	op.isRegister = false;
-	
+	std::string stringVal = std::to_string(expression->getValue());
+	Operand op = Operand::operandWithNumberValue(stringVal);
 	stack.push(op);
 }
 
 void Codegen::visit(BinaryExpression *expression)
 {
-	
 	expression->getLeft()->accept(this);
 	
 	Token op = expression->getOperator();
