@@ -64,7 +64,7 @@ void Codegen::finalizeCodegen()
 
 void Codegen::visit(BasicExpression *expression)
 {
-	std::string stringVal = std::to_string(expression->getValue());
+	std::string stringVal = "$" + std::to_string(expression->getValue());
 	Operand op = Operand::operandWithNumberValue(stringVal);
 	stack.push(op);
 }
