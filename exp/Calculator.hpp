@@ -1,7 +1,6 @@
 //  Calculator.hpp
 
-#ifndef Calculator_hpp
-#define Calculator_hpp
+#pragma once
 
 #include <string>
 
@@ -16,4 +15,3 @@ private:
 	std::string expression;
 };
 
-#endif /* Calculator_hpp */

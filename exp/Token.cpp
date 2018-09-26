@@ -1,19 +1,22 @@
 // Token.cpp
 
 #include "Token.hpp"
-
+namespace jcToken
+{
+	
 int getOperatorPrecedence(Token op)
 {
 	switch (op) {
-		case Add:
-		case Subtract:
+		case Token::Add:
+		case Token::Subtract:
 			return 1;
-		case Multiply:
-		case Divide:
+		case Token::Multiply:
+		case Token::Divide:
 			return 2;
 		default:
 			return -1;
-
 	}
 }
 
+}
+ 

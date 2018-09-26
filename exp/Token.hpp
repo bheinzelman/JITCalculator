@@ -1,9 +1,8 @@
 //  Token.h
 
-#ifndef Token_h
-#define Token_h
+#pragma once
 
-enum Token
+enum class Token
 {
 	Add,
 	Subtract,
@@ -12,10 +11,12 @@ enum Token
 	LParen,
 	RParen,
 	Num,
-	Error
+	Error,
+	EndOfStream
 };
 
-int getOperatorPrecedence(Token op);
-
-
-#endif 
+namespace jcToken
+{
+	int getOperatorPrecedence(Token op);
+}
+ 

@@ -1,7 +1,6 @@
 //  Parser.hpp
 
-#ifndef Parser_hpp
-#define Parser_hpp
+#pragma once
 
 #include <memory>
 
@@ -22,10 +21,14 @@ private:
 private:
 	std::shared_ptr<Expression> getTerm();
 	
+	// Will return the error token if the next token is not an operator
 	Token peekOperator();
+	
+	Token nextToken(int *lex);
+	Token peekToken(int *lex);
+	// asserts the next token is of a given type
+	void eat(Token token);
 	
 	std::shared_ptr<Expression> getExpression(int prevPrec=1);
 };
 
-
-#endif

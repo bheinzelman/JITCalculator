@@ -1,27 +1,25 @@
 // Interpreter.hpp
 
-#ifndef Interpreter_hpp
-#define Interpreter_hpp
+#pragma once
 
 #include <memory>
+#include <stack>
 
 #include "Visitor.h"
 #include "ast.hpp"
 
-class Interpreter : Visitor
+#include "bc.hpp"
+
+class Interpreter
 {
 public:
-	Interpreter(std::shared_ptr<Expression> expression);
+	Interpreter(std::vector<bc::Instruction> instructions);
 	
 	int interpret();
-	
-	void visit(BasicExpression *expression);
-	
-	void visit(BinaryExpression *expression);
+private:
+	int popStack();
 	
 private:
-	int lastValue;
-	std::shared_ptr<Expression> expression;
+	std::vector<bc::Instruction> mInstructions;
+	std::stack<int> mStack;
 };
-
-#endif

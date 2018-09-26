@@ -1,7 +1,6 @@
 // Codegen.hpp
 
-#ifndef Codegen_hpp
-#define Codegen_hpp
+#pragma once
 
 #include <memory>
 #include <string>
@@ -48,5 +47,3 @@ private:
 	
 	void addInstruction(std::string instruction, std::string source, std::string dest);
 };
-
-#endif

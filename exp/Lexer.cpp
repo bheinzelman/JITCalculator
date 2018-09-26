@@ -12,7 +12,7 @@ Token Lexer::currentToken() const {
 	return _currentToken;
 }
 
-bool Lexer::peakToken(Token *token, int *lexeme)
+bool Lexer::peekToken(Token *token, int *lexeme)
 {
 	int i = index;
 	Token t;
@@ -33,34 +33,34 @@ bool Lexer::peakToken(Token *token, int *lexeme)
 
 bool Lexer::getNextToken(Token *token, int *lexeme)
 {
-	Token nextToken = Error;
+	Token nextToken = Token::Error;
 	if (hasMoreChars()) {
 		char next;
 		nextNonWhitespaceChar(&next);
 		switch (next) {
 			case '(':
-				nextToken = LParen;
+				nextToken = Token::LParen;
 				break;
 			case ')':
-				nextToken = RParen;
+				nextToken = Token::RParen;
 				break;
 			case '+':
-				nextToken = Add;
+				nextToken = Token::Add;
 				break;
 			case '-':
-				nextToken = Subtract;
+				nextToken = Token::Subtract;
 				break;
 			case '/':
-				nextToken = Divide;
+				nextToken = Token::Divide;
 				break;
 			case '*':
-				nextToken = Multiply;
+				nextToken = Token::Multiply;
 				break;
 			default:
 				break;
 		}
 		
-		if (nextToken != Error) {
+		if (nextToken != Token::Error) {
 			if (token != nullptr) {
 				*token = nextToken;
 			}
@@ -82,16 +82,20 @@ bool Lexer::getNextToken(Token *token, int *lexeme)
 				*lexeme = value;
 			}
 			if (token != nullptr) {
-				*token = Num;
+				*token = Token::Num;
 			}
 			return true;
 		} else {
 			if (token != nullptr) {
-				*token = Error;
+				*token = Token::Error;
 			}
 			return false;
+		}		
+	} else {
+		if (token != nullptr) {
+			*token = Token::EndOfStream;
+			return true;
 		}
-		
 	}
 	return false;
 }

@@ -1,7 +1,6 @@
 //  Lexer.hpp
 
-#ifndef Lexer_hpp
-#define Lexer_hpp
+#pragma once
 
 #include <string>
 
@@ -14,7 +13,7 @@ public:
 	
 	Token currentToken() const;
 	
-	bool peakToken(Token *token, int *lexeme=nullptr);
+	bool peekToken(Token *token, int *lexeme=nullptr);
 	
 	bool getNextToken(Token *token, int *lexeme=nullptr);
 	
@@ -29,4 +28,3 @@ private:
 	bool hasMoreChars() const;
 };
 
-#endif /* Lexer_hpp */

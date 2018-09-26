@@ -4,18 +4,24 @@
 #include "Codegen.hpp"
 #include "Lexer.hpp"
 #include "Parser.hpp"
+#include "jc.h"
 
 #include <iostream>
 #include <fstream>
 
-#define VERSION_STRING "0.0.0"
+#include <cstdio>
+#include <readline/readline.h>
+#include <readline/history.h>
+
 
 void run_shell(std::ostream &stream) {
-	stream << "JITCalculator v" << VERSION_STRING << "\n";
+	stream << "JITCalculator v" << JC_VERSION_STRING << "\n";
 	while (true) {
-		stream << ">>> ";
-		std::string exp;
-		std::getline(std::cin, exp);
+		const char *rawIn = readline(">>> ");
+		
+		JC_ASSERT(rawIn);
+		add_history(rawIn);
+		std::string exp = std::string(rawIn);
 		
 		if (exp.size() == 0) {
 			continue;

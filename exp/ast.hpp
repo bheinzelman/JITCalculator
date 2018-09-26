@@ -1,7 +1,6 @@
 //  ast.hpp
 
-#ifndef ast_hpp
-#define ast_hpp
+#pragma once
 
 #include "Visitor.h"
 #include "Token.hpp"
@@ -51,5 +50,3 @@ private:
 	Token op;
 };
 
-
-#endif

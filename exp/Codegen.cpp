@@ -88,16 +88,16 @@ void Codegen::visit(BinaryExpression *expression)
 	}
 
 	switch (op) {
-		case Add:
+		case Token::Add:
 			add(source.value, dest.value);
 			break;
-		case Subtract:
+		case Token::Subtract:
 			sub(source.value, dest.value);
 			break;
-		case Multiply:
+		case Token::Multiply:
 			mult(source.value, dest.value);
 			break;
-		case Divide:
+		case Token::Divide:
 			divide(source.value, dest.value);
 			break;
 		default:
