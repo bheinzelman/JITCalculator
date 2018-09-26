@@ -23,6 +23,8 @@ int Calculator::calculate() const
 	Parser parser(std::make_shared<Lexer>(lex));
 	auto ast = parser.parse();
 	
+	assert(ast);
+	
 	Interpreter interpreter(ast);
 	return interpreter.interpret();
 	
