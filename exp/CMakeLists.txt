@@ -8,6 +8,10 @@ file(GLOB Src
 )
 
 find_library(READLINE_LIB readline)
+if (NOT READLINE_LIB)
+	find_library(READLINE_LIB edit)
+endif()
+
 add_executable(main ${Src})
 target_link_libraries(main ${READLINE_LIB})
 
