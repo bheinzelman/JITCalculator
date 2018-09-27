@@ -3,9 +3,6 @@
 #include "ast.hpp"
 #include "Token.hpp"
 
-Expression::~Expression()
-{
-}
 
 BasicExpression::BasicExpression(int value) : value(value)
 {

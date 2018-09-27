@@ -10,7 +10,9 @@
 class Expression
 {
 public:
-	virtual ~Expression();
+	virtual ~Expression()
+	{
+	}
 	
 	virtual void accept(Visitor *v)=0;
 };
