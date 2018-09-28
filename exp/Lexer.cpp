@@ -12,26 +12,22 @@ Token Lexer::currentToken() const {
 	return _currentToken;
 }
 
-bool Lexer::peekToken(Token *token, int *lexeme)
+bool Lexer::peekToken(Token *token, jcVariablePtr lexeme)
 {
 	int i = index;
 	Token t;
-	int value;
-	bool result = getNextToken(&t, &value);
+	bool result = getNextToken(&t, lexeme);
 	index = i;
 	
 	if (result) {
 		if (token != nullptr) {
 			*token = t;
 		}
-		if (lexeme != nullptr) {
-			*lexeme = value;
-		}
 	}
 	return result;
 }
 
-bool Lexer::getNextToken(Token *token, int *lexeme)
+bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 {
 	Token nextToken = Token::Error;
 	if (hasMoreChars()) {
@@ -56,6 +52,9 @@ bool Lexer::getNextToken(Token *token, int *lexeme)
 			case '*':
 				nextToken = Token::Multiply;
 				break;
+			case '=':
+				nextToken = Token::Assign;
+				break;
 			default:
 				break;
 		}
@@ -79,10 +78,29 @@ bool Lexer::getNextToken(Token *token, int *lexeme)
 			}
 			int value = atoi(numString.c_str());
 			if (lexeme != nullptr) {
-				*lexeme = value;
+				lexeme->setInt(value);
 			}
 			if (token != nullptr) {
 				*token = Token::Num;
+			}
+			return true;
+		} else if (isalpha(next)) {
+			std::string word(1, next);
+			
+			while (hasMoreChars() && isalpha(expression[index])) {
+				word += std::string(1, expression[index++]);
+				if (word == "let") {
+					if (token != nullptr) {
+						*token = Token::LetKw;
+					}
+					return true;
+				}
+			}
+			if (token != nullptr) {
+				*token = Token::Id;
+			}
+			if (lexeme != nullptr) {
+				lexeme->setString(word);
 			}
 			return true;
 		} else {

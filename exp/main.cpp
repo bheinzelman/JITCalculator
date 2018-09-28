@@ -43,8 +43,12 @@ void run_shell(std::ostream &stream) {
 			}
 		
 		} else {
-			Calculator c(exp);
-			stream << c.calculate() << "\n";
+			try {
+				Calculator c(exp);
+				stream << c.calculate() << "\n";
+			} catch (jcException excecption) {
+				stream << "jcException... " << excecption.getMessage() << std::endl;
+			}
 		}
 	}
 }

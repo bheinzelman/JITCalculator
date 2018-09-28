@@ -19,6 +19,8 @@
 		3C3CA723215C2B1D00956902 /* Codegen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BBF200DC3A6004DFF87 /* Codegen.cpp */; };
 		3C3CA726215C316100956902 /* bc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C3CA724215C316100956902 /* bc.cpp */; };
 		3C3CA727215C316A00956902 /* bc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C3CA724215C316100956902 /* bc.cpp */; };
+		3C3CA75C215D4BE000956902 /* jcVariable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C3CA75A215D4BE000956902 /* jcVariable.cpp */; };
+		3C3CA75D215D4ECC00956902 /* jcVariable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C3CA75A215D4BE000956902 /* jcVariable.cpp */; };
 		3C8E3BB1200DBC38004DFF87 /* Token.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB0200DBC38004DFF87 /* Token.cpp */; };
 		3C8E3BB4200DBC7F004DFF87 /* Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB2200DBC7F004DFF87 /* Lexer.cpp */; };
 		3C8E3BB8200DBE10004DFF87 /* ast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BB6200DBE10004DFF87 /* ast.cpp */; };
@@ -50,6 +52,8 @@
 		3C3CA719215C297200956902 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3C3CA724215C316100956902 /* bc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bc.cpp; sourceTree = "<group>"; };
 		3C3CA725215C316100956902 /* bc.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = bc.hpp; sourceTree = "<group>"; };
+		3C3CA75A215D4BE000956902 /* jcVariable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcVariable.cpp; sourceTree = "<group>"; };
+		3C3CA75B215D4BE000956902 /* jcVariable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcVariable.hpp; sourceTree = "<group>"; };
 		3C8E3BAF200DBBBE004DFF87 /* Token.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Token.hpp; sourceTree = "<group>"; };
 		3C8E3BB0200DBC38004DFF87 /* Token.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Token.cpp; sourceTree = "<group>"; };
 		3C8E3BB2200DBC7F004DFF87 /* Lexer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Lexer.cpp; sourceTree = "<group>"; };
@@ -144,6 +148,8 @@
 				3C3CA70C215C0FAD00956902 /* jc.h */,
 				3C3CA724215C316100956902 /* bc.cpp */,
 				3C3CA725215C316100956902 /* bc.hpp */,
+				3C3CA75A215D4BE000956902 /* jcVariable.cpp */,
+				3C3CA75B215D4BE000956902 /* jcVariable.hpp */,
 			);
 			path = exp;
 			sourceTree = "<group>";
@@ -243,6 +249,7 @@
 				3C3CA718215C297200956902 /* units.mm in Sources */,
 				3C3CA71F215C2B1200956902 /* Lexer.cpp in Sources */,
 				3C3CA721215C2B1800956902 /* Parser.cpp in Sources */,
+				3C3CA75D215D4ECC00956902 /* jcVariable.cpp in Sources */,
 				3C3CA727215C316A00956902 /* bc.cpp in Sources */,
 				3C3CA722215C2B1A00956902 /* Interpreter.cpp in Sources */,
 				3C3CA71D215C2B0B00956902 /* Calculator.cpp in Sources */,
@@ -259,6 +266,7 @@
 				3CF2B62D1FE635250039F40B /* main.cpp in Sources */,
 				3C8E3BB4200DBC7F004DFF87 /* Lexer.cpp in Sources */,
 				3C8E3BBB200DBFAA004DFF87 /* Parser.cpp in Sources */,
+				3C3CA75C215D4BE000956902 /* jcVariable.cpp in Sources */,
 				3C3CA726215C316100956902 /* bc.cpp in Sources */,
 				3C8E3BBE200DC1BC004DFF87 /* Interpreter.cpp in Sources */,
 				3C17CCBD1FEA2B5100BE0474 /* Calculator.cpp in Sources */,

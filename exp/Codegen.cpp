@@ -1,6 +1,7 @@
 //  Codegen.cpp
 
 #include "Codegen.hpp"
+#include "jc.h"
 #include <iostream>
 
 static std::string MOV = "movl";
@@ -67,6 +68,11 @@ void Codegen::visit(BasicExpression *expression)
 	std::string stringVal = "$" + std::to_string(expression->getValue());
 	Operand op = Operand::operandWithNumberValue(stringVal);
 	stack.push(op);
+}
+
+void Codegen::visit(FunctionDecl *expression)
+{
+	JC_FAIL(); // not implemented
 }
 
 void Codegen::visit(BinaryExpression *expression)

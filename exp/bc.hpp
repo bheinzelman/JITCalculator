@@ -42,17 +42,19 @@ namespace bc
 	class Generator : Visitor
 	{
 	public:
-		Generator(std::shared_ptr<Expression> expression);
+		Generator(std::shared_ptr<Node> root);
 		
 		std::vector<Instruction> getInstructions();
 		
 		void visit(BasicExpression *expression);
 		
 		void visit(BinaryExpression *expression);
+		
+		void visit(FunctionDecl *function);
 	private:
 		
 	private:
-		std::shared_ptr<Expression> expression;
+		std::shared_ptr<Node> mRoot;
 		std::vector<Instruction> mOutput;
 	};
 	

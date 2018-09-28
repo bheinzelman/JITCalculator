@@ -36,7 +36,10 @@ int Calculator::calculate() const
 		std::cout << instruction.toString() << std::endl;
 	}
 #endif
+	if (output.size()) {
+		Interpreter interpreter(output);
+		return interpreter.interpret();
+	}
+	return 0;
 	
-	Interpreter interpreter(output);
-	return interpreter.interpret();
 }

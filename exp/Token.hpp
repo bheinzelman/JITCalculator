@@ -12,6 +12,9 @@ enum class Token
 	RParen,
 	Num,
 	Error,
+	LetKw,
+	Id,
+	Assign,
 	EndOfStream
 };
 

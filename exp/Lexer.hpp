@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Token.hpp"
+#include "jcVariable.hpp"
 
 class Lexer
 {
@@ -13,9 +14,9 @@ public:
 	
 	Token currentToken() const;
 	
-	bool peekToken(Token *token, int *lexeme=nullptr);
+	bool peekToken(Token *token, jcVariablePtr lexeme=nullptr);
 	
-	bool getNextToken(Token *token, int *lexeme=nullptr);
+	bool getNextToken(Token *token, jcVariablePtr lexeme=nullptr);
 	
 private:
 	std::string expression;

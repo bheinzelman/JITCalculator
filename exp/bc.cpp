@@ -62,15 +62,20 @@ namespace bc
 		return output;
 	}
 	
-	Generator::Generator(std::shared_ptr<Expression> expression) : expression(expression)
+	Generator::Generator(std::shared_ptr<Node> root) : mRoot(root)
 	{
 		
 	}
 	
 	std::vector<Instruction> Generator::getInstructions()
 	{
-		expression->accept(this);
+		mRoot->accept(this);
 		return mOutput;
+	}
+	
+	void Generator::visit(FunctionDecl *function)
+	{
+		//todo
 	}
 	
 	void Generator::visit(BasicExpression *expression)

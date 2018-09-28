@@ -52,3 +52,22 @@ Token BinaryExpression::getOperator() const
 {
 	return op;
 }
+
+FunctionDecl::FunctionDecl(const std::string &id, std::shared_ptr<Expression> exp) : mId(id), mExpression(exp)
+{
+}
+
+void FunctionDecl::accept(Visitor *v)
+{
+	v->visit(this);
+}
+
+std::string FunctionDecl::getId() const
+{
+	return mId;
+}
+
+std::shared_ptr<Expression> FunctionDecl::getExpression() const
+{
+	return mExpression;
+}

@@ -27,6 +27,7 @@ public:
 	void visit(BasicExpression *expression);
 	
 	void visit(BinaryExpression *expression);
+	void visit(FunctionDecl *expression);
 private:
 	std::shared_ptr<Expression> ast;
 	std::stack<Operand> stack;
