@@ -26,6 +26,7 @@ private:
 	
 	// Will return the error token if the next token is not an operator
 	Token peekOperator();
+    bool peekExpression();
 	
 	Token nextToken(jcVariablePtr lex);
 	Token peekToken();

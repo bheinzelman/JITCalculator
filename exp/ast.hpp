@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 static fourcc kExpressionType = 'expr';
 static fourcc kFunctionDeclType = 'decl';
@@ -50,6 +51,34 @@ private:
 	int value;
 };
 
+class VariableExpression : public Expression
+{
+public:
+    VariableExpression(std::string variableName);
+
+    std::string getVariableName() const;
+
+    void accept(Visitor *v) override;
+
+private:
+    std::string mVariableName;
+};
+
+class FunctionCallExpression : public Expression
+{
+public:
+    FunctionCallExpression(const std::string functionId, const std::vector<std::shared_ptr<Expression>> arguments);
+
+    std::string getFunctionId() const;
+    std::vector<std::shared_ptr<Expression>> getArguments() const;
+
+    void accept(Visitor *v) override;
+
+private:
+    std::string mFunctionId;
+    std::vector<std::shared_ptr<Expression>> mArguments;
+};
+
 class BinaryExpression : public Expression
 {
 public:
@@ -74,12 +103,13 @@ private:
 class FunctionDecl : public Node
 {
 public:
-	FunctionDecl(const std::string &id, std::shared_ptr<Expression> exp);
+    FunctionDecl(const std::string &id, std::shared_ptr<Expression> exp, std::vector<std::string> params);
 	
 	void accept(Visitor *v) override;
 	
 	std::string getId() const;
 	std::shared_ptr<Expression> getExpression() const;
+    std::vector<std::string> getParameters() const;
 	
 	fourcc type() const override
 	{
@@ -89,5 +119,6 @@ public:
 private:
 	std::string mId;
 	std::shared_ptr<Expression> mExpression;
+    std::vector<std::string> mParams;
 };
 

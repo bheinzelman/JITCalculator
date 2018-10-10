@@ -55,6 +55,9 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 			case '=':
 				nextToken = Token::Assign;
 				break;
+            case ',':
+                nextToken = Token::Comma;
+                break;
 			default:
 				break;
 		}

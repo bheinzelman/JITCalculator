@@ -53,7 +53,7 @@ Token BinaryExpression::getOperator() const
 	return op;
 }
 
-FunctionDecl::FunctionDecl(const std::string &id, std::shared_ptr<Expression> exp) : mId(id), mExpression(exp)
+FunctionDecl::FunctionDecl(const std::string &id, std::shared_ptr<Expression> exp, std::vector<std::string> params) : mId(id), mExpression(exp), mParams(params)
 {
 }
 
@@ -70,4 +70,43 @@ std::string FunctionDecl::getId() const
 std::shared_ptr<Expression> FunctionDecl::getExpression() const
 {
 	return mExpression;
+}
+
+std::vector<std::string> FunctionDecl::getParameters() const
+{
+    return mParams;
+}
+
+VariableExpression::VariableExpression(std::string variableName) : mVariableName(variableName)
+{
+}
+
+std::string VariableExpression::getVariableName() const
+{
+    return mVariableName;
+}
+
+void VariableExpression::accept(Visitor *v)
+{
+    v->visit(this);
+}
+
+FunctionCallExpression::FunctionCallExpression(const std::string functionId, const std::vector<std::shared_ptr<Expression>> arguments) : mFunctionId(functionId), mArguments(arguments)
+{
+
+}
+
+std::string FunctionCallExpression::getFunctionId() const
+{
+    return mFunctionId;
+}
+
+std::vector<std::shared_ptr<Expression>> FunctionCallExpression::getArguments() const
+{
+    return mArguments;
+}
+
+void FunctionCallExpression::accept(Visitor *v)
+{
+    v->visit(this);
 }

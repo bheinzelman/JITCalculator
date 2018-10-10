@@ -15,6 +15,7 @@ enum class Token
 	LetKw,
 	Id,
 	Assign,
+    Comma,
 	EndOfStream
 };
 

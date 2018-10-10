@@ -1,6 +1,6 @@
 //  main.cpp
 
-#include "Calculator.hpp"
+#include "Runtime.hpp"
 #include "Codegen.hpp"
 #include "Lexer.hpp"
 #include "Parser.hpp"
@@ -16,6 +16,8 @@
 
 void run_shell(std::ostream &stream) {
 	stream << "JITCalculator v" << JC_VERSION_STRING << "\n";
+
+    Runtime runtime;
 	while (true) {
 		const char *rawIn = readline(">>> ");
 		
@@ -44,8 +46,10 @@ void run_shell(std::ostream &stream) {
 		
 		} else {
 			try {
-				Calculator c(exp);
-				stream << c.calculate() << "\n";
+                int output;
+                if (runtime.evaluate(exp, &output)) {
+                    stream << output << std::endl;
+                }
 			} catch (jcException excecption) {
 				stream << "jcException... " << excecption.getMessage() << std::endl;
 			}

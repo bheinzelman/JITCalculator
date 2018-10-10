@@ -24,13 +24,16 @@ static int performArtithmaticOp(bc::Op op, int right, int left)
 	}
 }
 
-Interpreter::Interpreter(std::vector<bc::Instruction> instructions): mInstructions(instructions)
+Interpreter::Interpreter(std::vector<bc::Instruction> instructions, SymbolTable &symbols): mSymbols(symbols)
 {
+    mInstructionStack.push(instructions);
 }
 
 int Interpreter::interpret()
 {
-	for (auto instruction : mInstructions) {
+    mVariableLut.push(std::map<std::string, int>());
+
+	for (auto instruction : mInstructionStack.top()) {
 		bc::Op op = instruction.getOp();
 		
 		switch (op) {
@@ -38,31 +41,58 @@ int Interpreter::interpret()
 			case bc::Subtract:
 			case bc::Multiply:
 			case bc::Divide: {
-				int right = popStack();
-				int left = popStack();
-				mStack.push(performArtithmaticOp(op, right, left));
+				jcVariablePtr right = popStack();
+				jcVariablePtr left = popStack();
+
+                jcVariablePtr result = jcVariable::Create();
+                result->setInt(performArtithmaticOp(op, resolveVariable(right), resolveVariable(left)));
+				mStack.push(result);
 				break;
 			}
 			case bc::Push:
 				mStack.push(instruction.getOperand(0));
 				break;
-			case bc::Pop:
-				// not implemented
-				JC_FAIL();
+            case bc::Pop: {
+                jcVariablePtr variableName = instruction.getOperand(0);
+                mVariableLut.top()[variableName->asString()] = resolveVariable(popStack());
 				break;
+            }
+            case bc::Call: {
+                jcVariablePtr functionName = instruction.getOperand(0);
+                auto instructionsCtx = mSymbols.getContext(functionName->asString());
+                mInstructionStack.push(instructionsCtx->getInstructions());
+
+                int returnValue = interpret();
+                jcVariablePtr returnValuePtr = jcVariable::Create();
+                returnValuePtr->setInt(returnValue);
+                mStack.push(returnValuePtr);
+                break;
+            }
 			default:
 				JC_FAIL();
 				break;
 		}
 	}
-	JC_ASSERT(mStack.size() == 1);
-	return popStack();
+    mInstructionStack.pop();
+    mVariableLut.pop();
+
+	return popStack()->asInt();
 }
 
-int Interpreter::popStack()
+int Interpreter::resolveVariable(jcVariablePtr var)
+{
+    if (var->getType() == jcVariable::TypeInt) {
+        return var->asInt();
+    } else {
+        JC_ASSERT_OR_THROW(mVariableLut.top().count(var->asString()) > 0, "undefined variable");
+        return mVariableLut.top()[var->asString()];
+    }
+}
+
+jcVariablePtr Interpreter::popStack()
 {
 	JC_ASSERT(mStack.size());
-	int top = mStack.top();
+	auto top = mStack.top();
 	mStack.pop();
 	return top;
 }

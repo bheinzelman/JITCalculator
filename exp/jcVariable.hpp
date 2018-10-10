@@ -16,6 +16,12 @@ class jcVariable
 {
 	jcVariable();
 public:
+    enum Type {
+        TypeString,
+        TypeInt,
+        TypeNone
+    };
+
 	static jcVariablePtr Create();
 	
 	~jcVariable();
@@ -25,18 +31,17 @@ public:
 	
 	void setString(const std::string &str);
 	void setInt(const int val);
+
+    inline Type getType() const {
+        return mCurrentType;
+    }
 	
 private:
 	void willSet();
 	
 private:
-	enum type {
-		TypeString,
-		TypeInt,
-		TypeNone
-	};
 	
-	type mCurrentType;
+	Type mCurrentType;
 	
 	union {
 		char *mStr;

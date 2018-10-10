@@ -22,6 +22,13 @@ std::shared_ptr<Node> Parser::parse()
 	}
 }
 
+bool Parser::peekExpression()
+{
+    return peekToken() == Token::Num ||
+        peekToken() == Token::LParen ||
+        peekToken() == Token::Id;
+}
+
 std::shared_ptr<Expression> Parser::getTerm()
 {
 	jcVariablePtr value = jcVariable::Create();
@@ -32,8 +39,33 @@ std::shared_ptr<Expression> Parser::getTerm()
 		auto exp = getExpression();
 		eat(Token::RParen);
 		return exp;
-	}
-	JC_THROW("Could not parse term");
+    } else if (tok == Token::Id) {
+        if (peekToken() == Token::LParen) {
+            //function
+            eat(Token::LParen);
+            std::vector<std::shared_ptr<Expression>> args;
+            while (1) {
+                if (peekExpression() == false) {
+                    break;
+                }
+
+                auto argument = getExpression();
+
+                args.push_back(argument);
+
+                if (peekToken() != Token::RParen) {
+                    eat(Token::Comma);
+                }
+            }
+
+            eat(Token::RParen);
+            return std::make_shared<FunctionCallExpression>(value->asString(), args);
+        } else {
+            //variable
+            return std::make_shared<VariableExpression>(value->asString());
+        }
+    }
+    return nullptr;
 }
 	
 Token Parser::peekOperator()
@@ -61,12 +93,26 @@ std::shared_ptr<FunctionDecl> Parser::getFunctionDecl()
 	JC_ASSERT_OR_THROW(tok == Token::Id, "Expected an ID");
 	
 	eat(Token::LParen);
-	/* Params */
+
+    std::vector<std::string> funcParams;
+    while (peekToken() == Token::Id) {
+        jcVariablePtr var = jcVariable::Create();
+        nextToken(var);
+
+        funcParams.push_back(var->asString());
+
+        if (peekToken() != Token::Comma) {
+            break;
+        }
+
+        eat(Token::Comma);
+    }
 	eat(Token::RParen);
 	eat(Token::Assign);
 	auto exp = getExpression();
+    JC_ASSERT_OR_THROW(exp != nullptr, "Function must have expression");
 	
-	auto decl = std::make_shared<FunctionDecl>(idLex->asString(), exp);
+	auto decl = std::make_shared<FunctionDecl>(idLex->asString(), exp, funcParams);
 	return decl;
 }
 	

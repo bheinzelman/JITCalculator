@@ -4,6 +4,7 @@
 
 #include "ast.hpp"
 #include "Visitor.h"
+#include "jcVariable.hpp"
 
 #include <vector>
 #include <stack>
@@ -19,24 +20,25 @@ namespace bc
 		Add,
 		Subtract,
 		Multiply,
-		Divide
+		Divide,
+        Call
 	};
 	
 	class Instruction
 	{
 	public:
-		Instruction(bc::Op op, std::vector<int> operands);
+		Instruction(bc::Op op, std::vector<jcVariablePtr> operands);
 		
 		int numOperands() const;
 		
-		int getOperand(int idx) const;
+		jcVariablePtr getOperand(int idx) const;
 		
 		bc::Op getOp() const;
 		
 		std::string toString() const;
 	private:
 		bc::Op mOp;
-		std::vector<int> mOperands;
+		std::vector<jcVariablePtr> mOperands;
 	};
 	
 	class Generator : Visitor
@@ -49,8 +51,12 @@ namespace bc
 		void visit(BasicExpression *expression);
 		
 		void visit(BinaryExpression *expression);
+
+        void visit(FunctionCallExpression *expression);
 		
 		void visit(FunctionDecl *function);
+
+        void visit(VariableExpression *expression);
 	private:
 		
 	private:

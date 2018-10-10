@@ -4,6 +4,7 @@
 #include "jc.h"
 
 #include <string>
+#include <algorithm>
 
 namespace bc
 {
@@ -29,7 +30,7 @@ namespace bc
 		return "";
 	}
 	
-	Instruction::Instruction(bc::Op op, std::vector<int> operands) : mOp(op), mOperands(operands)
+	Instruction::Instruction(bc::Op op, std::vector<jcVariablePtr> operands) : mOp(op), mOperands(operands)
 	{
 	}
 	
@@ -38,7 +39,7 @@ namespace bc
 		return (int)mOperands.size();
 	}
 	
-	int Instruction::getOperand(int idx) const
+	jcVariablePtr Instruction::getOperand(int idx) const
 	{
 		JC_ASSERT(idx < mOperands.size());
 		return mOperands[idx];
@@ -53,7 +54,7 @@ namespace bc
 	{
 		std::string output = opToString(mOp) + " ";
 		for (int i = 0; i < mOperands.size(); i++) {
-			int operand = mOperands[i];
+			int operand = mOperands[i]->asInt();
 			output += std::to_string(operand);
 			if (i < mOperands.size() - 1) {
 				output += ", ";
@@ -75,14 +76,43 @@ namespace bc
 	
 	void Generator::visit(FunctionDecl *function)
 	{
-		//todo
+        for (std::string param : function->getParameters()) {
+            jcVariablePtr paramVar = jcVariable::Create();
+            paramVar->setString(param);
+            Instruction popOp = Instruction(bc::Pop, {paramVar});
+            mOutput.push_back(popOp);
+        }
+        function->getExpression()->accept(this);
 	}
+
+    void Generator::visit(VariableExpression *expression)
+    {
+        jcVariablePtr varId = jcVariable::Create();
+        varId->setString(expression->getVariableName());
+        Instruction pushOp = Instruction(bc::Push, {varId});
+        mOutput.push_back(pushOp);
+    }
 	
 	void Generator::visit(BasicExpression *expression)
 	{
-		Instruction pushOp = Instruction(bc::Push, {expression->getValue()});
+        jcVariablePtr expressionVal = jcVariable::Create();
+        expressionVal->setInt(expression->getValue());
+		Instruction pushOp = Instruction(bc::Push, {expressionVal});
 		mOutput.push_back(pushOp);
 	}
+
+    void Generator::visit(FunctionCallExpression *expression)
+    {
+        auto arguments = expression->getArguments();
+        std::reverse(std::begin(arguments), std::end(arguments));
+        for (auto arg : arguments) {
+            arg->accept(this);
+        }
+        jcVariablePtr functionName = jcVariable::Create();
+        functionName->setString(expression->getFunctionId());
+        Instruction callInstruction = Instruction(bc::Call, {functionName});
+        mOutput.push_back(callInstruction);
+    }
 	
 	void Generator::visit(BinaryExpression *expression)
 	{
