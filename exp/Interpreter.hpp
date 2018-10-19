@@ -15,17 +15,24 @@
 class Interpreter
 {
 public:
-	Interpreter(std::vector<bc::Instruction> entryPoint, SymbolTable &symbols);
+	Interpreter();
 	
-	int interpret();
+	int interpret(std::vector<bc::Instruction> instructions, int startingPoint);
 private:
 	jcVariablePtr popStack();
 
     int resolveVariable(jcVariablePtr var);
+    bool resolveRuntimeVariable(std::string var, int *output);
+    void setVariable(std::string var, jcVariablePtr to);
+
+    void mapLabels(std::vector<bc::Instruction> instructions);
 	
 private:
-    std::stack<std::vector<bc::Instruction>> mInstructionStack;
 	std::stack<jcVariablePtr> mStack;
     std::stack<std::map<std::string, int>> mVariableLut;
-    SymbolTable mSymbols;
+
+    // instruction pointer
+    int mIp;
+
+    std::map<std::string, int> mLabelLut;
 };

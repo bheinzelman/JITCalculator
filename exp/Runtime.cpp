@@ -31,20 +31,28 @@ bool Runtime::evaluate(std::string expression, int *value)
 	
 	bc::Generator bcGenerator(ast);
 	auto output = bcGenerator.getInstructions();
-#if 0
-	for (auto instruction : output) {
-		std::cout << instruction.toString() << std::endl;
-	}
-#endif
+
 	if (output.size()) {
         if (ast->type() == kFunctionDeclType) {
             std::shared_ptr<FunctionDecl> functionDecl = std::static_pointer_cast<FunctionDecl>(ast);
             mSymbols.setContext(functionDecl->getId(), output, functionDecl);
             return false;
         }
+
+        output.push_back(bc::Instruction(bc::Exit, {}));
+
+#if 0
+        for (auto instruction : output) {
+            std::cout << instruction.toString() << std::endl;
+        }
+#endif
         
-		Interpreter interpreter(output, mSymbols);
-        int myValue = interpreter.interpret();
+		Interpreter interpreter;
+
+        std::vector<bc::Instruction> instructions = mSymbols.asInstructionList();
+        output.insert(output.end(), instructions.begin(), instructions.end());
+
+        int myValue = interpreter.interpret(output, 0);
         if (value) {
             *value = myValue;
         }

@@ -23,6 +23,8 @@ public:
     };
 
 	static jcVariablePtr Create();
+    static jcVariablePtr Create(std::string value);
+    static jcVariablePtr Create(int value);
 	
 	~jcVariable();
 	

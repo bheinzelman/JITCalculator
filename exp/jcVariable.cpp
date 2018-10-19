@@ -8,6 +8,20 @@ jcVariablePtr jcVariable::Create()
 	return std::make_shared<jcVariable>(jcVariable());
 }
 
+jcVariablePtr jcVariable::Create(std::string value)
+{
+    auto me = jcVariable::Create();
+    me->setString(value);
+    return me;
+}
+
+jcVariablePtr jcVariable::Create(int value)
+{
+    auto me = jcVariable::Create();
+    me->setInt(value);
+    return me;
+}
+
 jcVariable::jcVariable() : mCurrentType(TypeNone)
 {
 }

@@ -21,8 +21,16 @@ namespace bc
 				return "DIV";
 			case bc::Push:
 				return "PUSH";
+            case bc::Set:
+                return "SET";
 			case bc::Pop:
 				return "POP";
+            case bc::Ret:
+                return "RET";
+            case bc::Exit:
+                return "EXIT";
+            case bc::Call:
+                return "CALL";
 			default:
 				JC_FAIL();
 				break;
@@ -33,6 +41,10 @@ namespace bc
 	Instruction::Instruction(bc::Op op, std::vector<jcVariablePtr> operands) : mOp(op), mOperands(operands)
 	{
 	}
+
+    Instruction::Instruction(bc::Op op) : mOp(op)
+    {
+    }
 	
 	int Instruction::numOperands() const
 	{
@@ -76,27 +88,42 @@ namespace bc
 	
 	void Generator::visit(FunctionDecl *function)
 	{
+        const std::string tmpIp = "_ip";
+
+        Instruction functionLabel = Instruction(bc::Label, {jcVariable::Create(function->getId())});
+        mOutput.push_back(functionLabel);
+        
+        Instruction popIp = Instruction(bc::Pop, {jcVariable::Create(tmpIp)});
+        mOutput.push_back(popIp);
+
         for (std::string param : function->getParameters()) {
-            jcVariablePtr paramVar = jcVariable::Create();
-            paramVar->setString(param);
+            jcVariablePtr paramVar = jcVariable::Create(param);
             Instruction popOp = Instruction(bc::Pop, {paramVar});
             mOutput.push_back(popOp);
         }
+
         function->getExpression()->accept(this);
+
+        Instruction setIp = Instruction(bc::Set, {
+            jcVariable::Create(bc::vars::ip),
+            jcVariable::Create(tmpIp)
+        });
+        mOutput.push_back(setIp);
+
+        Instruction returnInstruction = Instruction(bc::Ret, {});
+        mOutput.push_back(returnInstruction);
 	}
 
     void Generator::visit(VariableExpression *expression)
     {
-        jcVariablePtr varId = jcVariable::Create();
-        varId->setString(expression->getVariableName());
+        jcVariablePtr varId = jcVariable::Create(expression->getVariableName());
         Instruction pushOp = Instruction(bc::Push, {varId});
         mOutput.push_back(pushOp);
     }
 	
 	void Generator::visit(BasicExpression *expression)
 	{
-        jcVariablePtr expressionVal = jcVariable::Create();
-        expressionVal->setInt(expression->getValue());
+        jcVariablePtr expressionVal = jcVariable::Create(expression->getValue());
 		Instruction pushOp = Instruction(bc::Push, {expressionVal});
 		mOutput.push_back(pushOp);
 	}
@@ -108,8 +135,13 @@ namespace bc
         for (auto arg : arguments) {
             arg->accept(this);
         }
-        jcVariablePtr functionName = jcVariable::Create();
-        functionName->setString(expression->getFunctionId());
+
+        // push instruction pointer
+        mOutput.push_back(Instruction(bc::Push, {jcVariable::Create(vars::ip)}));
+        mOutput.push_back(Instruction(bc::Push, {jcVariable::Create(1)}));
+        mOutput.push_back(Instruction(bc::Add));
+
+        jcVariablePtr functionName = jcVariable::Create(expression->getFunctionId());
         Instruction callInstruction = Instruction(bc::Call, {functionName});
         mOutput.push_back(callInstruction);
     }

@@ -29,6 +29,7 @@
 		3C8E3BC1200DC3A6004DFF87 /* Codegen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E3BBF200DC3A6004DFF87 /* Codegen.cpp */; };
 		3CF2B62D1FE635250039F40B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2B62C1FE635250039F40B /* main.cpp */; };
 		4EFF2131216DA85100E57AC5 /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4EFF212F216DA85100E57AC5 /* SymbolTable.cpp */; };
+		4EFF2132216E7F0F00E57AC5 /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4EFF212F216DA85100E57AC5 /* SymbolTable.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -258,6 +259,7 @@
 				3C3CA727215C316A00956902 /* bc.cpp in Sources */,
 				3C3CA722215C2B1A00956902 /* Interpreter.cpp in Sources */,
 				3C3CA71D215C2B0B00956902 /* Runtime.cpp in Sources */,
+				4EFF2132216E7F0F00E57AC5 /* SymbolTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,7 +292,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = WSG985FR47;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = units/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = team.units;
@@ -306,7 +308,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = WSG985FR47;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = units/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = team.units;
@@ -422,7 +424,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WSG985FR47;
+				DEVELOPMENT_TEAM = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -433,7 +435,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WSG985FR47;
+				DEVELOPMENT_TEAM = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};

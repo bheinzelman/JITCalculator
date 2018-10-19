@@ -42,6 +42,8 @@ public:
 
     void setContext(const std::string &functionName, const std::vector<bc::Instruction> &instructions, const std::shared_ptr<FunctionDecl> decl);
 
+    std::vector<bc::Instruction> asInstructionList() const;
+
 private:
     std::map<std::string, std::shared_ptr<SymbolContext>> mLut;
 

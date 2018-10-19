@@ -14,3 +14,14 @@ void SymbolTable::setContext(const std::string &functionName, const std::vector<
 {
     mLut[functionName] = SymbolContext::Create(instructions, decl);
 }
+
+std::vector<bc::Instruction> SymbolTable::asInstructionList() const
+{
+    std::vector<bc::Instruction> instructions = {};
+    for (auto keyVal : mLut) {
+        for (auto instruction : keyVal.second->getInstructions()) {
+            instructions.push_back(instruction);
+        }
+    }
+    return instructions;
+}

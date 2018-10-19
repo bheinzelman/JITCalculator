@@ -16,18 +16,35 @@ namespace bc
 	enum Op
 	{
 		Push,
+        Set,
+        Ret,
 		Pop,
 		Add,
 		Subtract,
 		Multiply,
 		Divide,
-        Call
+        Call,
+        Label,
+        Exit,
 	};
-	
+
+    /**
+     * runtime variables
+     */
+    namespace vars {
+        // instruction pointer
+        const std::string ip = "$ip";
+        // base pointer
+        const std::string bp = "$bp";
+        // stack pointer
+        const std::string sp = "$sp";
+    }
+
 	class Instruction
 	{
 	public:
 		Instruction(bc::Op op, std::vector<jcVariablePtr> operands);
+        Instruction(bc::Op op);
 		
 		int numOperands() const;
 		

@@ -91,23 +91,26 @@ std::shared_ptr<FunctionDecl> Parser::getFunctionDecl()
 	Token tok = nextToken(idLex);
 	
 	JC_ASSERT_OR_THROW(tok == Token::Id, "Expected an ID");
-	
-	eat(Token::LParen);
-
     std::vector<std::string> funcParams;
-    while (peekToken() == Token::Id) {
-        jcVariablePtr var = jcVariable::Create();
-        nextToken(var);
+    
+    if (peekToken() == Token::LParen) {
+        eat(Token::LParen);
 
-        funcParams.push_back(var->asString());
+        while (peekToken() == Token::Id) {
+            jcVariablePtr var = jcVariable::Create();
+            nextToken(var);
 
-        if (peekToken() != Token::Comma) {
-            break;
+            funcParams.push_back(var->asString());
+
+            if (peekToken() != Token::Comma) {
+                break;
+            }
+
+            eat(Token::Comma);
         }
-
-        eat(Token::Comma);
+        eat(Token::RParen);
     }
-	eat(Token::RParen);
+
 	eat(Token::Assign);
 	auto exp = getExpression();
     JC_ASSERT_OR_THROW(exp != nullptr, "Function must have expression");
