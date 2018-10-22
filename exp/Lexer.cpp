@@ -58,13 +58,19 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
             case ',':
                 nextToken = Token::Comma;
                 break;
+            case '>':
+                nextToken = Token::Greater_Than;
+                break;
+            case '<':
+                nextToken = Token::Less_Than;
+                break;
 			default:
 				break;
 		}
 		
 		if (nextToken != Token::Error) {
 			if (token != nullptr) {
-				*token = nextToken;
+				*token = resolveTwoCharOperator(nextToken);
 			}
 			return true;
 		}
@@ -119,6 +125,25 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 		}
 	}
 	return false;
+}
+
+Token Lexer::resolveTwoCharOperator(Token firstOperator)
+{
+    Token returnToken = firstOperator;
+    Token peek;
+    if (peekToken(&peek, nullptr)) {
+        if (firstOperator == Token::Greater_Than && peek == Token::Assign) {
+            returnToken = Token::Greater_Than_Equal;
+        } else if (firstOperator == Token::Less_Than && peek == Token::Assign) {
+            returnToken = Token::Less_Than_Equal;
+        } else if (firstOperator == Token::Assign && peek == Token::Assign) {
+            returnToken = Token::Equals;
+        }
+    }
+    if (returnToken != firstOperator) {
+        getNextToken(nullptr);
+    }
+    return returnToken;
 }
 
 char Lexer::peek()

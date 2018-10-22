@@ -21,7 +21,6 @@ public:
 	
 private:
     std::istream &mInput;
-//    int index;
 	Token _currentToken;
 	
 private:
@@ -35,5 +34,7 @@ private:
 	bool nextNonWhitespaceChar(char *c);
 	
 	bool hasMoreChars();
+
+    Token resolveTwoCharOperator(Token firstOperator);
 };
 

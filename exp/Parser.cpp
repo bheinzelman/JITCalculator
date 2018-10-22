@@ -88,6 +88,11 @@ Token Parser::peekOperator()
 		case Token::Subtract:
 		case Token::Divide:
 		case Token::Multiply:
+        case Token::Less_Than:
+        case Token::Greater_Than:
+        case Token::Less_Than_Equal:
+        case Token::Greater_Than_Equal:
+        case Token::Equals:
 			return tok;
 		default:
 			break;

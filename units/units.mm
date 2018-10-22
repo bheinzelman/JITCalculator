@@ -25,6 +25,14 @@
 			 @{@"value": @99, @"exp": @"(5 - 1) * 5 * 5 - 1"},
              @{@"value": @0, @"exp": @"let add(x,y) = x + y"},
              @{@"value": @4, @"exp": @"add(add(1,1), add(1,1))"},
+             @{@"value": @0, @"exp": @"2 > 3"},
+             @{@"value": @1, @"exp": @"2 < 3"},
+             @{@"value": @0, @"exp": @"2 >= 3"},
+             @{@"value": @1, @"exp": @"2 >= 1"},
+             @{@"value": @1, @"exp": @"2 <= 3"},
+             @{@"value": @1, @"exp": @"2 <= 2"},
+             @{@"value": @1, @"exp": @"2 == 2"},
+             @{@"value": @1, @"exp": @"(1 == 2) == 0"},
 			 ];
 }
 
@@ -41,8 +49,10 @@
         try {
             std::vector<int> output;
             if (rt.evaluate(stream, output)) {
-                if (output.size())
+                if (output.size()) {
                     XCTAssert(output.front() == expected);
+                    assert(output.front() == expected);
+                }
             }
         } catch (jcException exception) {
             std::cerr << exception.getMessage() << std::endl;

@@ -18,6 +18,16 @@ static int performArtithmaticOp(bc::Op op, int right, int left)
 			return left * right;
 		case bc::Divide:
 			return left / right;
+        case bc::Greater_Than:
+            return left > right;
+        case bc::Less_Than:
+            return left < right;
+        case bc::Greater_Than_Equal:
+            return left >= right;
+        case bc::Less_Than_Equal:
+            return left <= right;
+        case bc::Equals:
+            return left == right;
 		default:
 			JC_FAIL();
 			break;
@@ -54,7 +64,12 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
 			case bc::Add:
 			case bc::Subtract:
 			case bc::Multiply:
-			case bc::Divide: {
+			case bc::Divide:
+            case bc::Greater_Than:
+            case bc::Less_Than:
+            case bc::Less_Than_Equal:
+            case bc::Greater_Than_Equal:
+            case bc::Equals: {
 				jcVariablePtr right = popStack();
 				jcVariablePtr left = popStack();
 

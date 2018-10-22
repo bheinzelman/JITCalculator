@@ -31,6 +31,16 @@ namespace bc
                 return "EXIT";
             case bc::Call:
                 return "CALL";
+            case bc::Less_Than:
+                return "LESS_THAN";
+            case bc::Greater_Than:
+                return "GREATER_THAN";
+            case bc::Less_Than_Equal:
+                return "LESS_THAN_EQUAL";
+            case bc::Greater_Than_Equal:
+                return "GREATER_THAN_EQUAL";
+            case bc::Equals:
+                return "EQUALS";
 			default:
 				JC_FAIL();
 				break;
@@ -167,6 +177,21 @@ namespace bc
 			case Token::Divide:
 				bytecodeOp = bc::Divide;
 				break;
+            case Token::Greater_Than:
+                bytecodeOp = bc::Greater_Than;
+                break;
+            case Token::Less_Than:
+                bytecodeOp = bc::Less_Than;
+                break;
+            case Token::Less_Than_Equal:
+                bytecodeOp = bc::Less_Than_Equal;
+                break;
+            case Token::Greater_Than_Equal:
+                bytecodeOp = bc::Greater_Than_Equal;
+                break;
+            case Token::Equals:
+                bytecodeOp = bc::Equals;
+                break;
 			default:
 				JC_FAIL();
 		}
