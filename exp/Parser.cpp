@@ -12,9 +12,21 @@ Parser::Parser(std::shared_ptr<Lexer> lexer) : lex(lexer)
 {
 }
 
-
-std::shared_ptr<Node> Parser::parse()
+std::vector<std::shared_ptr<Node>> Parser::parse()
 {
+    std::vector<std::shared_ptr<Node>> output;
+    while (auto node = parseLine()) {
+        output.push_back(node);
+    }
+    return output;
+}
+
+std::shared_ptr<Node> Parser::parseLine()
+{
+    if (peekToken() == Token::EndOfStream) {
+        return nullptr;
+    }
+
 	if (peekToken() == Token::LetKw) {
 		return getFunctionDecl();
 	} else {
@@ -132,7 +144,9 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
 			} else {
 				break;
 			}
-		}
+        } else if (op == Token::EndOfStream) {
+            break;
+        }
 		
 		// skip the token
 		nextToken(nullptr);

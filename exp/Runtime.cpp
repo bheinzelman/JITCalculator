@@ -16,48 +16,51 @@
 #include <memory>
 #include <cstring>
 #include <cstdlib>
+#include <sstream>
 
 Runtime::Runtime()
 {
 }
 
-bool Runtime::evaluate(std::string expression, int *value)
+bool Runtime::evaluate(std::istream &stream, std::vector<int> &outputValues)
 {
-	Lexer lex(expression);
-	Parser parser(std::make_shared<Lexer>(lex));
-	auto ast = parser.parse();
-	
-	JC_ASSERT(ast);
-	
-	bc::Generator bcGenerator(ast);
-	auto output = bcGenerator.getInstructions();
+    Lexer lex(stream);
+    Parser parser(std::make_shared<Lexer>(lex));
+    std::vector<std::shared_ptr<Node>> nodes = parser.parse();
 
-	if (output.size()) {
-        if (ast->type() == kFunctionDeclType) {
-            std::shared_ptr<FunctionDecl> functionDecl = std::static_pointer_cast<FunctionDecl>(ast);
-            mSymbols.setContext(functionDecl->getId(), output, functionDecl);
-            return false;
-        }
+    if (nodes.size() == 0) {
+        return false;
+    }
 
-        output.push_back(bc::Instruction(bc::Exit, {}));
+    for (auto ast : nodes) {
+        JC_ASSERT(ast);
+
+        bc::Generator bcGenerator(ast);
+        auto output = bcGenerator.getInstructions();
+
+        if (output.size()) {
+            if (ast->type() == kFunctionDeclType) {
+                std::shared_ptr<FunctionDecl> functionDecl = std::static_pointer_cast<FunctionDecl>(ast);
+                mSymbols.setContext(functionDecl->getId(), output, functionDecl);
+                continue;
+            }
+
+            output.push_back(bc::Instruction(bc::Exit, {}));
 
 #if 0
-        for (auto instruction : output) {
-            std::cout << instruction.toString() << std::endl;
-        }
+            for (auto instruction : output) {
+                std::cout << instruction.toString() << std::endl;
+            }
 #endif
-        
-		Interpreter interpreter;
 
-        std::vector<bc::Instruction> instructions = mSymbols.asInstructionList();
-        output.insert(output.end(), instructions.begin(), instructions.end());
+            Interpreter interpreter;
 
-        int myValue = interpreter.interpret(output, 0);
-        if (value) {
-            *value = myValue;
+            std::vector<bc::Instruction> instructions = mSymbols.asInstructionList();
+            output.insert(output.end(), instructions.begin(), instructions.end());
+
+            int myValue = interpreter.interpret(output, 0);
+            outputValues.push_back(myValue);
         }
-        return true;
-	}
-    return false;
-	
+    }
+    return true;
 }

@@ -14,8 +14,9 @@ class Parser
 {
 public:
 	Parser(std::shared_ptr<Lexer> lexer);
-	
-	std::shared_ptr<Node> parse();
+
+    std::vector<std::shared_ptr<Node>> parse();
+	std::shared_ptr<Node> parseLine();
 	
 	// private member variables
 private:

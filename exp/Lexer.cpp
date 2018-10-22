@@ -3,9 +3,8 @@
 #include "Lexer.hpp"
 #include "Token.hpp"
 
-Lexer::Lexer(std::string expression) : expression(expression)
+Lexer::Lexer(std::istream &inputStream) : mInput(inputStream)
 {
-	this->index = 0;
 }
 
 Token Lexer::currentToken() const {
@@ -14,10 +13,11 @@ Token Lexer::currentToken() const {
 
 bool Lexer::peekToken(Token *token, jcVariablePtr lexeme)
 {
-	int i = index;
+    int64_t i = position();
+
 	Token t;
 	bool result = getNextToken(&t, lexeme);
-	index = i;
+    seekPosition(i);
 	
 	if (result) {
 		if (token != nullptr) {
@@ -73,8 +73,8 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 		if (isdigit(next)) {
 			std::string numString = "";
 			numString += next;
-			while (isdigit(expression[index])) {
-				numString += expression[index++];
+			while (isdigit(peek())) {
+				numString += nextChar();
 				if (!hasMoreChars()) {
 					break;
 				}
@@ -90,8 +90,8 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 		} else if (isalpha(next)) {
 			std::string word(1, next);
 			
-			while (hasMoreChars() && isalpha(expression[index])) {
-				word += std::string(1, expression[index++]);
+			while (hasMoreChars() && isalpha(peek())) {
+				word += std::string(1, nextChar());
 				if (word == "let") {
 					if (token != nullptr) {
 						*token = Token::LetKw;
@@ -121,29 +121,45 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 	return false;
 }
 
+char Lexer::peek()
+{
+    return mInput.peek();
+}
+
+char Lexer::nextChar()
+{
+    return mInput.get();
+}
+
+int64_t Lexer::position()
+{
+    return mInput.tellg();
+}
+
+void Lexer::seekPosition(int64_t pos)
+{
+    mInput.seekg(pos);
+}
 
 bool Lexer::nextNonWhitespaceChar(char *c)
 {
-	while (isspace(expression[index]))
+	while (hasMoreChars() && isspace(peek()))
 	{
-		index++;
-		if (!hasMoreChars()) {
-			break;
-		}
+        nextChar();
 	}
 	
 	if (hasMoreChars()) {
 		if (c != nullptr) {
-			*c = expression[index];
+			*c = peek();
 		}
-		index += 1;
+        nextChar();
 		return true;
 	}
 	return false;
 }
 
-bool Lexer::hasMoreChars() const
+bool Lexer::hasMoreChars()
 {
-	return index < expression.size();
+    return !(mInput.eof() || peek() == EOF);
 }
 

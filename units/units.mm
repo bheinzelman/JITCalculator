@@ -3,6 +3,8 @@
 #import <XCTest/XCTest.h>
 
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include "Runtime.hpp"
 
@@ -33,13 +35,17 @@
 		NSString *expression = d[@"exp"];
 		
 		std::string exp = std::string(expression.UTF8String);
+        std::stringstream stream;
+        stream << exp;
 
-        int value;
         try {
-            if (rt.evaluate(exp, &value)) {
-                XCTAssert(value == expected);
+            std::vector<int> output;
+            if (rt.evaluate(stream, output)) {
+                if (output.size())
+                    XCTAssert(output.front() == expected);
             }
-        } catch (...) {
+        } catch (jcException exception) {
+            std::cerr << exception.getMessage() << std::endl;
             XCTFail();
         }
 	}

@@ -34,10 +34,6 @@ namespace bc
     namespace vars {
         // instruction pointer
         const std::string ip = "$ip";
-        // base pointer
-        const std::string bp = "$bp";
-        // stack pointer
-        const std::string sp = "$sp";
     }
 
 	class Instruction

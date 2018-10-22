@@ -1,0 +1,11 @@
+let add(x,y) = x + y
+
+add(2,2) + add(2,2)
+
+let times(x,y) = x * y
+
+times(4,4)
+
+let squared(x) = x * x
+
+squared(8)
