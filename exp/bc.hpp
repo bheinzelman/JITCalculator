@@ -16,7 +16,6 @@ namespace bc
 	enum Op
 	{
 		Push,
-        Set,
         Ret,
 		Pop,
 		Add,
@@ -30,6 +29,8 @@ namespace bc
         Equals,
         Call,
         Label,
+        JmpTrue,
+        Jmp,
         Exit,
 	};
 
@@ -75,6 +76,8 @@ namespace bc
 		void visit(FunctionDecl *function);
 
         void visit(VariableExpression *expression);
+
+        void visit(Guard *guard);
 	private:
 		
 	private:

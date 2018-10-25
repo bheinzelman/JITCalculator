@@ -2,6 +2,7 @@
 
 #include "Lexer.hpp"
 #include "Token.hpp"
+#include "jc.h"
 
 Lexer::Lexer(std::istream &inputStream) : mInput(inputStream)
 {
@@ -32,7 +33,13 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 	Token nextToken = Token::Error;
 	if (hasMoreChars()) {
 		char next;
-		nextNonWhitespaceChar(&next);
+        if (nextNonWhitespaceChar(&next) == false) {
+            if (token != nullptr) {
+                *token = Token::EndOfStream;
+            }
+            return true;
+        }
+
 		switch (next) {
 			case '(':
 				nextToken = Token::LParen;
@@ -63,6 +70,9 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
                 break;
             case '<':
                 nextToken = Token::Less_Than;
+                break;
+            case '|':
+                nextToken = Token::Pipe;
                 break;
 			default:
 				break;
@@ -98,12 +108,20 @@ bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 			
 			while (hasMoreChars() && isalpha(peek())) {
 				word += std::string(1, nextChar());
+
+                Token keywordToken = Token::Error;
 				if (word == "let") {
-					if (token != nullptr) {
-						*token = Token::LetKw;
-					}
-					return true;
-				}
+                    keywordToken = Token::LetKw;
+                } else if (word == "else") {
+                    keywordToken = Token::ElseKw;
+                }
+
+                if (keywordToken != Token::Error) {
+                    if (token != nullptr) {
+                        *token = keywordToken;
+                    }
+                    return true;
+                }
 			}
 			if (token != nullptr) {
 				*token = Token::Id;
@@ -185,6 +203,6 @@ bool Lexer::nextNonWhitespaceChar(char *c)
 
 bool Lexer::hasMoreChars()
 {
-    return !(mInput.eof() || peek() == EOF);
+    return mInput.eof() == false && peek() != EOF && peek() != '\0';
 }
 

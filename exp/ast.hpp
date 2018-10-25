@@ -12,6 +12,7 @@
 
 static fourcc kExpressionType = 'expr';
 static fourcc kFunctionDeclType = 'decl';
+static fourcc kFunctionGuardType = 'grd_';
 
 class Node
 {
@@ -100,16 +101,40 @@ private:
 	Token op;
 };
 
+class Guard : public Node {
+public:
+    Guard(const std::shared_ptr<Expression> guardExpression,
+          const std::shared_ptr<Expression> body);
+
+    void accept(Visitor *v) override;
+
+    std::shared_ptr<Expression> getGuardExpression() const;
+
+    std::shared_ptr<Expression> getBodyExpression() const;
+
+    fourcc type() const override
+    {
+        return kFunctionGuardType;
+    }
+
+private:
+    std::shared_ptr<Expression> mGuardExpression;
+    std::shared_ptr<Expression> mBodyExpression;
+};
+
 class FunctionDecl : public Node
 {
 public:
-    FunctionDecl(const std::string &id, std::shared_ptr<Expression> exp, std::vector<std::string> params);
+    FunctionDecl(const std::string &id, std::shared_ptr<Expression> exp,
+                 std::vector<std::string> params,
+                 const std::vector<std::shared_ptr<Guard>> &guards);
 	
 	void accept(Visitor *v) override;
 	
 	std::string getId() const;
-	std::shared_ptr<Expression> getExpression() const;
+	std::shared_ptr<Expression> getDefaultExpression() const;
     std::vector<std::string> getParameters() const;
+    std::vector<std::shared_ptr<Guard>> getGuards() const;
 	
 	fourcc type() const override
 	{
@@ -120,5 +145,6 @@ private:
 	std::string mId;
 	std::shared_ptr<Expression> mExpression;
     std::vector<std::string> mParams;
+    std::vector<std::shared_ptr<Guard>> mGuards;
 };
 

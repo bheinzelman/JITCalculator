@@ -18,9 +18,11 @@ enum class Token
 	Num,
 	Error,
 	LetKw,
+    ElseKw,
 	Id,
 	Assign,
     Comma,
+    Pipe, 
 	EndOfStream
 };
 

@@ -128,11 +128,29 @@ std::shared_ptr<FunctionDecl> Parser::getFunctionDecl()
         eat(Token::RParen);
     }
 
+    std::vector<std::shared_ptr<Guard>> guards;
+
+    while (peekToken() == Token::Pipe) {
+        nextToken(nullptr);
+
+        if (peekToken() == Token::ElseKw) {
+            nextToken(nullptr);
+            break;
+        }
+
+        auto guardExpression = getExpression();
+        eat(Token::Assign);
+        auto bodyExpression = getExpression();
+
+        guards.push_back(std::make_shared<Guard>(guardExpression, bodyExpression));
+    }
+
+
 	eat(Token::Assign);
 	auto exp = getExpression();
     JC_ASSERT_OR_THROW(exp != nullptr, "Function must have expression");
 	
-	auto decl = std::make_shared<FunctionDecl>(idLex->asString(), exp, funcParams);
+	auto decl = std::make_shared<FunctionDecl>(idLex->asString(), exp, funcParams, guards);
 	return decl;
 }
 	

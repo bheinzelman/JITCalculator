@@ -78,7 +78,12 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
 				break;
 			}
             case bc::Push: {
-                mStack.push(instruction.getOperand(0));
+                jcVariablePtr operand = instruction.getOperand(0);
+                if (operand->getType() == jcVariable::TypeInt) {
+                    mStack.push(operand);
+                } else {
+                    mStack.push(jcVariable::Create(resolveVariable(operand)));
+                }
 				break;
             }
             case bc::Pop: {
@@ -92,24 +97,35 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
                 mVariableLut.top()[variableName->asString()] = value;
 				break;
             }
-            case bc::Set: {
-                JC_ASSERT_OR_THROW(instruction.numOperands() == 2, "Invalid number of args for SET");
-                // Form SET x, y, x = y
-
-                jcVariablePtr left = instruction.getOperand(0);
-                jcVariablePtr right = instruction.getOperand(1);
-
-                setVariable(left->asString(), right);
-
-                break;
-            }
             case bc::Call: {
                 jcVariablePtr functionName = instruction.getOperand(0);
                 JC_ASSERT_OR_THROW(mLabelLut.count(functionName->asString()) > 0, "Function " + functionName->asString() + " does not exist");
+                pushIp();
+                mVariableLut.push(std::map<std::string, int>());
                 mIp = mLabelLut[functionName->asString()];
                 break;
             }
+            case bc::JmpTrue:
+            case bc::Jmp: {
+                JC_ASSERT_OR_THROW(instruction.numOperands() == 1, "Invalid jmpTrue operands");
+                JC_ASSERT_OR_THROW(instruction.getOperand(0)->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
+
+                if (op == bc::JmpTrue) {
+                    bool shouldJump = resolveVariable(popStack());
+                    if (shouldJump == false) {
+                        break;
+                    }
+                }
+
+                std::string label = instruction.getOperand(0)->asString();
+                JC_ASSERT_OR_THROW(mLabelLut.count(label) > 0, "label " + label + " does not exist");
+                mIp = mLabelLut[label];
+
+                break;
+            }
             case bc::Ret: {
+                popIp();
+                mVariableLut.pop();
                 break;
             }
             case bc::Label:
@@ -123,9 +139,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
 		}
 	}
 
-    mVariableLut.pop();
-
-	return popStack()->asInt();
+	return resolveVariable(popStack());
 }
 
 int Interpreter::resolveVariable(jcVariablePtr var)
@@ -172,3 +186,15 @@ jcVariablePtr Interpreter::popStack()
 	mStack.pop();
 	return top;
 }
+
+void Interpreter::pushIp()
+{
+    mIpStack.push(mIp);
+}
+
+void Interpreter::popIp()
+{
+    mIp = mIpStack.top();
+    mIpStack.pop();
+}
+

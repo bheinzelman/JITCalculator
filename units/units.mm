@@ -33,6 +33,8 @@
              @{@"value": @1, @"exp": @"2 <= 2"},
              @{@"value": @1, @"exp": @"2 == 2"},
              @{@"value": @1, @"exp": @"(1 == 2) == 0"},
+             @{@"value": @0, @"exp": @"let x(a,b) | a > b = a | else = b"},
+             @{@"value": @2, @"exp": @"x(2,1)"}
 			 ];
 }
 
@@ -50,7 +52,8 @@
             std::vector<int> output;
             if (rt.evaluate(stream, output)) {
                 if (output.size()) {
-                    XCTAssert(output.front() == expected);
+                    int value = output.front();
+                    XCTAssert(value == expected);
                     assert(output.front() == expected);
                 }
             }

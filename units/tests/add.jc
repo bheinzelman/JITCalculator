@@ -1,11 +1,6 @@
-let add(x,y) = x + y
+let fact(ab) 
+| ab > 1 = fact(ab - 1) * ab 
+| else = 1
 
-add(2,2) + add(2,2)
-
-let times(x,y) = x * y
-
-times(4,4)
-
-let squared(x) = x * x
-
-squared(8)
+fact(5)
+fact(3)

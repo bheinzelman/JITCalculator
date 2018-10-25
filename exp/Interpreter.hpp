@@ -26,9 +26,14 @@ private:
     void setVariable(std::string var, jcVariablePtr to);
 
     void mapLabels(std::vector<bc::Instruction> instructions);
+
+    // push and pop instruction pointer
+    void pushIp();
+    void popIp();
 	
 private:
 	std::stack<jcVariablePtr> mStack;
+    std::stack<int> mIpStack;
     std::stack<std::map<std::string, int>> mVariableLut;
 
     // instruction pointer

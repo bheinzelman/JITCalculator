@@ -21,8 +21,6 @@ namespace bc
 				return "DIV";
 			case bc::Push:
 				return "PUSH";
-            case bc::Set:
-                return "SET";
 			case bc::Pop:
 				return "POP";
             case bc::Ret:
@@ -41,6 +39,12 @@ namespace bc
                 return "GREATER_THAN_EQUAL";
             case bc::Equals:
                 return "EQUALS";
+            case bc::JmpTrue:
+                return "JMP_TRUE";
+            case bc::Jmp:
+                return "Jmp";
+            case bc::Label:
+                return "Label";
 			default:
 				JC_FAIL();
 				break;
@@ -74,10 +78,19 @@ namespace bc
 	
 	std::string Instruction::toString() const
 	{
-		std::string output = opToString(mOp) + " ";
+        std::string output = "";
+        if (mOp != bc::Label) {
+            output += opToString(mOp) + " ";
+        }
+
 		for (int i = 0; i < mOperands.size(); i++) {
-			int operand = mOperands[i]->asInt();
-			output += std::to_string(operand);
+
+            if (mOperands[i]->getType() == jcVariable::TypeInt) {
+                int operand = mOperands[i]->asInt();
+                output += std::to_string(operand);
+            } else {
+                output += mOperands[i]->asString();
+            }
 			if (i < mOperands.size() - 1) {
 				output += ", ";
 			}
@@ -98,13 +111,10 @@ namespace bc
 	
 	void Generator::visit(FunctionDecl *function)
 	{
-        const std::string tmpIp = "_ip";
+        std::string functionName = function->getId();
 
-        Instruction functionLabel = Instruction(bc::Label, {jcVariable::Create(function->getId())});
+        Instruction functionLabel = Instruction(bc::Label, {jcVariable::Create(functionName)});
         mOutput.push_back(functionLabel);
-        
-        Instruction popIp = Instruction(bc::Pop, {jcVariable::Create(tmpIp)});
-        mOutput.push_back(popIp);
 
         for (std::string param : function->getParameters()) {
             jcVariablePtr paramVar = jcVariable::Create(param);
@@ -112,17 +122,50 @@ namespace bc
             mOutput.push_back(popOp);
         }
 
-        function->getExpression()->accept(this);
+        std::string endLabel = functionName + ".end";
 
-        Instruction setIp = Instruction(bc::Set, {
-            jcVariable::Create(bc::vars::ip),
-            jcVariable::Create(tmpIp)
-        });
-        mOutput.push_back(setIp);
+        if (function->getGuards().size()) {
+            // do guard expressions
+            for (int i = 0; i < function->getGuards().size(); i++) {
+                std::shared_ptr<Guard> guard = function->getGuards()[i];
+                guard->getGuardExpression()->accept(this);
+
+                std::string label = functionName + "." + std::to_string(i);
+                Instruction jmpInstruction = Instruction(bc::JmpTrue, {jcVariable::Create(label)});
+                mOutput.push_back(jmpInstruction);
+            }
+
+            // jump to default if none of guards hit
+            std::string lastLabel = functionName + "." + std::to_string(function->getGuards().size());
+            mOutput.push_back(Instruction(bc::Jmp, {jcVariable::Create(lastLabel)}));
+
+            // now do the guard bodies
+
+            for (int i = 0; i < function->getGuards().size(); i++) {
+                std::shared_ptr<Guard> guard = function->getGuards()[i];
+                std::string label = functionName + "." + std::to_string(i);
+
+                mOutput.push_back(Instruction(bc::Label, {jcVariable::Create(label)}));
+                guard->getBodyExpression()->accept(this);
+
+                mOutput.push_back(Instruction(bc::Jmp, {jcVariable::Create(endLabel)}));
+            }
+
+            mOutput.push_back(Instruction(bc::Label, {jcVariable::Create(lastLabel)}));
+        }
+
+        function->getDefaultExpression()->accept(this);
+
+        mOutput.push_back(Instruction(bc::Label, {jcVariable::Create(endLabel)}));
 
         Instruction returnInstruction = Instruction(bc::Ret, {});
         mOutput.push_back(returnInstruction);
 	}
+
+    void Generator::visit(Guard *guard)
+    {
+        JC_FAIL();
+    }
 
     void Generator::visit(VariableExpression *expression)
     {
@@ -145,11 +188,6 @@ namespace bc
         for (auto arg : arguments) {
             arg->accept(this);
         }
-
-        // push instruction pointer
-        mOutput.push_back(Instruction(bc::Push, {jcVariable::Create(vars::ip)}));
-        mOutput.push_back(Instruction(bc::Push, {jcVariable::Create(1)}));
-        mOutput.push_back(Instruction(bc::Add));
 
         jcVariablePtr functionName = jcVariable::Create(expression->getFunctionId());
         Instruction callInstruction = Instruction(bc::Call, {functionName});
