@@ -1,32 +1,40 @@
 //  Lexer.hpp
 
-#ifndef Lexer_hpp
-#define Lexer_hpp
+#pragma once
 
 #include <string>
+#include <istream>
 
 #include "Token.hpp"
+#include "jcVariable.hpp"
 
 class Lexer
 {
 public:
-	Lexer(std::string expression);
+    Lexer(std::istream &inputStream);
 	
 	Token currentToken() const;
 	
-	bool peakToken(Token *token, int *lexeme=nullptr);
+	bool peekToken(Token *token, jcVariablePtr lexeme=nullptr);
 	
-	bool getNextToken(Token *token, int *lexeme=nullptr);
+	bool getNextToken(Token *token, jcVariablePtr lexeme=nullptr);
 	
 private:
-	std::string expression;
-	int index;
+    std::istream &mInput;
 	Token _currentToken;
 	
 private:
+    char peek();
+
+    char nextChar();
+
+    int64_t position();
+    void seekPosition(int64_t pos);
+
 	bool nextNonWhitespaceChar(char *c);
 	
-	bool hasMoreChars() const;
+	bool hasMoreChars();
+
+    Token resolveTwoCharOperator(Token firstOperator);
 };
 
-#endif /* Lexer_hpp */

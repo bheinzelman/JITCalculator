@@ -1,27 +1,43 @@
 // Interpreter.hpp
 
-#ifndef Interpreter_hpp
-#define Interpreter_hpp
+#pragma once
 
 #include <memory>
+#include <stack>
+#include <map>
 
 #include "Visitor.h"
+#include "SymbolTable.hpp"
 #include "ast.hpp"
 
-class Interpreter : Visitor
+#include "bc.hpp"
+
+class Interpreter
 {
 public:
-	Interpreter(std::shared_ptr<Expression> expression);
+	Interpreter();
 	
-	int interpret();
-	
-	void visit(BasicExpression *expression);
-	
-	void visit(BinaryExpression *expression);
+	int interpret(std::vector<bc::Instruction> instructions, int startingPoint);
+private:
+	jcVariablePtr popStack();
+
+    int resolveVariable(jcVariablePtr var);
+    bool resolveRuntimeVariable(std::string var, int *output);
+    void setVariable(std::string var, jcVariablePtr to);
+
+    void mapLabels(std::vector<bc::Instruction> instructions);
+
+    // push and pop instruction pointer
+    void pushIp();
+    void popIp();
 	
 private:
-	int lastValue;
-	std::shared_ptr<Expression> expression;
-};
+	std::stack<jcVariablePtr> mStack;
+    std::stack<int> mIpStack;
+    std::stack<std::map<std::string, int>> mVariableLut;
 
-#endif
+    // instruction pointer
+    int mIp;
+
+    std::map<std::string, int> mLabelLut;
+};

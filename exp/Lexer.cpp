@@ -2,67 +2,85 @@
 
 #include "Lexer.hpp"
 #include "Token.hpp"
+#include "jc.h"
 
-Lexer::Lexer(std::string expression) : expression(expression)
+Lexer::Lexer(std::istream &inputStream) : mInput(inputStream)
 {
-	this->index = 0;
 }
 
 Token Lexer::currentToken() const {
 	return _currentToken;
 }
 
-bool Lexer::peakToken(Token *token, int *lexeme)
+bool Lexer::peekToken(Token *token, jcVariablePtr lexeme)
 {
-	int i = index;
+    int64_t i = position();
+
 	Token t;
-	int value;
-	bool result = getNextToken(&t, &value);
-	index = i;
+	bool result = getNextToken(&t, lexeme);
+    seekPosition(i);
 	
 	if (result) {
 		if (token != nullptr) {
 			*token = t;
 		}
-		if (lexeme != nullptr) {
-			*lexeme = value;
-		}
 	}
 	return result;
 }
 
-bool Lexer::getNextToken(Token *token, int *lexeme)
+bool Lexer::getNextToken(Token *token, jcVariablePtr lexeme)
 {
-	Token nextToken = Error;
+	Token nextToken = Token::Error;
 	if (hasMoreChars()) {
 		char next;
-		nextNonWhitespaceChar(&next);
+        if (nextNonWhitespaceChar(&next) == false) {
+            if (token != nullptr) {
+                *token = Token::EndOfStream;
+            }
+            return true;
+        }
+
 		switch (next) {
 			case '(':
-				nextToken = LParen;
+				nextToken = Token::LParen;
 				break;
 			case ')':
-				nextToken = RParen;
+				nextToken = Token::RParen;
 				break;
 			case '+':
-				nextToken = Add;
+				nextToken = Token::Add;
 				break;
 			case '-':
-				nextToken = Subtract;
+				nextToken = Token::Subtract;
 				break;
 			case '/':
-				nextToken = Divide;
+				nextToken = Token::Divide;
 				break;
 			case '*':
-				nextToken = Multiply;
+				nextToken = Token::Multiply;
 				break;
+			case '=':
+				nextToken = Token::Assign;
+				break;
+            case ',':
+                nextToken = Token::Comma;
+                break;
+            case '>':
+                nextToken = Token::Greater_Than;
+                break;
+            case '<':
+                nextToken = Token::Less_Than;
+                break;
+            case '|':
+                nextToken = Token::Pipe;
+                break;
 			default:
 				break;
 		}
 		
-		if (nextToken != Error) {
+		if (nextToken != Token::Error) {
 			if (token != nullptr) {
-				*token = nextToken;
+				*token = resolveTwoCharOperator(nextToken);
 			}
 			return true;
 		}
@@ -71,54 +89,120 @@ bool Lexer::getNextToken(Token *token, int *lexeme)
 		if (isdigit(next)) {
 			std::string numString = "";
 			numString += next;
-			while (isdigit(expression[index])) {
-				numString += expression[index++];
+			while (isdigit(peek())) {
+				numString += nextChar();
 				if (!hasMoreChars()) {
 					break;
 				}
 			}
 			int value = atoi(numString.c_str());
 			if (lexeme != nullptr) {
-				*lexeme = value;
+				lexeme->setInt(value);
 			}
 			if (token != nullptr) {
-				*token = Num;
+				*token = Token::Num;
+			}
+			return true;
+		} else if (isalpha(next)) {
+			std::string word(1, next);
+			
+			while (hasMoreChars() && isalpha(peek())) {
+				word += std::string(1, nextChar());
+
+                Token keywordToken = Token::Error;
+				if (word == "let") {
+                    keywordToken = Token::LetKw;
+                } else if (word == "else") {
+                    keywordToken = Token::ElseKw;
+                }
+
+                if (keywordToken != Token::Error) {
+                    if (token != nullptr) {
+                        *token = keywordToken;
+                    }
+                    return true;
+                }
+			}
+			if (token != nullptr) {
+				*token = Token::Id;
+			}
+			if (lexeme != nullptr) {
+				lexeme->setString(word);
 			}
 			return true;
 		} else {
 			if (token != nullptr) {
-				*token = Error;
+				*token = Token::Error;
 			}
 			return false;
+		}		
+	} else {
+		if (token != nullptr) {
+			*token = Token::EndOfStream;
+			return true;
 		}
-		
 	}
 	return false;
 }
 
+Token Lexer::resolveTwoCharOperator(Token firstOperator)
+{
+    Token returnToken = firstOperator;
+    Token peek;
+    if (peekToken(&peek, nullptr)) {
+        if (firstOperator == Token::Greater_Than && peek == Token::Assign) {
+            returnToken = Token::Greater_Than_Equal;
+        } else if (firstOperator == Token::Less_Than && peek == Token::Assign) {
+            returnToken = Token::Less_Than_Equal;
+        } else if (firstOperator == Token::Assign && peek == Token::Assign) {
+            returnToken = Token::Equals;
+        }
+    }
+    if (returnToken != firstOperator) {
+        getNextToken(nullptr);
+    }
+    return returnToken;
+}
+
+char Lexer::peek()
+{
+    return mInput.peek();
+}
+
+char Lexer::nextChar()
+{
+    return mInput.get();
+}
+
+int64_t Lexer::position()
+{
+    return mInput.tellg();
+}
+
+void Lexer::seekPosition(int64_t pos)
+{
+    mInput.seekg(pos);
+}
 
 bool Lexer::nextNonWhitespaceChar(char *c)
 {
-	while (isspace(expression[index]))
+	while (hasMoreChars() && isspace(peek()))
 	{
-		index++;
-		if (!hasMoreChars()) {
-			break;
-		}
+        nextChar();
 	}
 	
 	if (hasMoreChars()) {
 		if (c != nullptr) {
-			*c = expression[index];
+			*c = peek();
 		}
-		index += 1;
+        nextChar();
 		return true;
 	}
 	return false;
 }
 
-bool Lexer::hasMoreChars() const
+bool Lexer::hasMoreChars()
 {
-	return index < expression.size();
+    return mInput.eof() == false && peek() != EOF && peek() != '\0';
 }
 

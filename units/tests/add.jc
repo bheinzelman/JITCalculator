@@ -1,0 +1,6 @@
+let fact(ab) 
+| ab > 1 = fact(ab - 1) * ab 
+| else = 1
+
+fact(5)
+fact(3)

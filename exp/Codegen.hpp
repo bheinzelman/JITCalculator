@@ -1,7 +1,6 @@
 // Codegen.hpp
 
-#ifndef Codegen_hpp
-#define Codegen_hpp
+#pragma once
 
 #include <memory>
 #include <string>
@@ -28,6 +27,7 @@ public:
 	void visit(BasicExpression *expression);
 	
 	void visit(BinaryExpression *expression);
+	void visit(FunctionDecl *expression);
 private:
 	std::shared_ptr<Expression> ast;
 	std::stack<Operand> stack;
@@ -48,5 +48,3 @@ private:
 	
 	void addInstruction(std::string instruction, std::string source, std::string dest);
 };
-
-#endif
