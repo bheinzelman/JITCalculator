@@ -2,27 +2,27 @@
 
 #include "jc.h"
 
+#include "Interpreter.hpp"
+#include "Lexer.hpp"
+#include "Parser.hpp"
 #include "Runtime.hpp"
 #include "Token.hpp"
-#include "Lexer.hpp"
 #include "Visitor.h"
 #include "ast.hpp"
-#include "Parser.hpp"
-#include "Interpreter.hpp"
 
 #include "bc.hpp"
 
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <memory>
-#include <cstring>
-#include <cstdlib>
 #include <sstream>
 
 Runtime::Runtime()
 {
 }
 
-bool Runtime::evaluate(std::istream &stream, std::vector<int> &outputValues)
+bool Runtime::evaluate(std::istream& stream, std::vector<int>& outputValues)
 {
     Lexer lex(stream);
     Parser parser(std::make_shared<Lexer>(lex));

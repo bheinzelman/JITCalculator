@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include "bc.hpp"
 #include "ast.hpp"
+#include "bc.hpp"
 
 #include <map>
 #include <vector>
 
-
-class SymbolContext
-{
+class SymbolContext {
 public:
-    SymbolContext(std::vector<bc::Instruction> instructions, std::shared_ptr<FunctionDecl> decl) : mDecl(decl), mInstructions(instructions)
+    SymbolContext(std::vector<bc::Instruction> instructions, std::shared_ptr<FunctionDecl> decl)
+        : mDecl(decl)
+        , mInstructions(instructions)
     {
     }
 
@@ -26,7 +26,8 @@ public:
         return mDecl;
     }
 
-    inline std::vector<bc::Instruction> getInstructions() const {
+    inline std::vector<bc::Instruction> getInstructions() const
+    {
         return mInstructions;
     }
 
@@ -35,16 +36,14 @@ private:
     std::vector<bc::Instruction> mInstructions;
 };
 
-class SymbolTable
-{
+class SymbolTable {
 public:
-    std::shared_ptr<SymbolContext> getContext(const std::string &functionName);
+    std::shared_ptr<SymbolContext> getContext(const std::string& functionName);
 
-    void setContext(const std::string &functionName, const std::vector<bc::Instruction> &instructions, const std::shared_ptr<FunctionDecl> decl);
+    void setContext(const std::string& functionName, const std::vector<bc::Instruction>& instructions, const std::shared_ptr<FunctionDecl> decl);
 
     std::vector<bc::Instruction> asInstructionList() const;
 
 private:
     std::map<std::string, std::shared_ptr<SymbolContext>> mLut;
-
 };

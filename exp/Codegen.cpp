@@ -12,143 +12,145 @@ static std::string DIV = "idivl";
 
 Operand Operand::operandWithRegisterName(std::string name)
 {
-	Operand op;
-	op.value = name;
-	op.isRegister = true;
-	return op;
+    Operand op;
+    op.value = name;
+    op.isRegister = true;
+    return op;
 }
 
 Operand Operand::operandWithNumberValue(std::string value)
 {
-	Operand op;
-	op.value = value;
-	op.isRegister = false;
-	return op;
+    Operand op;
+    op.value = value;
+    op.isRegister = false;
+    return op;
 }
 
-Codegen::Codegen(std::shared_ptr<Expression> ast) : ast(ast)
+Codegen::Codegen(std::shared_ptr<Expression> ast)
+    : ast(ast)
 {
-	code = "";
-	Operand ecx = Operand::operandWithRegisterName("%ecx");
-	Operand edx = Operand::operandWithRegisterName("%edx");
-	
-	registerQueue.push(ecx);
-	registerQueue.push(edx);
+    code = "";
+    Operand ecx = Operand::operandWithRegisterName("%ecx");
+    Operand edx = Operand::operandWithRegisterName("%edx");
+
+    registerQueue.push(ecx);
+    registerQueue.push(edx);
 }
 
 std::string Codegen::getCode()
 {
-	initCodegen();
-	
-	ast->accept(this);
-	
-	Operand result = stack.top();
-	mov(result.value, "%eax");
-	
-	finalizeCodegen();
-	return this->code;
+    initCodegen();
+
+    ast->accept(this);
+
+    Operand result = stack.top();
+    mov(result.value, "%eax");
+
+    finalizeCodegen();
+    return this->code;
 }
 
 void Codegen::initCodegen()
 {
-	code += "\t.globl _compute\n";
-	code += "_compute:\n";
-	code += "\tpushq %rbp\n";
-	code += "\tmovq %rsp, %rbp\n";
+    code += "\t.globl _compute\n";
+    code += "_compute:\n";
+    code += "\tpushq %rbp\n";
+    code += "\tmovq %rsp, %rbp\n";
 }
 
 void Codegen::finalizeCodegen()
 {
-	code += "\tpopq %rbp\n";
-	code += "\tretq\n";
+    code += "\tpopq %rbp\n";
+    code += "\tretq\n";
 }
 
-void Codegen::visit(BasicExpression *expression)
+void Codegen::visit(BasicExpression* expression)
 {
-	std::string stringVal = "$" + std::to_string(expression->getValue());
-	Operand op = Operand::operandWithNumberValue(stringVal);
-	stack.push(op);
+    std::string stringVal = "$" + std::to_string(expression->getValue());
+    Operand op = Operand::operandWithNumberValue(stringVal);
+    stack.push(op);
 }
 
-void Codegen::visit(FunctionDecl *expression)
+void Codegen::visit(FunctionDecl* expression)
 {
-	JC_FAIL(); // not implemented
+    JC_FAIL(); // not implemented
 }
 
-void Codegen::visit(BinaryExpression *expression)
+void Codegen::visit(BinaryExpression* expression)
 {
-	expression->getLeft()->accept(this);
-	
-	Token op = expression->getOperator();
-	
-	expression->getRight()->accept(this);
-	
-	Operand source = getOperand();
-	Operand dest = getOperand();
-	
-	if (!dest.isRegister) {
-		Operand reg = registerQueue.front();
-		registerQueue.pop();
-		mov(dest.value, reg.value);
-		dest = reg;
-	}
+    expression->getLeft()->accept(this);
 
-	switch (op) {
-		case Token::Add:
-			add(source.value, dest.value);
-			break;
-		case Token::Subtract:
-			sub(source.value, dest.value);
-			break;
-		case Token::Multiply:
-			mult(source.value, dest.value);
-			break;
-		case Token::Divide:
-			divide(source.value, dest.value);
-			break;
-		default:
-			return;
-	}
-	
-	if (source.isRegister) {
-		registerQueue.push(source);
-	}
-	
-	stack.push(dest);
+    Token op = expression->getOperator();
+
+    expression->getRight()->accept(this);
+
+    Operand source = getOperand();
+    Operand dest = getOperand();
+
+    if (!dest.isRegister) {
+        Operand reg = registerQueue.front();
+        registerQueue.pop();
+        mov(dest.value, reg.value);
+        dest = reg;
+    }
+
+    switch (op) {
+    case Token::Add:
+        add(source.value, dest.value);
+        break;
+    case Token::Subtract:
+        sub(source.value, dest.value);
+        break;
+    case Token::Multiply:
+        mult(source.value, dest.value);
+        break;
+    case Token::Divide:
+        divide(source.value, dest.value);
+        break;
+    default:
+        return;
+    }
+
+    if (source.isRegister) {
+        registerQueue.push(source);
+    }
+
+    stack.push(dest);
 }
 
-Operand Codegen::getOperand() {
-	auto top = stack.top();
-	stack.pop();
-	return top;
+Operand Codegen::getOperand()
+{
+    auto top = stack.top();
+    stack.pop();
+    return top;
 }
 
 void Codegen::add(std::string source, std::string dest)
 {
-	addInstruction(ADD, source, dest);
+    addInstruction(ADD, source, dest);
 }
 
 void Codegen::mult(std::string source, std::string dest)
 {
-	addInstruction(MUL, source, dest);
+    addInstruction(MUL, source, dest);
 }
 
 void Codegen::sub(std::string source, std::string dest)
 {
-	addInstruction(SUB, source, dest);
+    addInstruction(SUB, source, dest);
 }
 
 void Codegen::divide(std::string source, std::string dest)
 {
-	addInstruction(DIV, source, dest);
+    addInstruction(DIV, source, dest);
 }
 
 void Codegen::mov(std::string source, std::string dest)
 {
-	addInstruction(MOV, source, dest);
+    addInstruction(MOV, source, dest);
 }
 
 void Codegen::addInstruction(std::string instruction, std::string source, std::string dest)
 {
-	code += "\t" + instruction + " " + source + ", " + dest + "\n";
+    code += "\t" + instruction + " " + source + ", " + dest + "\n";
 }

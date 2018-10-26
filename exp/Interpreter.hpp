@@ -2,27 +2,27 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <stack>
-#include <map>
 
-#include "Visitor.h"
 #include "SymbolTable.hpp"
+#include "Visitor.h"
 #include "ast.hpp"
 
 #include "bc.hpp"
 
-class Interpreter
-{
+class Interpreter {
 public:
-	Interpreter();
-	
-	int interpret(std::vector<bc::Instruction> instructions, int startingPoint);
+    Interpreter();
+
+    int interpret(std::vector<bc::Instruction> instructions, int startingPoint);
+
 private:
-	jcVariablePtr popStack();
+    jcVariablePtr popStack();
 
     int resolveVariable(jcVariablePtr var);
-    bool resolveRuntimeVariable(std::string var, int *output);
+    bool resolveRuntimeVariable(std::string var, int* output);
     void setVariable(std::string var, jcVariablePtr to);
 
     void mapLabels(std::vector<bc::Instruction> instructions);
@@ -30,9 +30,9 @@ private:
     // push and pop instruction pointer
     void pushIp();
     void popIp();
-	
+
 private:
-	std::stack<jcVariablePtr> mStack;
+    std::stack<jcVariablePtr> mStack;
     std::stack<int> mIpStack;
     std::stack<std::map<std::string, int>> mVariableLut;
 

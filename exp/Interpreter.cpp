@@ -1,7 +1,7 @@
 //  Interpreter.cpp
 
-#include <memory>
 #include <iostream>
+#include <memory>
 
 #include "Interpreter.hpp"
 #include "ast.hpp"
@@ -9,29 +9,29 @@
 
 static int performArtithmaticOp(bc::Op op, int right, int left)
 {
-	switch (op) {
-		case bc::Add:
-			return left + right;
-		case bc::Subtract:
-			return left - right;
-		case bc::Multiply:
-			return left * right;
-		case bc::Divide:
-			return left / right;
-        case bc::Greater_Than:
-            return left > right;
-        case bc::Less_Than:
-            return left < right;
-        case bc::Greater_Than_Equal:
-            return left >= right;
-        case bc::Less_Than_Equal:
-            return left <= right;
-        case bc::Equals:
-            return left == right;
-		default:
-			JC_FAIL();
-			break;
-	}
+    switch (op) {
+    case bc::Add:
+        return left + right;
+    case bc::Subtract:
+        return left - right;
+    case bc::Multiply:
+        return left * right;
+    case bc::Divide:
+        return left / right;
+    case bc::Greater_Than:
+        return left > right;
+    case bc::Less_Than:
+        return left < right;
+    case bc::Greater_Than_Equal:
+        return left >= right;
+    case bc::Less_Than_Equal:
+        return left <= right;
+    case bc::Equals:
+        return left == right;
+    default:
+        JC_FAIL();
+        break;
+    }
 }
 
 Interpreter::Interpreter()
@@ -55,91 +55,91 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
     mVariableLut.push(std::map<std::string, int>());
     mIp = startingPoint;
     bool shouldExit = false;
-    while(shouldExit == false) {
+    while (shouldExit == false) {
         bc::Instruction instruction = instructions[mIp++];
 
-		bc::Op op = instruction.getOp();
-		
-		switch (op) {
-			case bc::Add:
-			case bc::Subtract:
-			case bc::Multiply:
-			case bc::Divide:
-            case bc::Greater_Than:
-            case bc::Less_Than:
-            case bc::Less_Than_Equal:
-            case bc::Greater_Than_Equal:
-            case bc::Equals: {
-				jcVariablePtr right = popStack();
-				jcVariablePtr left = popStack();
+        bc::Op op = instruction.getOp();
 
-                jcVariablePtr result = jcVariable::Create(performArtithmaticOp(op, resolveVariable(right), resolveVariable(left)));
-				mStack.push(result);
-				break;
-			}
-            case bc::Push: {
-                jcVariablePtr operand = instruction.getOperand(0);
-                if (operand->getType() == jcVariable::TypeInt) {
-                    mStack.push(operand);
-                } else {
-                    mStack.push(jcVariable::Create(resolveVariable(operand)));
+        switch (op) {
+        case bc::Add:
+        case bc::Subtract:
+        case bc::Multiply:
+        case bc::Divide:
+        case bc::Greater_Than:
+        case bc::Less_Than:
+        case bc::Less_Than_Equal:
+        case bc::Greater_Than_Equal:
+        case bc::Equals: {
+            jcVariablePtr right = popStack();
+            jcVariablePtr left = popStack();
+
+            jcVariablePtr result = jcVariable::Create(performArtithmaticOp(op, resolveVariable(right), resolveVariable(left)));
+            mStack.push(result);
+            break;
+        }
+        case bc::Push: {
+            jcVariablePtr operand = instruction.getOperand(0);
+            if (operand->getType() == jcVariable::TypeInt) {
+                mStack.push(operand);
+            } else {
+                mStack.push(jcVariable::Create(resolveVariable(operand)));
+            }
+            break;
+        }
+        case bc::Pop: {
+            jcVariablePtr variableName = instruction.getOperand(0);
+
+            int value;
+            if (!resolveRuntimeVariable(variableName->asString(), &value)) {
+                value = resolveVariable(popStack());
+            }
+
+            mVariableLut.top()[variableName->asString()] = value;
+            break;
+        }
+        case bc::Call: {
+            jcVariablePtr functionName = instruction.getOperand(0);
+            JC_ASSERT_OR_THROW(mLabelLut.count(functionName->asString()) > 0, "Function " + functionName->asString() + " does not exist");
+            pushIp();
+            mVariableLut.push(std::map<std::string, int>());
+            mIp = mLabelLut[functionName->asString()];
+            break;
+        }
+        case bc::JmpTrue:
+        case bc::Jmp: {
+            JC_ASSERT_OR_THROW(instruction.numOperands() == 1, "Invalid jmpTrue operands");
+            JC_ASSERT_OR_THROW(instruction.getOperand(0)->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
+
+            if (op == bc::JmpTrue) {
+                bool shouldJump = resolveVariable(popStack());
+                if (shouldJump == false) {
+                    break;
                 }
-				break;
             }
-            case bc::Pop: {
-                jcVariablePtr variableName = instruction.getOperand(0);
 
-                int value;
-                if (!resolveRuntimeVariable(variableName->asString(), &value)) {
-                    value = resolveVariable(popStack());
-                }
+            std::string label = instruction.getOperand(0)->asString();
+            JC_ASSERT_OR_THROW(mLabelLut.count(label) > 0, "label " + label + " does not exist");
+            mIp = mLabelLut[label];
 
-                mVariableLut.top()[variableName->asString()] = value;
-				break;
-            }
-            case bc::Call: {
-                jcVariablePtr functionName = instruction.getOperand(0);
-                JC_ASSERT_OR_THROW(mLabelLut.count(functionName->asString()) > 0, "Function " + functionName->asString() + " does not exist");
-                pushIp();
-                mVariableLut.push(std::map<std::string, int>());
-                mIp = mLabelLut[functionName->asString()];
-                break;
-            }
-            case bc::JmpTrue:
-            case bc::Jmp: {
-                JC_ASSERT_OR_THROW(instruction.numOperands() == 1, "Invalid jmpTrue operands");
-                JC_ASSERT_OR_THROW(instruction.getOperand(0)->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
+            break;
+        }
+        case bc::Ret: {
+            popIp();
+            mVariableLut.pop();
+            break;
+        }
+        case bc::Label:
+            break;
+        case bc::Exit:
+            shouldExit = true;
+            break;
+        default:
+            JC_FAIL();
+            break;
+        }
+    }
 
-                if (op == bc::JmpTrue) {
-                    bool shouldJump = resolveVariable(popStack());
-                    if (shouldJump == false) {
-                        break;
-                    }
-                }
-
-                std::string label = instruction.getOperand(0)->asString();
-                JC_ASSERT_OR_THROW(mLabelLut.count(label) > 0, "label " + label + " does not exist");
-                mIp = mLabelLut[label];
-
-                break;
-            }
-            case bc::Ret: {
-                popIp();
-                mVariableLut.pop();
-                break;
-            }
-            case bc::Label:
-                break;
-            case bc::Exit:
-                shouldExit = true;
-                break;
-			default:
-				JC_FAIL();
-				break;
-		}
-	}
-
-	return resolveVariable(popStack());
+    return resolveVariable(popStack());
 }
 
 int Interpreter::resolveVariable(jcVariablePtr var)
@@ -168,7 +168,7 @@ void Interpreter::setVariable(std::string var, jcVariablePtr to)
     mVariableLut.top()[var] = resolveVariable(to);
 }
 
-bool Interpreter::resolveRuntimeVariable(std::string var, int *output)
+bool Interpreter::resolveRuntimeVariable(std::string var, int* output)
 {
     if (var == bc::vars::ip) {
         if (output) {
@@ -181,10 +181,10 @@ bool Interpreter::resolveRuntimeVariable(std::string var, int *output)
 
 jcVariablePtr Interpreter::popStack()
 {
-	JC_ASSERT(mStack.size());
-	auto top = mStack.top();
-	mStack.pop();
-	return top;
+    JC_ASSERT(mStack.size());
+    auto top = mStack.top();
+    mStack.pop();
+    return top;
 }
 
 void Interpreter::pushIp()
@@ -197,4 +197,3 @@ void Interpreter::popIp()
     mIp = mIpStack.top();
     mIpStack.pop();
 }
-

@@ -2,32 +2,29 @@
 
 #pragma once
 
-enum class Token
-{
-	Add,
-	Subtract,
-	Multiply,
-	Divide,
+enum class Token {
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
     Less_Than,
     Greater_Than,
     Less_Than_Equal,
     Greater_Than_Equal,
     Equals,
-	LParen,
-	RParen,
-	Num,
-	Error,
-	LetKw,
+    LParen,
+    RParen,
+    Num,
+    Error,
+    LetKw,
     ElseKw,
-	Id,
-	Assign,
+    Id,
+    Assign,
     Comma,
-    Pipe, 
-	EndOfStream
+    Pipe,
+    EndOfStream
 };
 
-namespace jcToken
-{
-	int getOperatorPrecedence(Token op);
+namespace jcToken {
+int getOperatorPrecedence(Token op);
 }
- 

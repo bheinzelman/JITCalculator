@@ -7,14 +7,12 @@
 #include <istream>
 #include <string>
 
-class Runtime
-{
+class Runtime {
 public:
-	Runtime();
+    Runtime();
 
-    bool evaluate(std::istream &stream, std::vector<int> &outputValues);
-	
+    bool evaluate(std::istream& stream, std::vector<int>& outputValues);
+
 private:
     SymbolTable mSymbols;
 };
-
