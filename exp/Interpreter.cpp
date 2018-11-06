@@ -79,11 +79,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
         }
         case bc::Push: {
             jcVariablePtr operand = instruction.getOperand(0);
-            if (operand->getType() == jcVariable::TypeInt) {
-                mStack.push(operand);
-            } else {
-                mStack.push(jcVariable::Create(resolveVariable(operand)));
-            }
+            mStack.push(operand);
             break;
         }
         case bc::Pop: {
@@ -124,8 +120,13 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
             break;
         }
         case bc::Ret: {
+            if (mStack.top()->getType() != jcVariable::TypeInt) {
+                mStack.push(jcVariable::Create(resolveVariable(popStack())));
+            }
+
             popIp();
             mVariableLut.pop();
+            
             break;
         }
         case bc::Label:

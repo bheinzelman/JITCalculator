@@ -14,9 +14,9 @@ public:
 
     Token currentToken() const;
 
-    bool peekToken(Token* token, jcVariablePtr lexeme = nullptr);
+    bool peekToken(Token* token, jcMutableVariablePtr lexeme = nullptr);
 
-    bool getNextToken(Token* token, jcVariablePtr lexeme = nullptr);
+    bool getNextToken(Token* token, jcMutableVariablePtr lexeme = nullptr);
 
 private:
     std::istream& mInput;

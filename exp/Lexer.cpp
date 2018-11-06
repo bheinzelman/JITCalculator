@@ -14,7 +14,7 @@ Token Lexer::currentToken() const
     return _currentToken;
 }
 
-bool Lexer::peekToken(Token* token, jcVariablePtr lexeme)
+bool Lexer::peekToken(Token* token, jcMutableVariablePtr lexeme)
 {
     int64_t i = position();
 
@@ -30,7 +30,7 @@ bool Lexer::peekToken(Token* token, jcVariablePtr lexeme)
     return result;
 }
 
-bool Lexer::getNextToken(Token* token, jcVariablePtr lexeme)
+bool Lexer::getNextToken(Token* token, jcMutableVariablePtr lexeme)
 {
     Token nextToken = Token::Error;
     if (hasMoreChars()) {

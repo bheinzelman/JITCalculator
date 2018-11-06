@@ -42,7 +42,7 @@ bool Parser::peekExpression()
 
 std::shared_ptr<Expression> Parser::getTerm()
 {
-    jcVariablePtr value = jcVariable::Create();
+    jcMutableVariablePtr value = jcMutableVariable::Create();
     Token tok = nextToken(value);
     if (tok == Token::Num) {
         return std::make_shared<BasicExpression>(BasicExpression(value->asInt()));
@@ -103,7 +103,7 @@ std::shared_ptr<FunctionDecl> Parser::getFunctionDecl()
 {
     eat(Token::LetKw);
 
-    jcVariablePtr idLex = jcVariable::Create();
+    jcMutableVariablePtr idLex = jcMutableVariable::Create();
     Token tok = nextToken(idLex);
 
     JC_ASSERT_OR_THROW(tok == Token::Id, "Expected an ID");
@@ -113,7 +113,7 @@ std::shared_ptr<FunctionDecl> Parser::getFunctionDecl()
         eat(Token::LParen);
 
         while (peekToken() == Token::Id) {
-            jcVariablePtr var = jcVariable::Create();
+            jcMutableVariablePtr var = jcMutableVariable::Create();
             nextToken(var);
 
             funcParams.push_back(var->asString());
@@ -187,7 +187,7 @@ Token Parser::peekToken()
     return tok;
 }
 
-Token Parser::nextToken(jcVariablePtr lexeme)
+Token Parser::nextToken(jcMutableVariablePtr lexeme)
 {
     Token tok = Token::Error;
     JC_ASSERT_OR_THROW(lex->getNextToken(&tok, lexeme) == true, "Bad Token");

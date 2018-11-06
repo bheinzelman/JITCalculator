@@ -12,6 +12,15 @@
 ///////////////////////////////////
 using fourcc = int32_t;
 
+class jcVariable;
+using jcVariablePtr = std::shared_ptr<jcVariable>;
+
+class jcMutableVariable;
+using jcMutableVariablePtr = std::shared_ptr<jcMutableVariable>;
+
+class jcCollection;
+using jcCollectionPtr = std::shared_ptr<jcCollection>;
+
 class jcException : public std::exception {
 public:
     jcException(const std::string& message)

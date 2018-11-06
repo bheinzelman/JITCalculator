@@ -10,14 +10,21 @@ jcVariablePtr jcVariable::Create()
 jcVariablePtr jcVariable::Create(std::string value)
 {
     auto me = jcVariable::Create();
-    me->setString(value);
+    me->set_String(value);
     return me;
 }
 
 jcVariablePtr jcVariable::Create(int value)
 {
     auto me = jcVariable::Create();
-    me->setInt(value);
+    me->set_Int(value);
+    return me;
+}
+
+jcVariablePtr jcVariable::Create(const jcCollection& collection)
+{
+    auto me = jcVariable::Create();
+    me->set_Collection(collection);
     return me;
 }
 
@@ -28,9 +35,7 @@ jcVariable::jcVariable()
 
 jcVariable::~jcVariable()
 {
-    if (mCurrentType == TypeString) {
-        delete[] mData.mStr;
-    }
+    willSet();
 }
 
 std::string jcVariable::asString() const
@@ -49,7 +54,15 @@ int jcVariable::asInt() const
     return 0;
 }
 
-void jcVariable::setString(const std::string& str)
+jcCollection* jcVariable::asCollection() const
+{
+    if (mCurrentType == TypeCollection) {
+        return mData.collection;
+    }
+    return nullptr;
+}
+
+void jcVariable::set_String(const std::string& str)
 {
     willSet();
 
@@ -59,11 +72,21 @@ void jcVariable::setString(const std::string& str)
     mCurrentType = TypeString;
 }
 
-void jcVariable::setInt(const int val)
+void jcVariable::set_Int(const int val)
 {
     willSet();
     mData.mInt = val;
     mCurrentType = TypeInt;
+}
+
+void jcVariable::set_Collection(const jcCollection& collection)
+{
+    willSet();
+    mData.collection = new jcCollection;
+    for (int i = 0; i < collection.size(); i++) {
+        mData.collection->push(collection.at(i));
+    }
+    mCurrentType = TypeCollection;
 }
 
 void jcVariable::willSet()
@@ -71,4 +94,31 @@ void jcVariable::willSet()
     if (mCurrentType == TypeString) {
         delete[] mData.mStr;
     }
+    if (mCurrentType == TypeCollection) {
+        delete mData.collection; 
+    }
+}
+
+/**
+ Mutable Variable
+ */
+
+jcMutableVariablePtr jcMutableVariable::Create()
+{
+    return std::make_shared<jcMutableVariable>(jcMutableVariable());
+}
+
+void jcMutableVariable::setString(const std::string& str)
+{
+    set_String(str);
+}
+
+void jcMutableVariable::setInt(const int val)
+{
+    set_Int(val);
+}
+
+void jcMutableVariable::setCollection(const jcCollection& collection)
+{
+    set_Collection(collection);
 }

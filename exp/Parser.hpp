@@ -28,7 +28,7 @@ private:
     Token peekOperator();
     bool peekExpression();
 
-    Token nextToken(jcVariablePtr lex);
+    Token nextToken(jcMutableVariablePtr lex);
     Token peekToken();
     // asserts the next token is of a given type
     void eat(Token token);
