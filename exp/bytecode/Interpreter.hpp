@@ -31,6 +31,8 @@ private:
     void pushIp();
     void popIp();
 
+    void callFunction(bc::Instruction instruction);
+
 private:
     std::stack<jcVariablePtr> mStack;
     std::stack<int> mIpStack;

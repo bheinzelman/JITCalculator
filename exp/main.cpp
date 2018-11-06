@@ -1,6 +1,5 @@
 //  main.cpp
 
-#include "Codegen.hpp"
 #include "Lexer.hpp"
 #include "Parser.hpp"
 #include "Runtime.hpp"
@@ -14,7 +13,7 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
-void evaluate_stream(std::istream& inputStream, std::ostream& outputStream, Runtime& rt)
+void evaluate_stream(std::istream& inputStream, std::ostream& outputStream, Runtime& rt, bool printResults)
 {
     std::vector<int> output;
     try {
@@ -22,9 +21,10 @@ void evaluate_stream(std::istream& inputStream, std::ostream& outputStream, Runt
             outputStream << "Error evaluation" << std::endl;
             return;
         }
-
-        for (auto outputValue : output) {
-            outputStream << outputValue << std::endl;
+        if (printResults) {
+            for (auto outputValue : output) {
+                outputStream << outputValue << std::endl;
+            }
         }
     } catch (jcException exception) {
         outputStream << "jcException..." << exception.getMessage() << std::endl;
@@ -67,7 +67,7 @@ void run_shell(std::ostream& stream)
                 std::stringstream stream;
                 stream << exp;
 
-                evaluate_stream(stream, std::cout, runtime);
+                evaluate_stream(stream, std::cout, runtime, true);
 
             } catch (jcException excecption) {
                 stream << "jcException... " << excecption.getMessage() << std::endl;
@@ -86,7 +86,7 @@ void run_file(std::string filename)
     }
 
     Runtime runtime;
-    evaluate_stream(inputStream, std::cout, runtime);
+    evaluate_stream(inputStream, std::cout, runtime, false);
 
     inputStream.close();
 }

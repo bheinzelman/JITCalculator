@@ -6,6 +6,7 @@
 #include "Interpreter.hpp"
 #include "ast.hpp"
 #include "jc.h"
+#include "builtin.hpp"
 
 static int performArtithmaticOp(bc::Op op, int right, int left)
 {
@@ -94,11 +95,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
             break;
         }
         case bc::Call: {
-            jcVariablePtr functionName = instruction.getOperand(0);
-            JC_ASSERT_OR_THROW(mLabelLut.count(functionName->asString()) > 0, "Function " + functionName->asString() + " does not exist");
-            pushIp();
-            mVariableLut.push(std::map<std::string, int>());
-            mIp = mLabelLut[functionName->asString()];
+            callFunction(instruction);
             break;
         }
         case bc::JmpTrue:
@@ -141,6 +138,37 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
     }
 
     return resolveVariable(popStack());
+}
+
+void Interpreter::callFunction(bc::Instruction instruction)
+{
+    jcVariablePtr functionName = instruction.getOperand(0);
+    if (mLabelLut.count(functionName->asString()) > 0) {
+        pushIp();
+        mVariableLut.push(std::map<std::string, int>());
+        mIp = mLabelLut[functionName->asString()];
+
+        return;
+    }
+
+    auto builtinFunctionInfo = lib::builtin::info(functionName->asString());
+    if (builtinFunctionInfo.count(lib::builtin::kLibError) == 0)
+    {
+        int numArgs = builtinFunctionInfo[lib::builtin::kLibParameterNumber]->asInt();
+        std::vector<jcVariablePtr> args;
+
+        for (int i = 0; i < numArgs; i++) {
+            args.push_back(popStack());
+        }
+
+        std::reverse(std::begin(args), std::end(args));
+
+        jcVariablePtr result = lib::builtin::execute(functionName->asString(), args);
+        mStack.push(result);
+        return;
+    }
+
+    JC_THROW(functionName->asString() + " does not exist");
 }
 
 int Interpreter::resolveVariable(jcVariablePtr var)
