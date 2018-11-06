@@ -1,21 +1,33 @@
 # JITCalculator
 
-The plan is to create a JIT calculator. That is a Just In Time Calculator. 
+`JITCalculator` is a small functional language. 
 
-This started out as an implementation of a recursive decent parser for expressions that implements operator
-precedence with precedence climbing as described in this blog post: https://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing.
+## Data Types
+Currently the only data type is Integers.
 
-But I decided it would be much more interesting to make it JIT.
+## Functions
 
-## Compiling
-If you are running macOS this is easy, just open the Xcode project and hit compile.
+To define a function, use the `let` keyword. If the function does not take any arguments, the parens may be omitted.
 
-## Running
-Currently the program will ask you for an expression to compute at the command line. Currently, it will output the x86_64 assembly code to
-compute this expression and write it to a file under the `test/` directory.
+```
+ let add(a,b) = a + b
+ let x = 1
+```
 
-To run the generated assembly move to the `test/` folder and run  `gcc -o program main.c compute.s` to compile, and then `./program` to
-run it. 
+## Guards
+To do any type of branching, you currently must use guards.
+```
+let min(a,b) 
+  | a < b = a
+  | else = b
+```
+`JITCalculator` will evaluate each guard until it finds one that evaluates to true, then it will execute and return the corresponding expression. If no guards evaluate to true, the `else` expression will be run. Currently you must have an `else` condition. Guards allow for much more interesting computations, such as ones that require looping/recursion.
 
-This is obviously not a JIT, but I am working on it.
-
+## Example program
+```
+ let factorial(n) 
+  | n > 1 = factorial(n-1) * n
+  | else = 1
+  
+ factorial(5)
+```
