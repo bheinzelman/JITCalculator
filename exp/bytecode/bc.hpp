@@ -74,6 +74,8 @@ public:
 
     void visit(VariableExpression* expression);
 
+    void visit(ListExpression* list);
+
     void visit(Guard* guard);
 
 private:

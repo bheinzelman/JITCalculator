@@ -37,7 +37,7 @@ std::shared_ptr<Node> Parser::parseLine()
 
 bool Parser::peekExpression()
 {
-    return peekToken() == Token::Num || peekToken() == Token::LParen || peekToken() == Token::Id;
+    return peekToken() == Token::Num || peekToken() == Token::LParen || peekToken() == Token::Id || peekToken() == Token::LeftBracket;
 }
 
 std::shared_ptr<Expression> Parser::getTerm()
@@ -75,6 +75,19 @@ std::shared_ptr<Expression> Parser::getTerm()
             //variable
             return std::make_shared<VariableExpression>(value->asString());
         }
+    } else if (tok == Token::LeftBracket) {
+        std::vector<std::shared_ptr<Expression>> elements;
+        while (1) {
+            if (peekExpression() == false) {
+                break;
+            }
+            elements.push_back(getExpression());
+            if (peekToken() != Token::RightBracket) {
+                eat(Token::Comma);
+            }
+        }
+        eat(Token::RightBracket);
+        return std::make_shared<ListExpression>(elements);
     }
     return nullptr;
 }

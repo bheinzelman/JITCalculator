@@ -21,8 +21,11 @@ public:
 private:
     jcVariablePtr popStack();
 
-    int resolveVariable(jcVariablePtr var);
-    bool resolveRuntimeVariable(std::string var, int* output);
+    /**
+     Resolves variables to literal values..
+     */
+    jcVariablePtr resolveVariable(jcVariablePtr var);
+    bool resolveRuntimeVariable(std::string var, jcMutableVariablePtr output);
     void setVariable(std::string var, jcVariablePtr to);
 
     void mapLabels(std::vector<bc::Instruction> instructions);
@@ -36,7 +39,7 @@ private:
 private:
     std::stack<jcVariablePtr> mStack;
     std::stack<int> mIpStack;
-    std::stack<std::map<std::string, int>> mVariableLut;
+    std::stack<std::map<std::string, jcVariablePtr>> mVariableLut;
 
     // instruction pointer
     int mIp;

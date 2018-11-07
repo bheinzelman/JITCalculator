@@ -53,7 +53,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
 {
     mapLabels(instructions);
 
-    mVariableLut.push(std::map<std::string, int>());
+    mVariableLut.push(std::map<std::string, jcVariablePtr>());
     mIp = startingPoint;
     bool shouldExit = false;
     while (shouldExit == false) {
@@ -74,7 +74,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
             jcVariablePtr right = popStack();
             jcVariablePtr left = popStack();
 
-            jcVariablePtr result = jcVariable::Create(performArtithmaticOp(op, resolveVariable(right), resolveVariable(left)));
+            jcVariablePtr result = jcVariable::Create(performArtithmaticOp(op, resolveVariable(right)->asInt(), resolveVariable(left)->asInt()));
             mStack.push(result);
             break;
         }
@@ -86,9 +86,12 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
         case bc::Pop: {
             jcVariablePtr variableName = instruction.getOperand(0);
 
-            int value;
-            if (!resolveRuntimeVariable(variableName->asString(), &value)) {
-                value = resolveVariable(popStack());
+            jcMutableVariablePtr value = jcMutableVariable::Create();
+            if (!resolveRuntimeVariable(variableName->asString(), value)) {
+                jcVariablePtr var = resolveVariable(popStack());
+                if (var != nullptr) {
+                    value = jcMutableVariable::Create(*var);
+                }
             }
 
             mVariableLut.top()[variableName->asString()] = value;
@@ -104,7 +107,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
             JC_ASSERT_OR_THROW(instruction.getOperand(0)->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
 
             if (op == bc::JmpTrue) {
-                bool shouldJump = resolveVariable(popStack());
+                bool shouldJump = resolveVariable(popStack())->asInt();
                 if (shouldJump == false) {
                     break;
                 }
@@ -118,7 +121,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
         }
         case bc::Ret: {
             if (mStack.top()->getType() != jcVariable::TypeInt) {
-                mStack.push(jcVariable::Create(resolveVariable(popStack())));
+                mStack.push(resolveVariable(popStack()));
             }
 
             popIp();
@@ -137,7 +140,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
         }
     }
 
-    return resolveVariable(popStack());
+    return popStack()->asInt();
 }
 
 void Interpreter::callFunction(bc::Instruction instruction)
@@ -145,25 +148,18 @@ void Interpreter::callFunction(bc::Instruction instruction)
     jcVariablePtr functionName = instruction.getOperand(0);
     if (mLabelLut.count(functionName->asString()) > 0) {
         pushIp();
-        mVariableLut.push(std::map<std::string, int>());
+        mVariableLut.push(std::map<std::string, jcVariablePtr>());
         mIp = mLabelLut[functionName->asString()];
 
         return;
     }
 
-    auto builtinFunctionInfo = lib::builtin::info(functionName->asString());
-    if (builtinFunctionInfo.count(lib::builtin::kLibError) == 0)
+    auto builtinFunctionInfo = lib::builtin::Shared().info(functionName->asString());
+    if (builtinFunctionInfo.count(lib::kLibError) == 0)
     {
-        int numArgs = builtinFunctionInfo[lib::builtin::kLibParameterNumber]->asInt();
-        std::vector<jcVariablePtr> args;
-
-        for (int i = 0; i < numArgs; i++) {
-            args.push_back(popStack());
-        }
-
-        std::reverse(std::begin(args), std::end(args));
-
-        jcVariablePtr result = lib::builtin::execute(functionName->asString(), args);
+        jcVariablePtr result = lib::builtin::Shared().execute(functionName->asString(), [this]() {
+            return popStack();
+        });
         mStack.push(result);
         return;
     }
@@ -171,14 +167,23 @@ void Interpreter::callFunction(bc::Instruction instruction)
     JC_THROW(functionName->asString() + " does not exist");
 }
 
-int Interpreter::resolveVariable(jcVariablePtr var)
+jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
 {
     if (var->getType() == jcVariable::TypeInt) {
-        return var->asInt();
+        return var;
+    } else if (var->getType() == jcVariable::TypeCollection) {
+        jcCollection *collection = var->asCollection();
+        JC_ASSERT(collection != nullptr);
+
+        std::vector<jcVariablePtr> resolvedCollection;
+        for (int i = 0; i < (int)collection->size(); i++) {
+            resolvedCollection.push_back(resolveVariable(collection->at(i)));
+        }
+        return jcVariable::Create(jcCollection(resolvedCollection));
     } else {
-        int value;
-        if (resolveRuntimeVariable(var->asString(), &value)) {
-            return value;
+        jcMutableVariablePtr mutablePtr = jcMutableVariable::Create();
+        if (resolveRuntimeVariable(var->asString(), mutablePtr)) {
+            return mutablePtr;
         }
 
         JC_ASSERT_OR_THROW(mVariableLut.top().count(var->asString()) > 0, "undefined variable");
@@ -190,18 +195,18 @@ void Interpreter::setVariable(std::string var, jcVariablePtr to)
 {
     // Check if runtime var
     if (var == bc::vars::ip) {
-        mIp = resolveVariable(to);
+        mIp = resolveVariable(to)->asInt();
         return;
     }
     JC_ASSERT_OR_THROW(mVariableLut.top().count(var) > 0, "Cannot set undefined var");
     mVariableLut.top()[var] = resolveVariable(to);
 }
 
-bool Interpreter::resolveRuntimeVariable(std::string var, int* output)
+bool Interpreter::resolveRuntimeVariable(std::string var, jcMutableVariablePtr output)
 {
     if (var == bc::vars::ip) {
         if (output) {
-            *output = mIp;
+            output->setInt(mIp);
         }
         return true;
     }

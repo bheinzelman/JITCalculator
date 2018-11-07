@@ -4,25 +4,60 @@
 #include "jcVariable.hpp"
 
 #include <string>
+#include <functional>
 #include <map>
 #include <vector>
+#include <ostream>
 
 namespace lib
 {
-namespace builtin
-{
-    /**
-     Keys that populate the info dict
-     */
-    const std::string kLibParameterNumber = "LibParameterNumber";
-    const std::string kLibError = "LibError";
-    const std::string kLibReturnType = "LibReturnType";
 
-    /**
-     Library functions
-     */
-    const std::string kLibPrint = "print";
+/**
+ Keys that populate the info dict
+ */
+const std::string kLibParameterNumber = "LibParameterNumber";
+const std::string kLibError = "LibError";
+const std::string kLibReturnType = "LibReturnType";
 
+/**
+ Library functions
+
+ function: print
+    - prints the given value
+
+ function: List
+    - arg 1, number of elements
+    - arg ..., elements in the list
+    - returns a new list
+
+ function: head
+    - arg 1: a list
+    - returns the first element in the list
+
+ function: tail
+    - arg 1: a list
+    - returns the list with all elements but the first
+
+ */
+const std::string kLibPrint = "print";
+    
+const std::string kLibList = "List";
+const std::string kLibHead = "head";
+const std::string kLibTail = "tail";
+
+struct LibState {
+    std::ostream &mStdout;
+    std::ostream &mStderr;
+
+    LibState();
+};
+
+using LibraryFunction = std::function<jcVariablePtr(std::function<jcVariablePtr()>, LibState)>;
+
+class builtin {
+    builtin();
+public:
+    static builtin Shared();
     /**
      Return function info for given name
      If the function does not exist, the kLibError key will be set
@@ -33,6 +68,15 @@ namespace builtin
      Runs the given function with the supplied arguments
      Runtime error will be thrown if function does not exist
      */
-    jcVariablePtr execute(const std::string &functionName, const std::vector<jcVariablePtr> &args);
-}
+    jcVariablePtr execute(const std::string &functionName, std::function<jcVariablePtr()> stackAccess);
+
+    LibState state() const;
+
+private:
+    static std::map<std::string, std::map<std::string, jcVariablePtr>> mInfo;
+    static std::map<std::string, LibraryFunction> mFunctions;
+
+    LibState mState;
+};
+
 }

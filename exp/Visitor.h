@@ -8,6 +8,7 @@ class BinaryExpression;
 class FunctionCallExpression;
 class FunctionDecl;
 class Guard;
+class ListExpression;
 
 class Visitor {
 public:
@@ -15,6 +16,7 @@ public:
     virtual void visit(VariableExpression* expression) = 0;
     virtual void visit(FunctionCallExpression* expression) = 0;
     virtual void visit(BinaryExpression* expression) = 0;
+    virtual void visit(ListExpression* expression) = 0;
     virtual void visit(FunctionDecl* expression) = 0;
     virtual void visit(Guard* expression) = 0;
 };

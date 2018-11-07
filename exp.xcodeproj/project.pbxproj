@@ -29,6 +29,7 @@
 		4E0A7F9721914FBB00130C6B /* builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A7F9521914FBB00130C6B /* builtin.cpp */; };
 		4E0A7F98219153E000130C6B /* builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A7F9521914FBB00130C6B /* builtin.cpp */; };
 		4E6C0E7C2182CDA900A4F0D8 /* jcCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */; };
+		4EFAF74321928CF700407EB1 /* jcCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */; };
 		4EFF2131216DA85100E57AC5 /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4EFF212F216DA85100E57AC5 /* SymbolTable.cpp */; };
 		4EFF2132216E7F0F00E57AC5 /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4EFF212F216DA85100E57AC5 /* SymbolTable.cpp */; };
 /* End PBXBuildFile section */
@@ -288,6 +289,7 @@
 			files = (
 				3C3CA71E215C2B0F00956902 /* Token.cpp in Sources */,
 				3C3CA720215C2B1500956902 /* ast.cpp in Sources */,
+				4EFAF74321928CF700407EB1 /* jcCollection.cpp in Sources */,
 				3C3CA718215C297200956902 /* units.mm in Sources */,
 				3C3CA71F215C2B1200956902 /* Lexer.cpp in Sources */,
 				4E0A7F98219153E000130C6B /* builtin.cpp in Sources */,

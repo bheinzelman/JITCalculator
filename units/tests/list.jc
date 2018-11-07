@@ -1,0 +1,4 @@
+let x = [1, 2, 3]
+
+print(x())
+print(List(3, 5, 2, 4))

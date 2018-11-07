@@ -14,7 +14,7 @@
 
 @implementation units
 
-- (NSArray<NSDictionary *> *)expressions
+- (NSArray<NSDictionary *> *)inlineExpressions
 {
 	return @[
 			 @{@"value": @2, @"exp": @"1 + 1"},
@@ -34,13 +34,16 @@
              @{@"value": @1, @"exp": @"2 == 2"},
              @{@"value": @1, @"exp": @"(1 == 2) == 0"},
              @{@"value": @0, @"exp": @"let x(a,b) | a > b = a | else = b"},
-             @{@"value": @2, @"exp": @"x(2,1)"}
+             @{@"value": @2, @"exp": @"x(2,1)"},
+             @{@"value": @0, @"exp": @"let self(yy) = yy"},
+             @{@"value": @1, @"exp": @"self(1)"},
+             @{@"value": @1, @"exp": @"head([1,2,3])"},
 			 ];
 }
 
 - (void)test1 {
     Runtime rt;
-	for (NSDictionary *d in self.expressions) {
+	for (NSDictionary *d in self.inlineExpressions) {
 		int expected = [d[@"value"] intValue];
 		NSString *expression = d[@"exp"];
 		
