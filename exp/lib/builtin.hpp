@@ -38,12 +38,17 @@ const std::string kLibReturnType = "LibReturnType";
     - arg 1: a list
     - returns the list with all elements but the first
 
+ function: len
+    - arg 1: a list
+    - returns the length of the list
+
  */
 const std::string kLibPrint = "print";
     
 const std::string kLibList = "List";
 const std::string kLibHead = "head";
 const std::string kLibTail = "tail";
+const std::string kLibLen = "len";
 
 struct LibState {
     std::ostream &mStdout;

@@ -158,7 +158,7 @@ void Interpreter::callFunction(bc::Instruction instruction)
     if (builtinFunctionInfo.count(lib::kLibError) == 0)
     {
         jcVariablePtr result = lib::builtin::Shared().execute(functionName->asString(), [this]() {
-            return popStack();
+            return resolveVariable(popStack());
         });
         mStack.push(result);
         return;

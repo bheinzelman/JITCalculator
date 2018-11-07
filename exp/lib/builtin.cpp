@@ -35,6 +35,13 @@ std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
             {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
         }
     },
+    {
+        kLibLen,
+        {
+            {kLibParameterNumber, jcVariable::Create(1)},
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeInt)}
+        }
+    },
 };
 
 std::map<std::string, LibraryFunction> builtin::mFunctions =
@@ -82,6 +89,17 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
             }
 
             return jcVariable::Create(elementsTail);
+        }
+    },
+    {
+        kLibLen,
+        [](std::function<jcVariablePtr()> stackAccess, LibState state) -> jcVariablePtr {
+            jcVariablePtr arg = stackAccess();
+            JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
+            jcCollection *collection = arg->asCollection();
+            JC_ASSERT(collection != nullptr);
+
+            return jcVariable::Create((int)collection->size());
         }
     },
 };
