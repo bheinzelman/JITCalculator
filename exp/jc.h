@@ -61,6 +61,6 @@ private:
 #define JC_ASSERT_OR_THROW(e, m)  \
     do {                          \
         if (!(e)) {               \
-            throw jcException(m); \
+            JC_THROW(m); \
         }                         \
     } while (0);

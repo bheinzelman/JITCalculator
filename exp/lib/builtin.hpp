@@ -42,6 +42,11 @@ const std::string kLibReturnType = "LibReturnType";
     - arg 1: a list
     - returns the length of the list
 
+ function: concat
+    - arg 1: a list
+    - arg 2: a list
+    - returns list 1 and list 2 concatenated
+
  */
 const std::string kLibPrint = "print";
     
@@ -49,6 +54,7 @@ const std::string kLibList = "List";
 const std::string kLibHead = "head";
 const std::string kLibTail = "tail";
 const std::string kLibLen = "len";
+const std::string kLibConcat = "concat";
 
 struct LibState {
     std::ostream &mStdout;

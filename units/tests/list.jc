@@ -8,3 +8,5 @@ let sum(x)
 	| else = 0
 
 print(sum([1,2,3]))
+
+print(concat([1,2,3], [1,2,3]))

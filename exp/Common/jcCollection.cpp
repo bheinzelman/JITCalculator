@@ -36,3 +36,15 @@ size_t jcCollection::size() const
 {
     return mItems.size();
 }
+
+jcCollection jcCollection::concat(const jcCollection &other)
+{
+    std::vector<jcVariablePtr> newCollection;
+    for (int i = 0; i < (int)size(); i++) {
+        newCollection.push_back(at(i));
+    }
+    for (int i = 0; i < other.size(); i++) {
+        newCollection.push_back(other.at(i));
+    }
+    return jcCollection(newCollection);
+}
