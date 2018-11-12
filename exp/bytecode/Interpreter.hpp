@@ -16,7 +16,10 @@ class Interpreter {
 public:
     Interpreter();
 
-    int interpret(std::vector<bc::Instruction> instructions, int startingPoint);
+    /**
+     Returns value on the top of the stack
+     */
+    jcVariablePtr interpret(std::vector<bc::Instruction> instructions, int startingPoint);
 
 private:
     jcVariablePtr popStack();

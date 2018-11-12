@@ -49,7 +49,7 @@ void Interpreter::mapLabels(std::vector<bc::Instruction> instructions)
     }
 }
 
-int Interpreter::interpret(std::vector<bc::Instruction> instructions, int startingPoint)
+jcVariablePtr Interpreter::interpret(std::vector<bc::Instruction> instructions, int startingPoint)
 {
     mapLabels(instructions);
 
@@ -140,7 +140,7 @@ int Interpreter::interpret(std::vector<bc::Instruction> instructions, int starti
         }
     }
 
-    return popStack()->asInt();
+    return resolveVariable(popStack());
 }
 
 void Interpreter::callFunction(bc::Instruction instruction)

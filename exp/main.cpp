@@ -15,7 +15,7 @@
 
 void evaluate_stream(std::istream& inputStream, std::ostream& outputStream, Runtime& rt, bool printResults)
 {
-    std::vector<int> output;
+    std::vector<jcVariablePtr> output;
     try {
         if (!rt.evaluate(inputStream, output)) {
             outputStream << "Error evaluation" << std::endl;
@@ -23,7 +23,7 @@ void evaluate_stream(std::istream& inputStream, std::ostream& outputStream, Runt
         }
         if (printResults) {
             for (auto outputValue : output) {
-                outputStream << outputValue << std::endl;
+                outputStream << outputValue->stringRepresentation() << std::endl;
             }
         }
     } catch (jcException exception) {

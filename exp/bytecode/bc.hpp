@@ -13,22 +13,90 @@
 
 namespace bc {
 enum Op {
+    /**
+     Pushes a value to the argument stack
+     */
     Push,
+
+    /**
+     Returns control of the function back to the caller
+     */
     Ret,
+
+    /**
+     Pop value off argument stack
+        - arg - the variable to be placed into
+     */
     Pop,
+
+    /**
+     Adds the top two values in the argument stack
+     */
     Add,
+
+    /**
+     Subtracts the top two values in the argument stack
+     */
     Subtract,
+
+    /**
+     Multiplies the top two values in the argument stack
+     */
     Multiply,
+
+    /**
+     Divides the top two values in the argument stack
+     */
     Divide,
+
+    /**
+     Computes less than for top to values in the argument stack
+     */
     Less_Than,
+
+    /**
+     Computes greater than for top to values in the argument stack
+     */
     Greater_Than,
+
+    /**
+     Computes less than or equal for top to values in the argument stack
+     */
     Less_Than_Equal,
+
+    /**
+     Computes greater than or equal for top to values in the argument stack
+     */
     Greater_Than_Equal,
+
+    /**
+     Computes equality for top to values in the argument stack
+     */
     Equals,
+
+    /**
+     Calls the function at the given label or line number
+     */
     Call,
+
+    /**
+     Defines a label
+     */
     Label,
+
+    /**
+     Conditionally jump if the top of the stack is TRUE
+     */
     JmpTrue,
+
+    /**
+     Jump to label
+     */
     Jmp,
+
+    /**
+     Exit the program
+     */
     Exit,
 };
 
@@ -58,6 +126,9 @@ private:
     std::vector<jcVariablePtr> mOperands;
 };
 
+/**
+ Walks through the AST and generates bytecode
+ */
 class Generator : Visitor {
 public:
     Generator(std::shared_ptr<Node> root);

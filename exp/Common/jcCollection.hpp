@@ -18,7 +18,9 @@ public:
     jcVariablePtr at(int index) const;
     size_t size() const;
 
-    jcCollection concat(const jcCollection &other);
+    jcCollection concat(const jcCollection &other) const;
+
+    bool equal(const jcCollection &other) const;
 
 private:
     std::vector<jcVariablePtr> mItems;

@@ -46,7 +46,9 @@ public:
      if "1" -> "1"
      if [1,2,3] -> "[1, 2, 3]"
      */
-    std::string stringRepresentation();
+    std::string stringRepresentation() const;
+
+    bool equal(const jcVariable &other) const;
 
 protected:
     static jcVariablePtr Create();

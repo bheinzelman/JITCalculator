@@ -98,7 +98,7 @@ void jcVariable::willSet()
         delete mData.collection; 
     }
 }
-std::string jcVariable::stringRepresentation() {
+std::string jcVariable::stringRepresentation() const {
     if (getType() == TypeInt) {
         return std::to_string(asInt());
     } else if (getType() == TypeString) {
@@ -116,6 +116,31 @@ std::string jcVariable::stringRepresentation() {
         return rep + "]";
     }
     return "";
+}
+
+bool jcVariable::equal(const jcVariable &other) const
+{
+    if (getType() != other.getType()) {
+        return false;
+    }
+
+    switch (getType()) {
+        case TypeInt:
+            return asInt() == other.asInt();
+        case TypeString:
+            return asString() == other.asString();
+        case TypeCollection: {
+            auto collection1 = asCollection();
+            auto collection2 = other.asCollection();
+
+            if (collection1 != nullptr && collection2 != nullptr) {
+                return collection1->equal(*collection2);
+            }
+            return collection1 == collection2;
+        }
+        default:
+            return false;
+    }
 }
 
 /**
