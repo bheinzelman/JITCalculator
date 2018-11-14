@@ -141,3 +141,17 @@ std::shared_ptr<Expression> Guard::getBodyExpression() const
 {
     return mBodyExpression;
 }
+
+ListExpression::ListExpression(const std::vector<std::shared_ptr<Expression>> &elements) : mElements(elements)
+{
+}
+
+void ListExpression::accept(Visitor *v)
+{
+    v->visit(this);
+}
+
+std::vector<std::shared_ptr<Expression>> ListExpression::getElements() const
+{
+    return mElements;
+}

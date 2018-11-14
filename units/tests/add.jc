@@ -2,11 +2,11 @@ let fact(ab)
 | ab > 1 = fact(ab - 1) * ab 
 | else = 1 
 
-fact(10)
-fact(3)
+print(fact(10))
+print(fact(3))
 
 let min(a,b) 
 | a < b = a
 | else = b
 
-min(2,3)
+print(min(2,3))

@@ -96,6 +96,18 @@ private:
     Token op;
 };
 
+class ListExpression : public Expression {
+public:
+    ListExpression(const std::vector<std::shared_ptr<Expression>> &elements);
+
+    void accept(Visitor *v) override;
+
+    std::vector<std::shared_ptr<Expression>> getElements() const;
+
+private:
+    std::vector<std::shared_ptr<Expression>> mElements;
+};
+
 class Guard : public Node {
 public:
     Guard(const std::shared_ptr<Expression> guardExpression,

@@ -36,3 +36,39 @@ size_t jcCollection::size() const
 {
     return mItems.size();
 }
+
+jcCollection jcCollection::concat(const jcCollection &other) const
+{
+    std::vector<jcVariablePtr> newCollection;
+    for (int i = 0; i < (int)size(); i++) {
+        newCollection.push_back(at(i));
+    }
+    for (int i = 0; i < other.size(); i++) {
+        newCollection.push_back(other.at(i));
+    }
+    return jcCollection(newCollection);
+}
+
+bool jcCollection::equal(const jcCollection &other) const
+{
+    if (size() != other.size()) {
+        return false;
+    }
+
+    for (int i = 0; i < (int)size(); i++) {
+        auto elem1 = at(i);
+        auto elem2 = other.at(i);
+        if (elem1 == nullptr && elem2 == nullptr) {
+            return true;
+        }
+        
+        if (elem1 == nullptr ^ elem2 == nullptr) {
+            return false;
+        }
+
+        if (elem1->equal(*elem2) == false) {
+            return false;
+        }
+    }
+    return true;
+}

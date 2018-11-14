@@ -2,6 +2,7 @@
 
 #include "bc.hpp"
 #include "jc.h"
+#include "builtin.hpp"
 
 #include <algorithm>
 #include <string>
@@ -182,6 +183,21 @@ void Generator::visit(BasicExpression* expression)
     jcVariablePtr expressionVal = jcVariable::Create(expression->getValue());
     Instruction pushOp = Instruction(bc::Push, { expressionVal });
     mOutput.push_back(pushOp);
+}
+
+void Generator::visit(ListExpression* list)
+{
+    auto elements = list->getElements();
+    std::reverse(std::begin(elements), std::end(elements));
+    for (auto element : elements) {
+        element->accept(this);
+    }
+    Instruction pushOp = Instruction(bc::Push, { jcVariable::Create((int)elements.size())});
+    mOutput.push_back(pushOp);
+
+    Instruction callList = Instruction(bc::Call, { jcVariable::Create(lib::kLibList)});
+    mOutput.push_back(callList);
+    
 }
 
 void Generator::visit(FunctionCallExpression* expression)

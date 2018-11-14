@@ -22,7 +22,7 @@ Runtime::Runtime()
 {
 }
 
-bool Runtime::evaluate(std::istream& stream, std::vector<int>& outputValues)
+bool Runtime::evaluate(std::istream& stream, std::vector<jcVariablePtr>& outputValues)
 {
     Lexer lex(stream);
     Parser parser(std::make_shared<Lexer>(lex));
@@ -58,8 +58,7 @@ bool Runtime::evaluate(std::istream& stream, std::vector<int>& outputValues)
             std::vector<bc::Instruction> instructions = mSymbols.asInstructionList();
             output.insert(output.end(), instructions.begin(), instructions.end());
 
-            int myValue = interpreter.interpret(output, 0);
-            outputValues.push_back(myValue);
+            outputValues.push_back(interpreter.interpret(output, 0));
         }
     }
     return true;

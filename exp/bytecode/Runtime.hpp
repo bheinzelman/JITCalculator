@@ -11,7 +11,7 @@ class Runtime {
 public:
     Runtime();
 
-    bool evaluate(std::istream& stream, std::vector<int>& outputValues);
+    bool evaluate(std::istream& stream, std::vector<jcVariablePtr>& outputValues);
 
 private:
     SymbolTable mSymbols;

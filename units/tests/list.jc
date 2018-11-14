@@ -1,0 +1,12 @@
+let x = [1, 2, 3]
+
+print(x())
+print(List(3, 5, 2, 4))
+
+let sum(x) 
+	| len(x) > 0 = head(x) + sum(tail(x))
+	| else = 0
+
+print(sum([1,2,3]))
+
+print(concat([1,2,3], [1,2,3]))

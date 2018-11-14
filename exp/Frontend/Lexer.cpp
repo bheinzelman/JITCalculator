@@ -76,6 +76,12 @@ bool Lexer::getNextToken(Token* token, jcMutableVariablePtr lexeme)
         case '|':
             nextToken = Token::Pipe;
             break;
+        case '[':
+            nextToken = Token::LeftBracket;
+            break;
+        case ']':
+            nextToken = Token::RightBracket;
+            break;
         default:
             break;
         }

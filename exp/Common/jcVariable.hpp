@@ -40,6 +40,16 @@ public:
         return mCurrentType;
     }
 
+    /**
+     Returns the string representation,
+     if 1 -> "1"
+     if "1" -> "1"
+     if [1,2,3] -> "[1, 2, 3]"
+     */
+    std::string stringRepresentation() const;
+
+    bool equal(const jcVariable &other) const;
+
 protected:
     static jcVariablePtr Create();
 
@@ -64,6 +74,7 @@ class jcMutableVariable : public jcVariable
     jcMutableVariable() {}
 
 public:
+    static jcMutableVariablePtr Create(jcVariable &other);
     static jcMutableVariablePtr Create();
 
     void setString(const std::string& str);
