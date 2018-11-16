@@ -137,15 +137,15 @@ void VariableExpression::accept(Visitor* v)
     v->visit(this);
 }
 
-FunctionCallExpression::FunctionCallExpression(const std::string functionId, const std::vector<std::shared_ptr<Expression>> arguments)
-    : mFunctionId(functionId)
+FunctionCallExpression::FunctionCallExpression(std::shared_ptr<Expression> callee, const std::vector<std::shared_ptr<Expression>> arguments)
+    : mCallee(callee)
     , mArguments(arguments)
 {
 }
 
-std::string FunctionCallExpression::getFunctionId() const
+std::shared_ptr<Expression> FunctionCallExpression::getCallee() const
 {
-    return mFunctionId;
+    return mCallee;
 }
 
 std::vector<std::shared_ptr<Expression>> FunctionCallExpression::getArguments() const

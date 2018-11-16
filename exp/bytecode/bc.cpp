@@ -263,9 +263,8 @@ void Generator::visit(ListExpression* list)
     Instruction pushOp = Instruction(bc::Push, { jcVariable::Create((int)elements.size())});
     mOutput.push_back(pushOp);
 
-    Instruction callList = Instruction(bc::Call, { jcVariable::Create(lib::kLibList)});
-    mOutput.push_back(callList);
-    
+    mOutput.push_back(Instruction(bc::Push, {jcVariable::Create(lib::kLibList)}));
+    mOutput.push_back(Instruction(bc::Call));
 }
 
 void Generator::visit(FunctionCallExpression* expression)
@@ -276,9 +275,8 @@ void Generator::visit(FunctionCallExpression* expression)
         arg->accept(this);
     }
 
-    jcVariablePtr functionName = jcVariable::Create(expression->getFunctionId());
-    Instruction callInstruction = Instruction(bc::Call, { functionName });
-    mOutput.push_back(callInstruction);
+    expression->getCallee()->accept(this);
+    mOutput.push_back(Instruction(bc::Call));
 }
 
 void Generator::visit(BinaryExpression* expression)

@@ -65,15 +65,15 @@ private:
 
 class FunctionCallExpression : public Expression {
 public:
-    FunctionCallExpression(const std::string functionId, const std::vector<std::shared_ptr<Expression>> arguments);
+    FunctionCallExpression(std::shared_ptr<Expression> callee, const std::vector<std::shared_ptr<Expression>> arguments);
 
-    std::string getFunctionId() const;
+    std::shared_ptr<Expression> getCallee() const;
     std::vector<std::shared_ptr<Expression>> getArguments() const;
 
     void accept(Visitor* v) override;
 
 private:
-    std::string mFunctionId;
+    std::shared_ptr<Expression> mCallee;
     std::vector<std::shared_ptr<Expression>> mArguments;
 };
 

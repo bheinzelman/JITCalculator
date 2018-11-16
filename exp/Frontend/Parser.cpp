@@ -45,6 +45,37 @@ bool Parser::peekExpression()
            token == Token::LeftBrace;
 }
 
+std::vector<std::shared_ptr<Expression>> Parser::getFunctionCallArgs()
+{
+    eat(Token::LParen);
+    std::vector<std::shared_ptr<Expression>> args;
+    while (1) {
+        if (peekExpression() == false) {
+            break;
+        }
+
+        auto argument = getExpression();
+
+        args.push_back(argument);
+
+        if (peekToken() != Token::RParen) {
+            eat(Token::Comma);
+        }
+    }
+
+    eat(Token::RParen);
+    return args;
+}
+
+std::shared_ptr<Expression> Parser::getPostfixOps(std::shared_ptr<Expression> expIn)
+{
+    if (peekToken() == Token::LParen) {
+        auto functionCallArgs = getFunctionCallArgs();
+        return getPostfixOps(std::make_shared<FunctionCallExpression>(expIn, functionCallArgs));
+    }
+    return expIn;
+}
+
 std::shared_ptr<Expression> Parser::getTerm()
 {
     jcMutableVariablePtr value = jcMutableVariable::Create();
@@ -56,30 +87,7 @@ std::shared_ptr<Expression> Parser::getTerm()
         eat(Token::RParen);
         return exp;
     } else if (tok == Token::Id) {
-        if (peekToken() == Token::LParen) {
-            //function
-            eat(Token::LParen);
-            std::vector<std::shared_ptr<Expression>> args;
-            while (1) {
-                if (peekExpression() == false) {
-                    break;
-                }
-
-                auto argument = getExpression();
-
-                args.push_back(argument);
-
-                if (peekToken() != Token::RParen) {
-                    eat(Token::Comma);
-                }
-            }
-
-            eat(Token::RParen);
-            return std::make_shared<FunctionCallExpression>(value->asString(), args);
-        } else {
-            //variable
-            return std::make_shared<VariableExpression>(value->asString());
-        }
+        return std::make_shared<VariableExpression>(value->asString());
     } else if (tok == Token::LeftBracket) {
         std::vector<std::shared_ptr<Expression>> elements;
         while (1) {
@@ -195,7 +203,8 @@ std::shared_ptr<FunctionDecl> Parser::getFunctionDecl()
 
 std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
 {
-    std::shared_ptr<Expression> left = getTerm();
+    std::shared_ptr<Expression> left = getPostfixOps(getTerm());
+
     while (1) {
         Token op = peekOperator();
         if (op != Token::Error && jcToken::getOperatorPrecedence(op) < prevPrec) {

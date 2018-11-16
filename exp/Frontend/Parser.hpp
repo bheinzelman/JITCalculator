@@ -30,6 +30,9 @@ private:
     std::vector<std::shared_ptr<Guard>> getGuards();
     std::shared_ptr<FunctionBody> getFunctionBody();
 
+    std::vector<std::shared_ptr<Expression>> getFunctionCallArgs();
+    std::shared_ptr<Expression> getPostfixOps(std::shared_ptr<Expression> expIn);
+
     // Will return the error token if the next token is not an operator
     Token peekOperator();
     bool peekExpression();

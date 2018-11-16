@@ -61,6 +61,8 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         if (rt.evaluate(stream, output)) {
             if (output.size()) {
                 jcVariablePtr value = output.front();
+                std::cout << expectedValue->stringRepresentation() << std::endl;
+                std::cout << value->stringRepresentation() << std::endl;
                 JC_ASSERT(value != nullptr && expectedValue != nullptr);
                 return value->equal(*expectedValue);
             }
@@ -224,6 +226,37 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     stream << program;
 
     XCTAssert(testStream(stream, rt, intVecToPtr(valuesToSort)));
+}
+
+- (void)testInlineClosure
+{
+    Runtime rt;
+
+    NSString *program = @"{() = 555}()";
+
+    jcVariablePtr expected = jcVariable::Create(555);
+
+    std::stringstream stream;
+    toStream(program, stream);
+
+    XCTAssert(testStream(stream, rt, expected));
+}
+
+- (void)testFunctionCallString
+{
+    Runtime rt;
+
+    NSString *program = @"let callit(fn) = fn\
+    let four = 4 \
+    callit(four)() \
+    ";
+
+    jcVariablePtr expected = jcVariable::Create(4);
+
+    std::stringstream stream;
+    toStream(program, stream);
+
+    XCTAssert(testStream(stream, rt, expected));
 }
 
 

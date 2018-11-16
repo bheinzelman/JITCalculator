@@ -107,7 +107,7 @@ jcVariablePtr Interpreter::interpret(std::vector<bc::Instruction> instructions, 
             break;
         }
         case bc::Call: {
-            callFunction(instruction);
+            callFunction();
             break;
         }
         case bc::JmpTrue:
@@ -152,12 +152,15 @@ jcVariablePtr Interpreter::interpret(std::vector<bc::Instruction> instructions, 
     return resolveVariable(popStack());
 }
 
-void Interpreter::callFunction(bc::Instruction instruction)
+void Interpreter::callFunction()
 {
-
-    jcVariablePtr operand = instruction.getOperand(0);
+    jcVariablePtr operand = popStack();
     std::string functionName = "";
 
+    JC_ASSERT_OR_THROW(operand->getType() == jcVariable::TypeString ||
+                       operand->getType() == jcVariable::TypeClosure,
+                       "Cannot call non-closure or non-id value"
+                       );
 
     auto setupClosure = [&functionName, this](jcClosure *closure) {
         JC_ASSERT(closure);

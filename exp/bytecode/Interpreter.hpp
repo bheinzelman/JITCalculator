@@ -36,7 +36,7 @@ private:
     void pushIp();
     void popIp();
 
-    void callFunction(bc::Instruction instruction);
+    void callFunction();
 
     bool functionExists(jcVariablePtr var) const;
 
