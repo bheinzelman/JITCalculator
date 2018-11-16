@@ -83,6 +83,8 @@ enum Op {
 
     /**
      Calls the function at the given label or line number
+     Note, does not take arguments, will call the function/closure that is at the top
+     of the stack
      */
     Call,
 
