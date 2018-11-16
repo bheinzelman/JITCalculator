@@ -13,6 +13,7 @@
 static fourcc kExpressionType = 'expr';
 static fourcc kFunctionDeclType = 'decl';
 static fourcc kFunctionGuardType = 'grd_';
+static fourcc kFunctionBody = 'fbdy';
 
 class Node {
 public:
@@ -129,18 +130,51 @@ private:
     std::shared_ptr<Expression> mBodyExpression;
 };
 
+class FunctionBody : public Node {
+public:
+    FunctionBody(std::shared_ptr<Expression> exp,
+                 std::vector<std::string> params,
+                 const std::vector<std::shared_ptr<Guard>>& guards);
+
+    void accept(Visitor* v) override;
+
+    std::shared_ptr<Expression> getDefaultExpression() const;
+    std::vector<std::string> getParameters() const;
+    std::vector<std::shared_ptr<Guard>> getGuards() const;
+
+    fourcc type() const override
+    {
+        return kFunctionBody;
+    }
+
+private:
+    std::shared_ptr<Expression> mExpression;
+    std::vector<std::string> mParams;
+    std::vector<std::shared_ptr<Guard>> mGuards;
+};
+
+class Closure : public Expression {
+public:
+    Closure(const std::vector<std::string> &scope, std::shared_ptr<FunctionBody> body);
+
+    void accept(Visitor* v) override;
+    std::shared_ptr<FunctionBody> getBody() const;
+    std::vector<std::string> getScope() const;
+
+private:
+    std::vector<std::string> mScope;
+    std::shared_ptr<FunctionBody> mFunctionBody;
+};
+
 class FunctionDecl : public Node {
 public:
-    FunctionDecl(const std::string& id, std::shared_ptr<Expression> exp,
-        std::vector<std::string> params,
-        const std::vector<std::shared_ptr<Guard>>& guards);
+    FunctionDecl(const std::string& id,
+                 std::shared_ptr<FunctionBody> body);
 
     void accept(Visitor* v) override;
 
     std::string getId() const;
-    std::shared_ptr<Expression> getDefaultExpression() const;
-    std::vector<std::string> getParameters() const;
-    std::vector<std::shared_ptr<Guard>> getGuards() const;
+    std::shared_ptr<FunctionBody> getFunctionBody() const;
 
     fourcc type() const override
     {
@@ -149,7 +183,5 @@ public:
 
 private:
     std::string mId;
-    std::shared_ptr<Expression> mExpression;
-    std::vector<std::string> mParams;
-    std::vector<std::shared_ptr<Guard>> mGuards;
+    std::shared_ptr<FunctionBody> mBody;
 };

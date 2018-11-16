@@ -8,6 +8,8 @@
 
 #include <stack>
 #include <vector>
+#include <set>
+#include <utility>
 
 // all things bytecode
 
@@ -17,6 +19,11 @@ enum Op {
      Pushes a value to the argument stack
      */
     Push,
+
+    /**
+     Push a closure
+     */
+    PushC,
 
     /**
      Returns control of the function back to the caller
@@ -131,9 +138,10 @@ private:
  */
 class Generator : Visitor {
 public:
-    Generator(std::shared_ptr<Node> root);
+    Generator();
 
-    std::vector<Instruction> getInstructions();
+    std::vector<Instruction> getInstructions(std::shared_ptr<Node> root);
+    std::vector<Instruction> getClosureInstructions();
 
     void visit(BasicExpression* expression);
 
@@ -143,6 +151,10 @@ public:
 
     void visit(FunctionDecl* function);
 
+    void visit(FunctionBody* functionBody);
+
+    void visit(Closure* functionBody);
+
     void visit(VariableExpression* expression);
 
     void visit(ListExpression* list);
@@ -150,9 +162,16 @@ public:
     void visit(Guard* guard);
 
 private:
+    void generateClosures();
+    std::string closureLabel(int idx) const;
 private:
-    std::shared_ptr<Node> mRoot;
     std::vector<Instruction> mOutput;
+    // closures to be generated at the end..
+    std::vector<std::pair<Closure *, std::set<std::string>>> mClosures;
+    std::set<std::string> mScope;
+    std::string mCurrentFunctionLabel;
+
+    int mNumClosures=0;
 };
 
 }

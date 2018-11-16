@@ -28,6 +28,13 @@ jcVariablePtr jcVariable::Create(const jcCollection& collection)
     return me;
 }
 
+jcVariablePtr jcVariable::Create(const jcClosure& closure)
+{
+    auto me = jcVariable::Create();
+    me->set_Closure(closure);
+    return me;
+}
+
 jcVariable::jcVariable()
     : mCurrentType(TypeNone)
 {
@@ -52,6 +59,14 @@ int jcVariable::asInt() const
         return mData.mInt;
     }
     return 0;
+}
+
+jcClosure* jcVariable::asClosure() const
+{
+    if (mCurrentType == TypeClosure) {
+        return mData.closure;
+    }
+    return nullptr;
 }
 
 jcCollection* jcVariable::asCollection() const
@@ -79,6 +94,16 @@ void jcVariable::set_Int(const int val)
     mCurrentType = TypeInt;
 }
 
+void jcVariable::set_Closure(const jcClosure &closure)
+{
+    willSet();
+
+    std::string name = closure.name();
+    std::map<std::string, jcVariablePtr> scope = closure.scope();
+    mData.closure = new jcClosure(name, scope);
+    mCurrentType = TypeClosure;
+}
+
 void jcVariable::set_Collection(const jcCollection& collection)
 {
     willSet();
@@ -96,6 +121,9 @@ void jcVariable::willSet()
     }
     if (mCurrentType == TypeCollection) {
         delete mData.collection; 
+    }
+    if (mCurrentType == TypeClosure) {
+        delete mData.closure;
     }
 }
 std::string jcVariable::stringRepresentation() const {
@@ -118,6 +146,14 @@ std::string jcVariable::stringRepresentation() const {
     return "";
 }
 
+template<typename T>
+static bool pointerEqual(T* one, T* two) {
+    if (one != nullptr && two != nullptr) {
+        return one->equal(*two);
+    }
+    return one == two;
+}
+
 bool jcVariable::equal(const jcVariable &other) const
 {
     if (getType() != other.getType()) {
@@ -129,15 +165,10 @@ bool jcVariable::equal(const jcVariable &other) const
             return asInt() == other.asInt();
         case TypeString:
             return asString() == other.asString();
-        case TypeCollection: {
-            auto collection1 = asCollection();
-            auto collection2 = other.asCollection();
-
-            if (collection1 != nullptr && collection2 != nullptr) {
-                return collection1->equal(*collection2);
-            }
-            return collection1 == collection2;
-        }
+        case TypeCollection:
+            return pointerEqual(asCollection(), other.asCollection());
+        case TypeClosure:
+            return pointerEqual(asClosure(), other.asClosure());
         default:
             return false;
     }
@@ -155,9 +186,12 @@ jcMutableVariablePtr jcMutableVariable::Create(jcVariable &other)
     } else if (other.getType() == TypeString) {
         newVar->setString(other.asString());
     } else if (other.getType() == TypeCollection) {
-        auto collection = other.asCollection();
-        if (collection) {
+        if (auto collection = other.asCollection()) {
             newVar->setCollection(*collection);
+        }
+    } else if (other.getType() == TypeClosure) {
+        if (auto closure = other.asClosure()) {
+            newVar->setClosure(*closure);
         }
     }
     return newVar;
@@ -181,4 +215,9 @@ void jcMutableVariable::setInt(const int val)
 void jcMutableVariable::setCollection(const jcCollection& collection)
 {
     set_Collection(collection);
+}
+
+void jcMutableVariable::setClosure(const jcClosure& closure)
+{
+    set_Closure(closure);
 }

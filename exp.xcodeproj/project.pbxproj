@@ -29,9 +29,9 @@
 		4E0A7F9721914FBB00130C6B /* builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A7F9521914FBB00130C6B /* builtin.cpp */; };
 		4E0A7F98219153E000130C6B /* builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A7F9521914FBB00130C6B /* builtin.cpp */; };
 		4E6C0E7C2182CDA900A4F0D8 /* jcCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */; };
+		4E907E33219E82C7003519CC /* jcClosure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E907E31219E82C7003519CC /* jcClosure.cpp */; };
+		4E907E34219E8F2F003519CC /* jcClosure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E907E31219E82C7003519CC /* jcClosure.cpp */; };
 		4EFAF74321928CF700407EB1 /* jcCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */; };
-		4EFF2131216DA85100E57AC5 /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4EFF212F216DA85100E57AC5 /* SymbolTable.cpp */; };
-		4EFF2132216E7F0F00E57AC5 /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4EFF212F216DA85100E57AC5 /* SymbolTable.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -75,8 +75,8 @@
 		4E0A7F9621914FBB00130C6B /* builtin.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = builtin.hpp; sourceTree = "<group>"; };
 		4E6C0E7A2182CB6300A4F0D8 /* jcCollection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcCollection.hpp; sourceTree = "<group>"; };
 		4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcCollection.cpp; sourceTree = "<group>"; };
-		4EFF212F216DA85100E57AC5 /* SymbolTable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SymbolTable.cpp; sourceTree = "<group>"; };
-		4EFF2130216DA85100E57AC5 /* SymbolTable.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SymbolTable.hpp; sourceTree = "<group>"; };
+		4E907E31219E82C7003519CC /* jcClosure.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcClosure.cpp; sourceTree = "<group>"; };
+		4E907E32219E82C7003519CC /* jcClosure.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcClosure.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +170,8 @@
 				3C3CA75B215D4BE000956902 /* jcVariable.hpp */,
 				4E6C0E7A2182CB6300A4F0D8 /* jcCollection.hpp */,
 				4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */,
+				4E907E31219E82C7003519CC /* jcClosure.cpp */,
+				4E907E32219E82C7003519CC /* jcClosure.hpp */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -183,8 +185,6 @@
 				3C8E3BBD200DC1BC004DFF87 /* Interpreter.hpp */,
 				3C3CA724215C316100956902 /* bc.cpp */,
 				3C3CA725215C316100956902 /* bc.hpp */,
-				4EFF212F216DA85100E57AC5 /* SymbolTable.cpp */,
-				4EFF2130216DA85100E57AC5 /* SymbolTable.hpp */,
 			);
 			path = bytecode;
 			sourceTree = "<group>";
@@ -290,6 +290,7 @@
 				3C3CA71E215C2B0F00956902 /* Token.cpp in Sources */,
 				3C3CA720215C2B1500956902 /* ast.cpp in Sources */,
 				4EFAF74321928CF700407EB1 /* jcCollection.cpp in Sources */,
+				4E907E34219E8F2F003519CC /* jcClosure.cpp in Sources */,
 				3C3CA718215C297200956902 /* units.mm in Sources */,
 				3C3CA71F215C2B1200956902 /* Lexer.cpp in Sources */,
 				4E0A7F98219153E000130C6B /* builtin.cpp in Sources */,
@@ -298,7 +299,6 @@
 				3C3CA727215C316A00956902 /* bc.cpp in Sources */,
 				3C3CA722215C2B1A00956902 /* Interpreter.cpp in Sources */,
 				3C3CA71D215C2B0B00956902 /* Runtime.cpp in Sources */,
-				4EFF2132216E7F0F00E57AC5 /* SymbolTable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,6 +309,7 @@
 				3C8E3BB1200DBC38004DFF87 /* Token.cpp in Sources */,
 				4E6C0E7C2182CDA900A4F0D8 /* jcCollection.cpp in Sources */,
 				3C8E3BB8200DBE10004DFF87 /* ast.cpp in Sources */,
+				4E907E33219E82C7003519CC /* jcClosure.cpp in Sources */,
 				3CF2B62D1FE635250039F40B /* main.cpp in Sources */,
 				3C8E3BB4200DBC7F004DFF87 /* Lexer.cpp in Sources */,
 				3C8E3BBB200DBFAA004DFF87 /* Parser.cpp in Sources */,
@@ -316,7 +317,6 @@
 				3C3CA726215C316100956902 /* bc.cpp in Sources */,
 				3C8E3BBE200DC1BC004DFF87 /* Interpreter.cpp in Sources */,
 				3C17CCBD1FEA2B5100BE0474 /* Runtime.cpp in Sources */,
-				4EFF2131216DA85100E57AC5 /* SymbolTable.cpp in Sources */,
 				4E0A7F9721914FBB00130C6B /* builtin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

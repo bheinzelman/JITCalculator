@@ -6,8 +6,6 @@
 #include <memory>
 #include <stack>
 
-#include "SymbolTable.hpp"
-#include "Visitor.h"
 #include "ast.hpp"
 
 #include "bc.hpp"
@@ -28,6 +26,7 @@ private:
      Resolves variables to literal values..
      */
     jcVariablePtr resolveVariable(jcVariablePtr var);
+    jcVariablePtr resolveFunction(jcVariablePtr var);
     bool resolveRuntimeVariable(std::string var, jcMutableVariablePtr output);
     void setVariable(std::string var, jcVariablePtr to);
 
@@ -38,6 +37,8 @@ private:
     void popIp();
 
     void callFunction(bc::Instruction instruction);
+
+    bool functionExists(jcVariablePtr var) const;
 
 private:
     std::stack<jcVariablePtr> mStack;

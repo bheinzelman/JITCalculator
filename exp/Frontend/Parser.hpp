@@ -7,8 +7,10 @@
 
 class Lexer;
 class Expression;
+class Guard;
 class Node;
 class FunctionDecl;
+class FunctionBody;
 
 class Parser {
 public:
@@ -23,6 +25,10 @@ private:
     // private helper functions
 private:
     std::shared_ptr<Expression> getTerm();
+
+    std::vector<std::string> getFunctionParams();
+    std::vector<std::shared_ptr<Guard>> getGuards();
+    std::shared_ptr<FunctionBody> getFunctionBody();
 
     // Will return the error token if the next token is not an operator
     Token peekOperator();

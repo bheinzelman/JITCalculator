@@ -4,6 +4,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 
 #include "Runtime.hpp"
@@ -13,7 +14,14 @@
 
 @end
 
-@implementation units
+@implementation units {
+    NSString *_testDirectory;
+}
+
+- (void)setUp
+{
+    _testDirectory = [[[NSProcessInfo processInfo] environment] objectForKey:@"TEST_DIR"];
+}
 
 - (NSArray<NSDictionary *> *)inlineExpressions
 {
@@ -146,4 +154,78 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 
     XCTAssert(testStream(stream, rt, expected));
 }
+
+- (void)testBasicClosure
+{
+    Runtime rt;
+
+    NSString *program = @"let callit(fn) = fn()\
+                          let returnNum(num) = callit({() = num})\
+                          returnNum(4)\
+    ";
+
+    jcVariablePtr expected = jcVariable::Create(4);
+
+    std::stringstream stream;
+    toStream(program, stream);
+
+    XCTAssert(testStream(stream, rt, expected));
+}
+
+- (void)testPassFunction
+{
+    Runtime rt;
+
+    NSString *program = @"let callit(fn) = fn()\
+    let four = 4 \
+    callit(four) \
+    ";
+
+    jcVariablePtr expected = jcVariable::Create(4);
+
+    std::stringstream stream;
+    toStream(program, stream);
+
+    XCTAssert(testStream(stream, rt, expected));
+}
+
+- (void)testQuicksort
+{
+    std::ifstream quickSortFile(std::string([_testDirectory UTF8String]) + "tests/qs.jc");
+
+    Runtime rt;
+    std::vector<jcVariablePtr> output;
+    XCTAssert(rt.evaluate(quickSortFile, output));
+    XCTAssert(output.size() == 0);
+
+    auto intVecToPtr = [](const std::vector<int> &vector) -> jcVariablePtr {
+        std::vector<jcVariablePtr> ptrs;
+        for (int v : vector) {
+            ptrs.push_back(jcVariable::Create(v));
+        }
+
+        jcCollection collection(ptrs);
+
+        return jcVariable::Create(collection);
+    };
+
+    std::vector<int> valuesToSort;
+    while (valuesToSort.size() < 10) {
+        valuesToSort.push_back(arc4random() % 100);
+    }
+
+    std::string program = "qs(" + intVecToPtr(valuesToSort)->stringRepresentation() + ")";
+
+    std::sort(valuesToSort.begin(), valuesToSort.end(), [](int x, int y) {
+        return x < y;
+    });
+
+    std::stringstream stream;
+    stream << program;
+
+    XCTAssert(testStream(stream, rt, intVecToPtr(valuesToSort)));
+}
+
+
+
 @end

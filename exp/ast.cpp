@@ -53,11 +53,57 @@ Token BinaryExpression::getOperator() const
     return op;
 }
 
-FunctionDecl::FunctionDecl(const std::string& id, std::shared_ptr<Expression> exp, std::vector<std::string> params, const std::vector<std::shared_ptr<Guard>>& guards)
+FunctionBody::FunctionBody(std::shared_ptr<Expression> exp,
+                           std::vector<std::string> params,
+                           const std::vector<std::shared_ptr<Guard>>& guards)
+: mExpression(exp), mParams(params), mGuards(guards)
+{
+
+}
+
+void FunctionBody::accept(Visitor* v)
+{
+    v->visit(this);
+}
+
+std::shared_ptr<Expression> FunctionBody::getDefaultExpression() const
+{
+    return mExpression;
+}
+
+std::vector<std::string> FunctionBody::getParameters() const
+{
+    return mParams;
+}
+
+Closure::Closure(const std::vector<std::string> &scope, std::shared_ptr<FunctionBody> body)
+: mScope(scope), mFunctionBody(body)
+{
+}
+
+void Closure::accept(Visitor* v)
+{
+    v->visit(this);
+}
+
+std::shared_ptr<FunctionBody> Closure::getBody() const
+{
+    return mFunctionBody;
+}
+
+std::vector<std::string> Closure::getScope() const
+{
+    return mScope;
+}
+
+std::vector<std::shared_ptr<Guard>> FunctionBody::getGuards() const
+{
+    return mGuards;
+}
+
+FunctionDecl::FunctionDecl(const std::string& id, std::shared_ptr<FunctionBody> body)
     : mId(id)
-    , mExpression(exp)
-    , mParams(params)
-    , mGuards(guards)
+    , mBody(body)
 {
 }
 
@@ -71,19 +117,9 @@ std::string FunctionDecl::getId() const
     return mId;
 }
 
-std::shared_ptr<Expression> FunctionDecl::getDefaultExpression() const
+std::shared_ptr<FunctionBody> FunctionDecl::getFunctionBody() const
 {
-    return mExpression;
-}
-
-std::vector<std::string> FunctionDecl::getParameters() const
-{
-    return mParams;
-}
-
-std::vector<std::shared_ptr<Guard>> FunctionDecl::getGuards() const
-{
-    return mGuards;
+    return mBody;
 }
 
 VariableExpression::VariableExpression(std::string variableName)

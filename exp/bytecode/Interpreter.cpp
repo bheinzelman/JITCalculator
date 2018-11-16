@@ -79,8 +79,17 @@ jcVariablePtr Interpreter::interpret(std::vector<bc::Instruction> instructions, 
             break;
         }
         case bc::Push: {
-            jcVariablePtr operand = instruction.getOperand(0);
+            jcVariablePtr operand = resolveVariable(instruction.getOperand(0));
             mStack.push(operand);
+            break;
+        }
+        case bc::PushC: {
+            std::string closureName = instruction.getOperand(0)->asString();
+            std::map<std::string, jcVariablePtr> scope = mVariableLut.top();
+
+            jcClosure closure = jcClosure(closureName, scope);
+
+            mStack.push(jcVariable::Create(closure));
             break;
         }
         case bc::Pop: {
@@ -145,26 +154,55 @@ jcVariablePtr Interpreter::interpret(std::vector<bc::Instruction> instructions, 
 
 void Interpreter::callFunction(bc::Instruction instruction)
 {
-    jcVariablePtr functionName = instruction.getOperand(0);
-    if (mLabelLut.count(functionName->asString()) > 0) {
+
+    jcVariablePtr operand = instruction.getOperand(0);
+    std::string functionName = "";
+
+
+    auto setupClosure = [&functionName, this](jcClosure *closure) {
+        JC_ASSERT(closure);
+        functionName = closure->name();
+
+        auto scope = closure->scope();
+
+        for (auto keyVal : scope) {
+            mStack.push(keyVal.second);
+        }
+    };
+
+    if (operand->getType() == jcVariable::TypeClosure) {
+        jcClosure *closure = operand->asClosure();
+        setupClosure(closure);
+    } else if (mVariableLut.top().count(operand->asString()) > 0) {
+        jcVariablePtr functionVar = mVariableLut.top()[operand->asString()];
+        if (functionVar->getType() == jcVariable::TypeClosure) {
+            setupClosure(functionVar->asClosure());
+        } else {
+            functionName = functionVar->asString();
+        }
+    } else {
+        functionName = operand->asString();
+    }
+
+    if (functionName.size() > 0 && mLabelLut.count(functionName) > 0) {
         pushIp();
         mVariableLut.push(std::map<std::string, jcVariablePtr>());
-        mIp = mLabelLut[functionName->asString()];
+        mIp = mLabelLut[functionName];
 
         return;
     }
 
-    auto builtinFunctionInfo = lib::builtin::Shared().info(functionName->asString());
+    auto builtinFunctionInfo = lib::builtin::Shared().info(functionName);
     if (builtinFunctionInfo.count(lib::kLibError) == 0)
     {
-        jcVariablePtr result = lib::builtin::Shared().execute(functionName->asString(), [this]() {
+        jcVariablePtr result = lib::builtin::Shared().execute(functionName, [this]() {
             return resolveVariable(popStack());
         });
         mStack.push(result);
         return;
     }
 
-    JC_THROW(functionName->asString() + " does not exist");
+    JC_THROW(operand->asString() + " does not exist");
 }
 
 jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
@@ -181,6 +219,11 @@ jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
         }
         return jcVariable::Create(jcCollection(resolvedCollection));
     } else {
+        // if a function is defined with this value let it through
+        if (functionExists(var)) {
+            return var;
+        }
+
         jcMutableVariablePtr mutablePtr = jcMutableVariable::Create();
         if (resolveRuntimeVariable(var->asString(), mutablePtr)) {
             return mutablePtr;
@@ -189,6 +232,27 @@ jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
         JC_ASSERT_OR_THROW(mVariableLut.top().count(var->asString()) > 0, "undefined variable");
         return mVariableLut.top()[var->asString()];
     }
+}
+
+bool Interpreter::functionExists(jcVariablePtr var) const
+{
+    std::string functionName = "";
+    if (var->getType() == jcVariable::TypeClosure) {
+        functionName = var->asClosure()->name();
+    } else {
+        functionName = var->asString();
+    }
+
+    if (mLabelLut.count(functionName) > 0) {
+        return true;
+    }
+
+    auto info = lib::builtin::Shared().info(functionName);
+    if (info.count(lib::kLibError) == 0) {
+        return true;
+    }
+
+    return false;
 }
 
 void Interpreter::setVariable(std::string var, jcVariablePtr to)
@@ -228,6 +292,7 @@ void Interpreter::pushIp()
 
 void Interpreter::popIp()
 {
+    JC_ASSERT(mIpStack.size());
     mIp = mIpStack.top();
     mIpStack.pop();
 }
