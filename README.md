@@ -3,7 +3,19 @@
 `JITCalculator` is a small functional language. 
 
 ## Data Types
-Currently the only data type is Integers.
+Currently the only data type are Integers, and List.
+
+## List 
+
+```
+let myList = [1, 2, 3]
+```
+Lists may also be nested:
+
+```
+let thisisvalid = [1, [2, 3], 4, [5]]
+```
+
 
 ## Functions
 
@@ -13,6 +25,11 @@ To define a function, use the `let` keyword. If the function does not take any a
  let add(a,b) = a + b
  let x = 1
 ```
+
+## Built in List Functions
+- `head` - returns the first element in the list
+- `tail` - returns the whole list minus the first element
+- `len` - returns the lenght of the list
 
 ## Guards
 To do any type of branching, you currently must use guards.
