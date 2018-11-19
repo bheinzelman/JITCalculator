@@ -26,6 +26,18 @@ void jcCollection::push(const jcVariablePtr var)
     mItems.push_back(var);
 }
 
+jcVariablePtr jcCollection::head() const
+{
+    JC_ASSERT(mItems.size());
+    return mItems.front();
+}
+
+jcCollection jcCollection::tail() const
+{
+    std::vector<jcVariablePtr> newElements(mItems.begin() + 1, mItems.end());
+    return jcCollection(newElements);
+}
+
 jcVariablePtr jcCollection::at(int index) const
 {
     JC_ASSERT(index < mItems.size());

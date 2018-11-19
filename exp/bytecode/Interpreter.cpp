@@ -49,15 +49,25 @@ void Interpreter::mapLabels(std::vector<bc::Instruction> instructions)
     }
 }
 
-jcVariablePtr Interpreter::interpret(std::vector<bc::Instruction> instructions, int startingPoint)
+void Interpreter::setInstructions(const std::vector<bc::Instruction> &instructions)
 {
-    mapLabels(instructions);
+    mInstructions = instructions;
+    mapLabels(mInstructions);
+}
 
+jcVariablePtr Interpreter::interpret(jcVariablePtr callableObject)
+{
+    JC_FAIL();
+    return nullptr;
+}
+
+jcVariablePtr Interpreter::interpret(int startingPoint)
+{
     mVariableLut.push(std::map<std::string, jcVariablePtr>());
     mIp = startingPoint;
     bool shouldExit = false;
     while (shouldExit == false) {
-        bc::Instruction instruction = instructions[mIp++];
+        bc::Instruction instruction = mInstructions[mIp++];
 
         bc::Op op = instruction.getOp();
 
@@ -107,7 +117,7 @@ jcVariablePtr Interpreter::interpret(std::vector<bc::Instruction> instructions, 
             break;
         }
         case bc::Call: {
-            callFunction();
+            callFunction(popStack());
             break;
         }
         case bc::JmpTrue:
@@ -152,9 +162,8 @@ jcVariablePtr Interpreter::interpret(std::vector<bc::Instruction> instructions, 
     return resolveVariable(popStack());
 }
 
-void Interpreter::callFunction()
+void Interpreter::callFunction(jcVariablePtr operand)
 {
-    jcVariablePtr operand = popStack();
     std::string functionName = "";
 
     JC_ASSERT_OR_THROW(operand->getType() == jcVariable::TypeString ||
@@ -198,9 +207,7 @@ void Interpreter::callFunction()
     auto builtinFunctionInfo = lib::builtin::Shared().info(functionName);
     if (builtinFunctionInfo.count(lib::kLibError) == 0)
     {
-        jcVariablePtr result = lib::builtin::Shared().execute(functionName, [this]() {
-            return resolveVariable(popStack());
-        });
+        jcVariablePtr result = lib::builtin::Shared().execute(functionName, *this);
         mStack.push(result);
         return;
     }

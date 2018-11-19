@@ -76,8 +76,8 @@ std::vector<std::string> FunctionBody::getParameters() const
     return mParams;
 }
 
-Closure::Closure(const std::vector<std::string> &scope, std::shared_ptr<FunctionBody> body)
-: mScope(scope), mFunctionBody(body)
+Closure::Closure(std::shared_ptr<FunctionBody> body)
+: mFunctionBody(body)
 {
 }
 
@@ -89,11 +89,6 @@ void Closure::accept(Visitor* v)
 std::shared_ptr<FunctionBody> Closure::getBody() const
 {
     return mFunctionBody;
-}
-
-std::vector<std::string> Closure::getScope() const
-{
-    return mScope;
 }
 
 std::vector<std::shared_ptr<Guard>> FunctionBody::getGuards() const

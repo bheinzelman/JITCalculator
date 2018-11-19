@@ -61,8 +61,6 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         if (rt.evaluate(stream, output)) {
             if (output.size()) {
                 jcVariablePtr value = output.front();
-                std::cout << expectedValue->stringRepresentation() << std::endl;
-                std::cout << value->stringRepresentation() << std::endl;
                 JC_ASSERT(value != nullptr && expectedValue != nullptr);
                 return value->equal(*expectedValue);
             }
@@ -212,8 +210,8 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     };
 
     std::vector<int> valuesToSort;
-    while (valuesToSort.size() < 10) {
-        valuesToSort.push_back(arc4random() % 100);
+    while (valuesToSort.size() < 5000) {
+        valuesToSort.push_back(arc4random() % 5000);
     }
 
     std::string program = "qs(" + intVecToPtr(valuesToSort)->stringRepresentation() + ")";

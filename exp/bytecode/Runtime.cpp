@@ -63,7 +63,9 @@ bool Runtime::evaluate(std::istream& stream, std::vector<jcVariablePtr>& outputV
             }
 #endif
 
-            outputValues.push_back(interpreter.interpret(output, 0));
+            interpreter.setInstructions(output);
+
+            outputValues.push_back(interpreter.interpret(0));
         }
     }
     return true;

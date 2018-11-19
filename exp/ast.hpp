@@ -155,14 +155,12 @@ private:
 
 class Closure : public Expression {
 public:
-    Closure(const std::vector<std::string> &scope, std::shared_ptr<FunctionBody> body);
+    Closure(std::shared_ptr<FunctionBody> body);
 
     void accept(Visitor* v) override;
     std::shared_ptr<FunctionBody> getBody() const;
-    std::vector<std::string> getScope() const;
-
+    
 private:
-    std::vector<std::string> mScope;
     std::shared_ptr<FunctionBody> mFunctionBody;
 };
 

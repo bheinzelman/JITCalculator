@@ -55,19 +55,19 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
 {
     {
         kLibPrint,
-        [](std::function<jcVariablePtr()> stackAccess, LibState state) -> jcVariablePtr {
-            jcVariablePtr arg = stackAccess();
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            jcVariablePtr arg = interpreter.popStack();
             state.mStdout << arg->stringRepresentation() << std::endl;
             return jcVariable::Create(0);
         }
     },
     {
         kLibList,
-        [](std::function<jcVariablePtr()> stackAccess, LibState state) -> jcVariablePtr {
-            int numElements = stackAccess()->asInt();
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            int numElements = interpreter.popStack()->asInt();
             std::vector<jcVariablePtr> elements;
             for (int i = 0; i < numElements; i++) {
-                elements.push_back(stackAccess());
+                elements.push_back(interpreter.popStack());
             }
             jcCollection collection(elements);
             return jcVariable::Create(collection);
@@ -75,33 +75,28 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
     },
     {
         kLibHead,
-        [](std::function<jcVariablePtr()> stackAccess, LibState state) -> jcVariablePtr {
-            jcVariablePtr arg = stackAccess();
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            jcVariablePtr arg = interpreter.popStack();
             JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
             JC_ASSERT(arg->asCollection() != nullptr);
-            return arg->asCollection()->at(0);
+            return arg->asCollection()->head();
         }
     },
     {
         kLibTail,
-        [](std::function<jcVariablePtr()> stackAccess, LibState state) -> jcVariablePtr {
-            jcVariablePtr arg = stackAccess();
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            jcVariablePtr arg = interpreter.popStack();
             JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
             jcCollection *collection = arg->asCollection();
             JC_ASSERT(collection != nullptr);
 
-            std::vector<jcVariablePtr> elementsTail;
-            for (int i = 1; i < (int)collection->size(); i++) {
-                elementsTail.push_back(collection->at(i));
-            }
-
-            return jcVariable::Create(elementsTail);
+            return jcVariable::Create(collection->tail());
         }
     },
     {
         kLibLen,
-        [](std::function<jcVariablePtr()> stackAccess, LibState state) -> jcVariablePtr {
-            jcVariablePtr arg = stackAccess();
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            jcVariablePtr arg = interpreter.popStack();;
             JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
             jcCollection *collection = arg->asCollection();
             JC_ASSERT(collection != nullptr);
@@ -111,9 +106,9 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
     },
     {
         kLibConcat,
-        [](std::function<jcVariablePtr()> stackAccess, LibState state) -> jcVariablePtr {
-            jcVariablePtr list1 = stackAccess();
-            jcVariablePtr list2 = stackAccess();
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            jcVariablePtr list1 = interpreter.popStack();;
+            jcVariablePtr list2 = interpreter.popStack();;
 
             JC_ASSERT(list1->getType() == jcVariable::TypeCollection);
             JC_ASSERT(list2->getType() == jcVariable::TypeCollection);
@@ -157,11 +152,10 @@ std::map<std::string, jcVariablePtr> builtin::info(const std::string &functionNa
     return errorDict;
 }
 
-    jcVariablePtr builtin::execute(const std::string &functionName,  std::function<jcVariablePtr()> stackAccess)
+    jcVariablePtr builtin::execute(const std::string &functionName, Interpreter &interpreter)
 {
-
     if (mFunctions.count(functionName)) {
-        return mFunctions[functionName](stackAccess, state());
+        return mFunctions[functionName](interpreter, state());
     }
     JC_THROW("Library function " + functionName + " undefined");
 }

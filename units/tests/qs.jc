@@ -1,0 +1,26 @@
+let filter(fn, array)
+	| len(array) == 0 = []
+	| fn(head(array)) = concat([head(array)], filter(fn, tail(array)))
+	| else = filter(fn, tail(array))
+
+
+let qs(array) 
+	| len(array) == 0 = []
+	| else = concat
+		(
+			concat(
+				qs(
+					filter(
+						{(x) = x < head(array)}, 
+						tail(array)
+					)
+				), 
+				[head(array)]
+			), 
+			qs(
+				filter(
+					{(x) = x >= head(array)}, 
+					tail(array)
+				)
+			)
+		)

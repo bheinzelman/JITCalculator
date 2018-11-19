@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <stack>
+#include <functional>
 
 #include "ast.hpp"
 
@@ -17,11 +18,19 @@ public:
     /**
      Returns value on the top of the stack
      */
-    jcVariablePtr interpret(std::vector<bc::Instruction> instructions, int startingPoint);
+    jcVariablePtr interpret(int startingPoint);
 
-private:
+    /**
+     Calls the function within the callable object
+     and returns the top of the stack
+     */
+    jcVariablePtr interpret(jcVariablePtr callableObject);
+
+    void setInstructions(const std::vector<bc::Instruction> &instructions);
+
     jcVariablePtr popStack();
 
+private:
     /**
      Resolves variables to literal values..
      */
@@ -36,7 +45,7 @@ private:
     void pushIp();
     void popIp();
 
-    void callFunction();
+    void callFunction(jcVariablePtr operand);
 
     bool functionExists(jcVariablePtr var) const;
 
@@ -49,4 +58,7 @@ private:
     int mIp;
 
     std::map<std::string, int> mLabelLut;
+
+    std::vector<bc::Instruction> mInstructions;
+    
 };

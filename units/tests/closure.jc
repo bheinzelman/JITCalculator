@@ -1,0 +1,4 @@
+let addClosure(x, y) = { () = {() = x + y } }
+
+print(addClosure(4,4)()() + 1)
+

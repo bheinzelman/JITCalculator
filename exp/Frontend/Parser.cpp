@@ -103,9 +103,8 @@ std::shared_ptr<Expression> Parser::getTerm()
         return std::make_shared<ListExpression>(elements);
     } else if (tok == Token::LeftBrace) {
         auto closure = getFunctionBody();
-        std::vector<std::string> scope;
         eat(Token::RightBrace);
-        return std::make_shared<Closure>(scope, closure);
+        return std::make_shared<Closure>(closure);
     }
     return nullptr;
 }
