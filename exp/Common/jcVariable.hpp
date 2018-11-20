@@ -7,6 +7,7 @@
 
 #include "jc.h"
 #include "jcCollection.hpp"
+#include "jcClosure.hpp"
 
 /**
  * variant type
@@ -22,18 +23,21 @@ public:
         TypeString,
         TypeInt,
         TypeCollection,
+        TypeClosure,
         TypeNone
     };
 
     static jcVariablePtr Create(std::string value);
     static jcVariablePtr Create(int value);
     static jcVariablePtr Create(const jcCollection& collection);
+    static jcVariablePtr Create(const jcClosure& closure);
 
     ~jcVariable();
 
     std::string asString() const;
     int asInt() const;
     jcCollection* asCollection() const;
+    jcClosure *asClosure() const;
 
     inline Type getType() const
     {
@@ -58,6 +62,7 @@ protected:
     void set_String(const std::string& str);
     void set_Int(const int val);
     void set_Collection(const jcCollection& collection);
+    void set_Closure(const jcClosure& closure);
 
 protected:
     Type mCurrentType;
@@ -66,6 +71,7 @@ protected:
         char* mStr;
         int mInt;
         jcCollection* collection;
+        jcClosure* closure;
     } mData;
 };
 
@@ -80,4 +86,5 @@ public:
     void setString(const std::string& str);
     void setInt(const int val);
     void setCollection(const jcCollection& collection);
+    void setClosure(const jcClosure& closure);
 };

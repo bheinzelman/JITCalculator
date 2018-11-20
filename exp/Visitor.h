@@ -7,8 +7,10 @@ class VariableExpression;
 class BinaryExpression;
 class FunctionCallExpression;
 class FunctionDecl;
+class FunctionBody;
 class Guard;
 class ListExpression;
+class Closure;
 
 class Visitor {
 public:
@@ -18,5 +20,7 @@ public:
     virtual void visit(BinaryExpression* expression) = 0;
     virtual void visit(ListExpression* expression) = 0;
     virtual void visit(FunctionDecl* expression) = 0;
+    virtual void visit(FunctionBody* expression) = 0;
+    virtual void visit(Closure* expression) = 0;
     virtual void visit(Guard* expression) = 0;
 };

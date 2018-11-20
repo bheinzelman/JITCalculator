@@ -24,6 +24,8 @@ enum class Token {
     Pipe,
     LeftBracket,
     RightBracket,
+    LeftBrace,
+    RightBrace,
     EndOfStream
 };
 

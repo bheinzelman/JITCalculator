@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "SymbolTable.hpp"
+//#include "SymbolTable.hpp"
+#include "bc.hpp"
 
 #include <istream>
 #include <string>
@@ -14,5 +15,5 @@ public:
     bool evaluate(std::istream& stream, std::vector<jcVariablePtr>& outputValues);
 
 private:
-    SymbolTable mSymbols;
+    std::vector<bc::Instruction> mDefinitions;
 };

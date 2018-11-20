@@ -1,0 +1,8 @@
+let addClosure(x, y) = { () = {() = x + y } }
+
+let myAdd(x,y) = addClosure(x,y)()()
+let myAddtwo = myAdd
+
+let fireFunc = myAddtwo(4,4) 
+
+print(fireFunc()())

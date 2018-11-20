@@ -46,6 +46,8 @@ static std::string opToString(bc::Op op)
         return "Jmp";
     case bc::Label:
         return "Label";
+    case bc::PushC:
+        return "PushC";
     default:
         JC_FAIL();
         break;
@@ -102,36 +104,72 @@ std::string Instruction::toString() const
     return output;
 }
 
-Generator::Generator(std::shared_ptr<Node> root)
-    : mRoot(root)
+Generator::Generator()
 {
 }
 
-std::vector<Instruction> Generator::getInstructions()
+std::vector<Instruction> Generator::getInstructions(std::shared_ptr<Node> root)
 {
-    mRoot->accept(this);
+    mOutput.clear();
+    mClosures.clear();
+    mScope.clear();
+    root->accept(this);
     return mOutput;
 }
 
-void Generator::visit(FunctionDecl* function)
+std::vector<Instruction> Generator::getClosureInstructions()
 {
-    std::string functionName = function->getId();
+    mOutput.clear();
+    generateClosures();
+    return mOutput;
+}
 
-    Instruction functionLabel = Instruction(bc::Label, { jcVariable::Create(functionName) });
-    mOutput.push_back(functionLabel);
+void Generator::generateClosures()
+{
+    for (int i = 0; i < mClosures.size(); i++) {
+        Closure *closure = mClosures[i].first;
+        std::set<std::string> scope = mClosures[i].second;
 
-    for (std::string param : function->getParameters()) {
+        std::string label = closureLabel(i);
+        mCurrentFunctionLabel = label;
+        mOutput.push_back(Instruction(bc::Label, {jcVariable::Create(label)}));
+
+        // push the current scope into the closure
+        for (auto it = scope.rbegin(); it != scope.rend(); ++it) {
+            std::string var = *it;
+            jcVariablePtr paramVar = jcVariable::Create(var);
+            Instruction popOp = Instruction(bc::Pop, { paramVar });
+            mOutput.push_back(popOp);
+        }
+
+        closure->getBody()->accept(this);
+    }
+}
+
+std::string Generator::closureLabel(int idx) const
+{
+    return std::string("c.") + std::to_string(idx);
+}
+
+void Generator::visit(FunctionBody* functionBody)
+{
+    JC_ASSERT(mCurrentFunctionLabel.size() > 0);
+
+    std::string functionName = mCurrentFunctionLabel;
+
+    for (std::string param : functionBody->getParameters()) {
         jcVariablePtr paramVar = jcVariable::Create(param);
         Instruction popOp = Instruction(bc::Pop, { paramVar });
         mOutput.push_back(popOp);
+        mScope.insert(param);
     }
 
     std::string endLabel = functionName + ".end";
 
-    if (function->getGuards().size()) {
+    if (functionBody->getGuards().size()) {
         // do guard expressions
-        for (int i = 0; i < function->getGuards().size(); i++) {
-            std::shared_ptr<Guard> guard = function->getGuards()[i];
+        for (int i = 0; i < functionBody->getGuards().size(); i++) {
+            std::shared_ptr<Guard> guard = functionBody->getGuards()[i];
             guard->getGuardExpression()->accept(this);
 
             std::string label = functionName + "." + std::to_string(i);
@@ -140,13 +178,13 @@ void Generator::visit(FunctionDecl* function)
         }
 
         // jump to default if none of guards hit
-        std::string lastLabel = functionName + "." + std::to_string(function->getGuards().size());
+        std::string lastLabel = functionName + "." + std::to_string(functionBody->getGuards().size());
         mOutput.push_back(Instruction(bc::Jmp, { jcVariable::Create(lastLabel) }));
 
         // now do the guard bodies
 
-        for (int i = 0; i < function->getGuards().size(); i++) {
-            std::shared_ptr<Guard> guard = function->getGuards()[i];
+        for (int i = 0; i < functionBody->getGuards().size(); i++) {
+            std::shared_ptr<Guard> guard = functionBody->getGuards()[i];
             std::string label = functionName + "." + std::to_string(i);
 
             mOutput.push_back(Instruction(bc::Label, { jcVariable::Create(label) }));
@@ -158,12 +196,42 @@ void Generator::visit(FunctionDecl* function)
         mOutput.push_back(Instruction(bc::Label, { jcVariable::Create(lastLabel) }));
     }
 
-    function->getDefaultExpression()->accept(this);
+    functionBody->getDefaultExpression()->accept(this);
 
     mOutput.push_back(Instruction(bc::Label, { jcVariable::Create(endLabel) }));
 
     Instruction returnInstruction = Instruction(bc::Ret, {});
     mOutput.push_back(returnInstruction);
+}
+
+void Generator::visit(Closure* closure)
+{
+    std::string closureName = closureLabel(mNumClosures++);
+
+    mOutput.push_back(Instruction(bc::PushC, {jcVariable::Create(closureName)}));
+
+
+    // NEED TO PUSH WHAT IS IN SCOPE SO WE KNOW WHAT WE HAVE IN SCOPE..., NEED TO ADD A PUSHC INSTRUCTION THAT CAN PUSH
+    // A CLOSURE OBJECT. THE CLOSURE OBJECT WILL HOLD A COPY OF THE ITEMS IN SCOPE. WHEN IT IS CALLED IT WILL PUSH THOSE
+    // ITEMS ONTO THE STACK... AHHHHH THIS IS WHAT NEEDS TO HAPPEN FOR THIS TO WORK>>>
+    mClosures.push_back(std::make_pair(closure, std::set<std::string>(mScope)));
+}
+
+void Generator::visit(FunctionDecl* function)
+{
+    // new function new scope..
+    mScope.clear();
+
+    std::string functionName = function->getId();
+
+    Instruction functionLabel = Instruction(bc::Label, { jcVariable::Create(functionName) });
+    mOutput.push_back(functionLabel);
+
+    mCurrentFunctionLabel = functionName;
+
+    auto functionBody = function->getFunctionBody();
+
+    functionBody->accept(this);
 }
 
 void Generator::visit(Guard* guard)
@@ -195,9 +263,8 @@ void Generator::visit(ListExpression* list)
     Instruction pushOp = Instruction(bc::Push, { jcVariable::Create((int)elements.size())});
     mOutput.push_back(pushOp);
 
-    Instruction callList = Instruction(bc::Call, { jcVariable::Create(lib::kLibList)});
-    mOutput.push_back(callList);
-    
+    mOutput.push_back(Instruction(bc::Push, {jcVariable::Create(lib::kLibList)}));
+    mOutput.push_back(Instruction(bc::Call));
 }
 
 void Generator::visit(FunctionCallExpression* expression)
@@ -208,9 +275,8 @@ void Generator::visit(FunctionCallExpression* expression)
         arg->accept(this);
     }
 
-    jcVariablePtr functionName = jcVariable::Create(expression->getFunctionId());
-    Instruction callInstruction = Instruction(bc::Call, { functionName });
-    mOutput.push_back(callInstruction);
+    expression->getCallee()->accept(this);
+    mOutput.push_back(Instruction(bc::Call));
 }
 
 void Generator::visit(BinaryExpression* expression)

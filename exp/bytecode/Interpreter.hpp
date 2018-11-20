@@ -5,9 +5,8 @@
 #include <map>
 #include <memory>
 #include <stack>
+#include <functional>
 
-#include "SymbolTable.hpp"
-#include "Visitor.h"
 #include "ast.hpp"
 
 #include "bc.hpp"
@@ -19,15 +18,29 @@ public:
     /**
      Returns value on the top of the stack
      */
-    jcVariablePtr interpret(std::vector<bc::Instruction> instructions, int startingPoint);
+    jcVariablePtr interpret();
+
+    /**
+     Calls the function within the callable object
+     and returns the top of the stack
+     */
+    jcVariablePtr interpret(jcVariablePtr callableObject);
+
+    void setInstructions(const std::vector<bc::Instruction> &instructions);
+
+    jcVariablePtr popStack();
 
 private:
-    jcVariablePtr popStack();
+    /**
+     Returns value on the top of the stack
+     */
+    jcVariablePtr eval();
 
     /**
      Resolves variables to literal values..
      */
     jcVariablePtr resolveVariable(jcVariablePtr var);
+    jcVariablePtr resolveFunction(jcVariablePtr var);
     bool resolveRuntimeVariable(std::string var, jcMutableVariablePtr output);
     void setVariable(std::string var, jcVariablePtr to);
 
@@ -37,15 +50,38 @@ private:
     void pushIp();
     void popIp();
 
-    void callFunction(bc::Instruction instruction);
+    /**
+     Calls the function with the given operand
+     If the operand is a builtin function, it will be called.
+     Otherwise the instruction pointer will be set to the function to
+     be called.
+     */
+    void callFunction(jcVariablePtr operand);
+
+    bool functionExists(jcVariablePtr var) const;
 
 private:
-    std::stack<jcVariablePtr> mStack;
-    std::stack<int> mIpStack;
-    std::stack<std::map<std::string, jcVariablePtr>> mVariableLut;
 
-    // instruction pointer
-    int mIp;
+    struct _state {
+        std::stack<jcVariablePtr> mStack;
+        std::stack<int> mIpStack;
+        std::stack<std::map<std::string, jcVariablePtr>> mVariableLut;
+
+        // instruction pointer
+        int mIp=0;
+
+        bool callSingleFunction=false;
+        int callCount=0;
+    };
+
+    _state& state();
+    void pushState();
+    void popState();
+
+    std::stack<_state> mState;
 
     std::map<std::string, int> mLabelLut;
+
+    std::vector<bc::Instruction> mInstructions;
+    
 };

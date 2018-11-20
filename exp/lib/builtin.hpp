@@ -2,6 +2,7 @@
 
 #include "jc.h"
 #include "jcVariable.hpp"
+#include "Interpreter.hpp"
 
 #include <string>
 #include <functional>
@@ -63,7 +64,7 @@ struct LibState {
     LibState();
 };
 
-using LibraryFunction = std::function<jcVariablePtr(std::function<jcVariablePtr()>, LibState)>;
+using LibraryFunction = std::function<jcVariablePtr(Interpreter &, LibState)>;
 
 class builtin {
     builtin();
@@ -79,7 +80,7 @@ public:
      Runs the given function with the supplied arguments
      Runtime error will be thrown if function does not exist
      */
-    jcVariablePtr execute(const std::string &functionName, std::function<jcVariablePtr()> stackAccess);
+    jcVariablePtr execute(const std::string &functionName, Interpreter &interpreter);
 
     LibState state() const;
 

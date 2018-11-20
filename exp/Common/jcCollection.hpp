@@ -18,6 +18,9 @@ public:
     jcVariablePtr at(int index) const;
     size_t size() const;
 
+    jcVariablePtr head() const;
+    jcCollection tail() const;
+
     jcCollection concat(const jcCollection &other) const;
 
     bool equal(const jcCollection &other) const;
