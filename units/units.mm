@@ -210,8 +210,8 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     };
 
     std::vector<int> valuesToSort;
-    while (valuesToSort.size() < 5000) {
-        valuesToSort.push_back(arc4random() % 5000);
+    while (valuesToSort.size() < 1000) {
+        valuesToSort.push_back(arc4random() % 1000);
     }
 
     std::string program = "qs(" + intVecToPtr(valuesToSort)->stringRepresentation() + ")";

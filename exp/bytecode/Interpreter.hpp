@@ -18,7 +18,7 @@ public:
     /**
      Returns value on the top of the stack
      */
-    jcVariablePtr interpret(int startingPoint);
+    jcVariablePtr interpret();
 
     /**
      Calls the function within the callable object
@@ -31,6 +31,11 @@ public:
     jcVariablePtr popStack();
 
 private:
+    /**
+     Returns value on the top of the stack
+     */
+    jcVariablePtr eval();
+
     /**
      Resolves variables to literal values..
      */
@@ -45,17 +50,35 @@ private:
     void pushIp();
     void popIp();
 
+    /**
+     Calls the function with the given operand
+     If the operand is a builtin function, it will be called.
+     Otherwise the instruction pointer will be set to the function to
+     be called.
+     */
     void callFunction(jcVariablePtr operand);
 
     bool functionExists(jcVariablePtr var) const;
 
 private:
-    std::stack<jcVariablePtr> mStack;
-    std::stack<int> mIpStack;
-    std::stack<std::map<std::string, jcVariablePtr>> mVariableLut;
 
-    // instruction pointer
-    int mIp;
+    struct _state {
+        std::stack<jcVariablePtr> mStack;
+        std::stack<int> mIpStack;
+        std::stack<std::map<std::string, jcVariablePtr>> mVariableLut;
+
+        // instruction pointer
+        int mIp=0;
+
+        bool callSingleFunction=false;
+        int callCount=0;
+    };
+
+    _state& state();
+    void pushState();
+    void popState();
+
+    std::stack<_state> mState;
 
     std::map<std::string, int> mLabelLut;
 
