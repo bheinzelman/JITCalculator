@@ -115,7 +115,7 @@ bool Lexer::getNextToken(Token* token, jcMutableVariablePtr lexeme)
         } else if (isalpha(next)) {
             std::string word(1, next);
 
-            while (hasMoreChars() && isalpha(peek())) {
+            while (hasMoreChars() && isalnum(peek())) {
                 word += std::string(1, nextChar());
 
                 Token keywordToken = Token::Error;
