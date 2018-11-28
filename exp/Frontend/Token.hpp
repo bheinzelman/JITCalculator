@@ -26,7 +26,8 @@ enum class Token {
     RightBracket,
     LeftBrace,
     RightBrace,
-    EndOfStream
+    EndOfStream,
+    None
 };
 
 namespace jcToken {

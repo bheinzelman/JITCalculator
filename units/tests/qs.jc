@@ -1,11 +1,11 @@
 let filter(fn, array)
-	| len(array) == 0 = []
+	| isEmpty(array) = []
 	| fn(head(array)) = concat([head(array)], filter(fn, tail(array)))
 	| else = filter(fn, tail(array))
 
 
 let qs(array) 
-	| len(array) == 0 = []
+	| isEmpty(array) = []
 	| else = concat
 		(
 			concat(

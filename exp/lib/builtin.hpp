@@ -56,6 +56,8 @@ const std::string kLibHead = "head";
 const std::string kLibTail = "tail";
 const std::string kLibLen = "len";
 const std::string kLibConcat = "concat";
+const std::string kLibCons = "cons";
+const std::string kLibIsEmpty = "isEmpty";
 
 struct LibState {
     std::ostream &mStdout;

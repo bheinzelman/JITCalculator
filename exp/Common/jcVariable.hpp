@@ -83,6 +83,7 @@ public:
     static jcMutableVariablePtr Create(jcVariable &other);
     static jcMutableVariablePtr Create();
 
+    void set(const jcVariable &other);
     void setString(const std::string& str);
     void setInt(const int val);
     void setCollection(const jcCollection& collection);

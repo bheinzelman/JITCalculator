@@ -107,10 +107,7 @@ void jcVariable::set_Closure(const jcClosure &closure)
 void jcVariable::set_Collection(const jcCollection& collection)
 {
     willSet();
-    mData.collection = new jcCollection;
-    for (int i = 0; i < collection.size(); i++) {
-        mData.collection->push(collection.at(i));
-    }
+    mData.collection = new jcCollection(collection);
     mCurrentType = TypeCollection;
 }
 
@@ -126,6 +123,7 @@ void jcVariable::willSet()
         delete mData.closure;
     }
 }
+
 std::string jcVariable::stringRepresentation() const {
     if (getType() == TypeInt) {
         return std::to_string(asInt());
@@ -134,12 +132,13 @@ std::string jcVariable::stringRepresentation() const {
     } else if (getType() == TypeCollection) {
         std::string rep = "[";
         if (asCollection() != nullptr) {
-            for (int i = 0; i < (int)asCollection()->size(); i++) {
-                rep += asCollection()->at(i)->stringRepresentation();
-                if (i != (int)asCollection()->size() - 1) {
-                    rep += ", ";
+            int i = (int)asCollection()->size();
+            asCollection()->forEach([&rep, &i](jcVariablePtr element) {
+                rep += element->stringRepresentation();
+                if (--i != 0) {
+                    rep += ", "; 
                 }
-            }
+            });
         }
         return rep + "]";
     }
@@ -178,22 +177,27 @@ bool jcVariable::equal(const jcVariable &other) const
  Mutable Variable
  */
 
-jcMutableVariablePtr jcMutableVariable::Create(jcVariable &other)
+void jcMutableVariable::set(const jcVariable &other)
 {
-    jcMutableVariablePtr newVar = jcMutableVariable::Create();
     if (other.getType() == TypeInt) {
-        newVar->setInt(other.asInt());
+        setInt(other.asInt());
     } else if (other.getType() == TypeString) {
-        newVar->setString(other.asString());
+        setString(other.asString());
     } else if (other.getType() == TypeCollection) {
         if (auto collection = other.asCollection()) {
-            newVar->setCollection(*collection);
+            setCollection(*collection);
         }
     } else if (other.getType() == TypeClosure) {
         if (auto closure = other.asClosure()) {
-            newVar->setClosure(*closure);
+            setClosure(*closure);
         }
     }
+}
+
+jcMutableVariablePtr jcMutableVariable::Create(jcVariable &other)
+{
+    jcMutableVariablePtr newVar = jcMutableVariable::Create();
+    newVar->set(other);
     return newVar;
 }
 

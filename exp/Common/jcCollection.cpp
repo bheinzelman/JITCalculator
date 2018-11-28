@@ -7,18 +7,20 @@ jcCollection::jcCollection()
 {
 }
 
-jcCollection::jcCollection(const std::vector<jcVariablePtr> &vector) : mItems(vector)
+jcCollection::jcCollection(int size)
+{
+    mItems.reserve(size);
+}
+
+jcCollection::jcCollection(const std::vector<jcVariablePtr> &list) : mItems(list)
 {
 }
 
-jcCollectionPtr jcCollection::Create()
+jcCollection::jcCollection(const jcCollection &other)
 {
-    return std::make_shared<jcCollection>();
-}
-
-jcCollectionPtr jcCollection::Create(const std::vector<std::shared_ptr<jcVariable>> &vector)
-{
-    return std::make_shared<jcCollection>(jcCollection(vector));
+    other.forEach([this](jcVariablePtr item) {
+        mItems.push_back(item);
+    });
 }
 
 void jcCollection::push(const jcVariablePtr var)
@@ -32,16 +34,9 @@ jcVariablePtr jcCollection::head() const
     return mItems.front();
 }
 
-jcCollection jcCollection::tail() const
+jcCollection jcCollection::tail()
 {
-    std::vector<jcVariablePtr> newElements(mItems.begin() + 1, mItems.end());
-    return jcCollection(newElements);
-}
-
-jcVariablePtr jcCollection::at(int index) const
-{
-    JC_ASSERT(index < mItems.size());
-    return mItems[index];
+    return jcCollection(std::vector<jcVariablePtr>(mItems.begin() + 1, mItems.end()));
 }
 
 size_t jcCollection::size() const
@@ -49,16 +44,30 @@ size_t jcCollection::size() const
     return mItems.size();
 }
 
+bool jcCollection::isEmpty() const
+{
+    return mItems.size() == 0;
+}
+
 jcCollection jcCollection::concat(const jcCollection &other) const
 {
-    std::vector<jcVariablePtr> newCollection;
-    for (int i = 0; i < (int)size(); i++) {
-        newCollection.push_back(at(i));
+    jcCollection newCollection((int)size() + (int)other.size());
+
+    forEach([&newCollection](jcVariablePtr value) {
+        newCollection.push(value);
+    });
+    other.forEach([&newCollection](jcVariablePtr value) {
+        newCollection.push(value);
+    });
+
+    return newCollection;
+}
+
+void jcCollection::forEach(std::function<void(jcVariablePtr)> callback) const
+{
+    for (auto item : mItems) {
+        callback(item);
     }
-    for (int i = 0; i < other.size(); i++) {
-        newCollection.push_back(other.at(i));
-    }
-    return jcCollection(newCollection);
 }
 
 bool jcCollection::equal(const jcCollection &other) const
@@ -67,9 +76,13 @@ bool jcCollection::equal(const jcCollection &other) const
         return false;
     }
 
+    auto it1 = mItems.begin();
+    auto it2 = other.mItems.begin();
+
     for (int i = 0; i < (int)size(); i++) {
-        auto elem1 = at(i);
-        auto elem2 = other.at(i);
+        auto elem1 = *it1;
+        auto elem2 = *it2;
+
         if (elem1 == nullptr && elem2 == nullptr) {
             return true;
         }
@@ -81,6 +94,8 @@ bool jcCollection::equal(const jcCollection &other) const
         if (elem1->equal(*elem2) == false) {
             return false;
         }
+        ++it1;
+        ++it2;
     }
     return true;
 }

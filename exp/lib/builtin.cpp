@@ -49,6 +49,20 @@ std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
             {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
         }
     },
+    {
+        kLibCons,
+        {
+            {kLibParameterNumber, jcVariable::Create(2)},
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
+        }
+    },
+    {
+        kLibIsEmpty,
+        {
+            {kLibParameterNumber, jcVariable::Create(1)},
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeInt)}
+        }
+    },
 };
 
 std::map<std::string, LibraryFunction> builtin::mFunctions =
@@ -65,12 +79,11 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         kLibList,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             int numElements = interpreter.popStack()->asInt();
-            std::vector<jcVariablePtr> elements;
+            jcCollection elements(numElements);
             for (int i = 0; i < numElements; i++) {
-                elements.push_back(interpreter.popStack());
+                elements.push(interpreter.popStack());
             }
-            jcCollection collection(elements);
-            return jcVariable::Create(collection);
+            return jcVariable::Create(elements);
         }
     },
     {
@@ -121,6 +134,41 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
             return jcVariable::Create(collection1->concat(*collection2));
         }
     },
+    {
+        kLibCons,
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            jcVariablePtr item = interpreter.popStack();;
+            jcVariablePtr list = interpreter.popStack();;
+
+            JC_ASSERT(list->getType() == jcVariable::TypeCollection);
+
+            jcCollection *collection = list->asCollection();
+            jcCollection newCollection((int)collection->size() + 1);
+            newCollection.push(item);
+
+            collection->forEach([&newCollection](jcVariablePtr item) {
+                newCollection.push(item);
+            });
+
+            JC_ASSERT(collection != nullptr);
+
+            return jcVariable::Create(newCollection);
+        }
+    },
+    {
+        kLibIsEmpty,
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            jcVariablePtr list = interpreter.popStack();
+
+            JC_ASSERT(list->getType() == jcVariable::TypeCollection);
+
+            jcCollection *collection = list->asCollection();
+
+            JC_ASSERT(collection != nullptr);
+
+            return jcVariable::Create(collection->isEmpty());
+        }
+    }
 };
 
 LibState::LibState() : mStdout(std::cout), mStderr(std::cerr)

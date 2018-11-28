@@ -48,7 +48,7 @@ void run_shell(std::ostream& stream)
         }
 
         // check for commands
-        if (exp.size() == 2 && exp[0] == '.') {
+        if (exp.size() >= 2 && exp[0] == '.') {
             char cmd = exp[1];
             switch (cmd) {
             case 'q':

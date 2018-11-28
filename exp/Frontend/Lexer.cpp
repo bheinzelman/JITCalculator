@@ -9,11 +9,6 @@ Lexer::Lexer(std::istream& inputStream)
 {
 }
 
-Token Lexer::currentToken() const
-{
-    return _currentToken;
-}
-
 bool Lexer::peekToken(Token* token, jcMutableVariablePtr lexeme)
 {
     int64_t i = position();

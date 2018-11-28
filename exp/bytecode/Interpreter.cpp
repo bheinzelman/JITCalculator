@@ -75,7 +75,7 @@ jcVariablePtr Interpreter::interpret(jcVariablePtr callableObject)
     if (state().mIp != -1) {
         returnValue = eval();
     } else {
-        returnValue = resolveVariable(popStack());
+        returnValue = popStack();
     }
     popState();
     return returnValue;
@@ -102,7 +102,7 @@ jcVariablePtr Interpreter::eval()
             jcVariablePtr right = popStack();
             jcVariablePtr left = popStack();
 
-            jcVariablePtr result = jcVariable::Create(performArtithmaticOp(op, resolveVariable(right)->asInt(), resolveVariable(left)->asInt()));
+            jcVariablePtr result = jcVariable::Create(performArtithmaticOp(op, right->asInt(), left->asInt()));
             state().mStack.push(result);
             break;
         }
@@ -125,7 +125,7 @@ jcVariablePtr Interpreter::eval()
 
             jcMutableVariablePtr value = jcMutableVariable::Create();
             if (!resolveRuntimeVariable(variableName->asString(), value)) {
-                jcVariablePtr var = resolveVariable(popStack());
+                jcVariablePtr var = popStack();
                 if (var != nullptr) {
                     value = jcMutableVariable::Create(*var);
                 }
@@ -145,7 +145,7 @@ jcVariablePtr Interpreter::eval()
             JC_ASSERT_OR_THROW(instruction.getOperand(0)->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
 
             if (op == bc::JmpTrue) {
-                bool shouldJump = resolveVariable(popStack())->asInt();
+                bool shouldJump = popStack()->asInt();
                 if (shouldJump == false) {
                     break;
                 }
@@ -158,10 +158,6 @@ jcVariablePtr Interpreter::eval()
             break;
         }
         case bc::Ret: {
-            if (state().mStack.top()->getType() != jcVariable::TypeInt) {
-                state().mStack.push(resolveVariable(popStack()));
-            }
-
             popIp();
             state().mVariableLut.pop();
 
@@ -243,14 +239,7 @@ jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
     if (var->getType() == jcVariable::TypeInt) {
         return var;
     } else if (var->getType() == jcVariable::TypeCollection) {
-        jcCollection *collection = var->asCollection();
-        JC_ASSERT(collection != nullptr);
-
-        std::vector<jcVariablePtr> resolvedCollection;
-        for (int i = 0; i < (int)collection->size(); i++) {
-            resolvedCollection.push_back(resolveVariable(collection->at(i)));
-        }
-        return jcVariable::Create(jcCollection(resolvedCollection));
+        return var;
     } else {
         // if a function is defined with this value let it through
         if (functionExists(var)) {
