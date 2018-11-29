@@ -74,7 +74,11 @@ private:
         int callCount=0;
     };
 
-    _state& state();
+    inline _state& state() {
+        JC_ASSERT(mState.size());
+        return mState.top();
+    }
+    
     void pushState();
     void popState();
 

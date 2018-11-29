@@ -20,9 +20,12 @@ public:
     bool isEmpty() const;
 
     jcVariablePtr head() const;
-    jcCollection tail();
 
-    jcCollection concat(const jcCollection &other) const;
+    /**
+     You own this sucker, be careful
+     */
+    jcCollection* tail() const;
+    jcCollection* concat(const jcCollection &other) const;
 
     void forEach(std::function<void(jcVariablePtr)> callback) const;
 

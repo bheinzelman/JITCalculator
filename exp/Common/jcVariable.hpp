@@ -14,10 +14,6 @@
  */
 
 class jcVariable {
-
-protected:
-    jcVariable();
-
 public:
     enum Type {
         TypeString,
@@ -27,9 +23,17 @@ public:
         TypeNone
     };
 
+    jcVariable();
+
     static jcVariablePtr Create(std::string value);
     static jcVariablePtr Create(int value);
-    static jcVariablePtr Create(const jcCollection& collection);
+
+    /**
+     WARNING, this transfers  the collection to the jcMutableVariable
+     and sets the given collection to NULL
+     */
+    static jcVariablePtr Create(jcCollection **collection);
+    
     static jcVariablePtr Create(const jcClosure& closure);
 
     ~jcVariable();
@@ -61,7 +65,7 @@ protected:
 
     void set_String(const std::string& str);
     void set_Int(const int val);
-    void set_Collection(const jcCollection& collection);
+    void set_Collection(jcCollection** collection);
     void set_Closure(const jcClosure& closure);
 
 protected:
@@ -77,15 +81,19 @@ protected:
 
 class jcMutableVariable : public jcVariable
 {
-    jcMutableVariable() {}
-
 public:
+    jcMutableVariable() {}
     static jcMutableVariablePtr Create(jcVariable &other);
     static jcMutableVariablePtr Create();
 
     void set(const jcVariable &other);
     void setString(const std::string& str);
     void setInt(const int val);
-    void setCollection(const jcCollection& collection);
+
+    /**
+     WARNING, this transfers  the collection to the jcMutableVariable
+     and sets the given collection to NULL
+     */
+    void setCollection(jcCollection** collection);
     void setClosure(const jcClosure& closure);
 };

@@ -79,11 +79,11 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         kLibList,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             int numElements = interpreter.popStack()->asInt();
-            jcCollection elements(numElements);
+            jcCollection *elements = new jcCollection(numElements);
             for (int i = 0; i < numElements; i++) {
-                elements.push(interpreter.popStack());
+                elements->push(interpreter.popStack());
             }
-            return jcVariable::Create(elements);
+            return jcVariable::Create(&elements);
         }
     },
     {
@@ -103,7 +103,9 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
             jcCollection *collection = arg->asCollection();
             JC_ASSERT(collection != nullptr);
 
-            return jcVariable::Create(collection->tail());
+            auto tail = collection->tail();
+
+            return jcVariable::Create(&tail);
         }
     },
     {
@@ -131,7 +133,9 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
 
             JC_ASSERT(collection1 != nullptr && collection2 != nullptr);
 
-            return jcVariable::Create(collection1->concat(*collection2));
+            jcCollection *newCollection = collection1->concat(*collection2);
+
+            return jcVariable::Create(&newCollection);
         }
     },
     {
@@ -143,16 +147,16 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
             JC_ASSERT(list->getType() == jcVariable::TypeCollection);
 
             jcCollection *collection = list->asCollection();
-            jcCollection newCollection((int)collection->size() + 1);
-            newCollection.push(item);
+            jcCollection *newCollection = new jcCollection((int)collection->size() + 1);
+            newCollection->push(item);
 
             collection->forEach([&newCollection](jcVariablePtr item) {
-                newCollection.push(item);
+                newCollection->push(item);
             });
 
             JC_ASSERT(collection != nullptr);
 
-            return jcVariable::Create(newCollection);
+            return jcVariable::Create(&newCollection);
         }
     },
     {

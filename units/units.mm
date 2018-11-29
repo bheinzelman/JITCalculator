@@ -119,16 +119,15 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     Runtime rt;
 
     NSString *program = @"concat([1,2,3], [4, 5])";
+    jcCollection* collection = new jcCollection({
+                        jcVariable::Create(1),
+                        jcVariable::Create(2),
+                        jcVariable::Create(3),
+                        jcVariable::Create(4),
+                        jcVariable::Create(5)
+    });
 
-    jcVariablePtr expected = jcVariable::Create(
-                                                jcCollection({
-                                                    jcVariable::Create(1),
-                                                    jcVariable::Create(2),
-                                                    jcVariable::Create(3),
-                                                    jcVariable::Create(4),
-                                                    jcVariable::Create(5)
-                                                    })
-                                                );
+    jcVariablePtr expected = jcVariable::Create(&collection);
     std::stringstream stream;
     toStream(program, stream);
 
@@ -143,13 +142,13 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
                           returnSelf(1, 2, 3) \
     ";
 
-    jcVariablePtr expected = jcVariable::Create(
-                                                jcCollection({
-                                                    jcVariable::Create(1),
-                                                    jcVariable::Create(2),
-                                                    jcVariable::Create(3)
-                                                })
-                                                );
+    jcCollection* collection = new jcCollection({
+                            jcVariable::Create(1),
+                            jcVariable::Create(2),
+                            jcVariable::Create(3)
+    });
+
+    jcVariablePtr expected = jcVariable::Create(&collection);
     std::stringstream stream;
     toStream(program, stream);
 
@@ -205,14 +204,16 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
             ptrs.push_back(jcVariable::Create(v));
         }
 
-        jcCollection collection(ptrs);
+        jcCollection* collection = new jcCollection(ptrs);
 
-        return jcVariable::Create(collection);
+        return jcVariable::Create(&collection);
     };
 
+    const int NUM_ITEMS = 10000;
+
     std::vector<int> valuesToSort;
-    while (valuesToSort.size() < 1000) {
-        valuesToSort.push_back(arc4random() % 1000);
+    while (valuesToSort.size() < NUM_ITEMS) {
+        valuesToSort.push_back(arc4random() % NUM_ITEMS);
     }
 
     std::string program = "qs(" + intVecToPtr(valuesToSort)->stringRepresentation() + ")";

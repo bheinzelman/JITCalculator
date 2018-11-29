@@ -4,7 +4,7 @@
 
 jcVariablePtr jcVariable::Create()
 {
-    return std::make_shared<jcVariable>(jcVariable());
+    return std::make_shared<jcVariable>();
 }
 
 jcVariablePtr jcVariable::Create(std::string value)
@@ -21,7 +21,7 @@ jcVariablePtr jcVariable::Create(int value)
     return me;
 }
 
-jcVariablePtr jcVariable::Create(const jcCollection& collection)
+jcVariablePtr jcVariable::Create(jcCollection** collection)
 {
     auto me = jcVariable::Create();
     me->set_Collection(collection);
@@ -104,10 +104,11 @@ void jcVariable::set_Closure(const jcClosure &closure)
     mCurrentType = TypeClosure;
 }
 
-void jcVariable::set_Collection(const jcCollection& collection)
+void jcVariable::set_Collection(jcCollection** collection)
 {
     willSet();
-    mData.collection = new jcCollection(collection);
+    mData.collection = *collection;
+    *collection = nullptr;
     mCurrentType = TypeCollection;
 }
 
@@ -185,7 +186,12 @@ void jcMutableVariable::set(const jcVariable &other)
         setString(other.asString());
     } else if (other.getType() == TypeCollection) {
         if (auto collection = other.asCollection()) {
-            setCollection(*collection);
+            // TODO fix this
+            jcCollection *newCollection = new jcCollection((int)collection->size());
+            collection->forEach([newCollection](jcVariablePtr element) {
+                newCollection->push(element);
+            });
+            setCollection(&newCollection);
         }
     } else if (other.getType() == TypeClosure) {
         if (auto closure = other.asClosure()) {
@@ -203,7 +209,7 @@ jcMutableVariablePtr jcMutableVariable::Create(jcVariable &other)
 
 jcMutableVariablePtr jcMutableVariable::Create()
 {
-    return std::make_shared<jcMutableVariable>(jcMutableVariable());
+    return std::make_shared<jcMutableVariable>();
 }
 
 void jcMutableVariable::setString(const std::string& str)
@@ -216,7 +222,7 @@ void jcMutableVariable::setInt(const int val)
     set_Int(val);
 }
 
-void jcMutableVariable::setCollection(const jcCollection& collection)
+void jcMutableVariable::setCollection(jcCollection **collection)
 {
     set_Collection(collection);
 }

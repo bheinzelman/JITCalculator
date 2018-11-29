@@ -34,9 +34,9 @@ jcVariablePtr jcCollection::head() const
     return mItems.front();
 }
 
-jcCollection jcCollection::tail()
+jcCollection* jcCollection::tail() const
 {
-    return jcCollection(std::vector<jcVariablePtr>(mItems.begin() + 1, mItems.end()));
+    return new jcCollection(std::vector<jcVariablePtr>(mItems.begin() + 1, mItems.end()));
 }
 
 size_t jcCollection::size() const
@@ -49,15 +49,15 @@ bool jcCollection::isEmpty() const
     return mItems.size() == 0;
 }
 
-jcCollection jcCollection::concat(const jcCollection &other) const
+jcCollection* jcCollection::concat(const jcCollection &other) const
 {
-    jcCollection newCollection((int)size() + (int)other.size());
+    jcCollection* newCollection = new jcCollection((int)size() + (int)other.size());
 
     forEach([&newCollection](jcVariablePtr value) {
-        newCollection.push(value);
+        newCollection->push(value);
     });
     other.forEach([&newCollection](jcVariablePtr value) {
-        newCollection.push(value);
+        newCollection->push(value);
     });
 
     return newCollection;

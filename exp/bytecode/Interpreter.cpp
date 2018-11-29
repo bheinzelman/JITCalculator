@@ -124,14 +124,12 @@ jcVariablePtr Interpreter::eval()
             jcVariablePtr variableName = instruction.getOperand(0);
 
             jcMutableVariablePtr value = jcMutableVariable::Create();
-            if (!resolveRuntimeVariable(variableName->asString(), value)) {
-                jcVariablePtr var = popStack();
-                if (var != nullptr) {
-                    value = jcMutableVariable::Create(*var);
-                }
+            if (resolveRuntimeVariable(variableName->asString(), value)) {
+                state().mVariableLut.top()[variableName->asString()] = value;
+            } else {
+                state().mVariableLut.top()[variableName->asString()] = popStack();
             }
 
-            state().mVariableLut.top()[variableName->asString()] = value;
             break;
         }
         case bc::Call: {
@@ -241,6 +239,10 @@ jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
     } else if (var->getType() == jcVariable::TypeCollection) {
         return var;
     } else {
+        if (state().mVariableLut.top().count(var->asString()) > 0) {
+            return state().mVariableLut.top()[var->asString()];
+        }
+
         // if a function is defined with this value let it through
         if (functionExists(var)) {
             return var;
@@ -251,8 +253,7 @@ jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
             return mutablePtr;
         }
 
-        JC_ASSERT_OR_THROW(state().mVariableLut.top().count(var->asString()) > 0, "undefined variable");
-        return state().mVariableLut.top()[var->asString()];
+        JC_THROW("undefined variable: " + var->asString());
     }
 }
 
@@ -317,12 +318,6 @@ void Interpreter::popIp()
     JC_ASSERT(state().mIpStack.size());
     state().mIp = state().mIpStack.top();
     state().mIpStack.pop();
-}
-
-Interpreter::_state& Interpreter::state()
-{
-    JC_ASSERT(mState.size());
-    return mState.top();
 }
 
 void Interpreter::pushState()
