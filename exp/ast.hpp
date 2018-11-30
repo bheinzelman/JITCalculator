@@ -63,6 +63,30 @@ private:
     std::string mVariableName;
 };
 
+class NegateExpression : public Expression {
+public:
+    NegateExpression(std::shared_ptr<Expression> exp);
+
+    std::shared_ptr<Expression> getExpression() const;
+
+    void accept(Visitor* v) override;
+
+private:
+    std::shared_ptr<Expression> mExpression;
+};
+
+class NotExpression : public Expression {
+public:
+    NotExpression(std::shared_ptr<Expression> exp);
+
+    std::shared_ptr<Expression> getExpression() const;
+
+    void accept(Visitor* v) override;
+
+private:
+    std::shared_ptr<Expression> mExpression;
+};
+
 class FunctionCallExpression : public Expression {
 public:
     FunctionCallExpression(std::shared_ptr<Expression> callee, const std::vector<std::shared_ptr<Expression>> arguments);

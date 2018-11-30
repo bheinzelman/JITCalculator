@@ -217,6 +217,20 @@ void Generator::visit(Closure* closure)
     mClosures.push_back(std::make_pair(closure, std::set<std::string>(mScope)));
 }
 
+void Generator::visit(NegateExpression* expression)
+{
+    expression->getExpression()->accept(this);
+    Instruction negate = Instruction(bc::Neg);
+    mOutput.push_back(negate);
+}
+
+void Generator::visit(NotExpression* expression)
+{
+    expression->getExpression()->accept(this);
+    Instruction notInstruction = Instruction(bc::Not);
+    mOutput.push_back(notInstruction);
+}
+
 void Generator::visit(FunctionDecl* function)
 {
     // new function new scope..

@@ -31,7 +31,12 @@ private:
     std::shared_ptr<FunctionBody> getFunctionBody();
 
     std::vector<std::shared_ptr<Expression>> getFunctionCallArgs();
+
+    // Will return Error token if the given token is not a prefix operator
+    Token peekPrefixOp();
+
     std::shared_ptr<Expression> getPostfixOps(std::shared_ptr<Expression> expIn);
+    std::shared_ptr<Expression> getPrefixOps(std::shared_ptr<Expression> expIn, Token prefixOp);
 
     // Will return the error token if the next token is not an operator
     Token peekOperator();

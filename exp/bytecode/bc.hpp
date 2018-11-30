@@ -37,6 +37,16 @@ enum Op {
     Pop,
 
     /**
+     Negates the value on the top of the stack -value
+     */
+    Neg,
+
+    /**
+     Inverts the value on the top of the stack !value
+     */
+    Not,
+
+    /**
      Adds the top two values in the argument stack
      */
     Add,
@@ -110,8 +120,8 @@ enum Op {
 };
 
 /**
-     * runtime variables
-     */
+ runtime variables
+ */
 namespace vars {
     // instruction pointer
     const std::string ip = "$ip";
@@ -145,23 +155,27 @@ public:
     std::vector<Instruction> getInstructions(std::shared_ptr<Node> root);
     std::vector<Instruction> getClosureInstructions();
 
-    void visit(BasicExpression* expression);
+    void visit(BasicExpression* expression) override;
 
-    void visit(BinaryExpression* expression);
+    void visit(BinaryExpression* expression) override;
 
-    void visit(FunctionCallExpression* expression);
+    void visit(NegateExpression* expression) override;
 
-    void visit(FunctionDecl* function);
+    void visit(NotExpression* expression) override;
 
-    void visit(FunctionBody* functionBody);
+    void visit(FunctionCallExpression* expression) override;
 
-    void visit(Closure* functionBody);
+    void visit(FunctionDecl* function) override;
 
-    void visit(VariableExpression* expression);
+    void visit(FunctionBody* functionBody) override;
 
-    void visit(ListExpression* list);
+    void visit(Closure* functionBody) override;
 
-    void visit(Guard* guard);
+    void visit(VariableExpression* expression) override;
+
+    void visit(ListExpression* list) override;
+
+    void visit(Guard* guard) override;
 
 private:
     void generateClosures();

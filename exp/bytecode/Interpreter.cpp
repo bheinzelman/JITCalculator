@@ -35,6 +35,19 @@ static int performArtithmaticOp(bc::Op op, int right, int left)
     }
 }
 
+static int performPrefixOp(bc::Op op, int val)
+{
+    switch (op) {
+        case bc::Neg:
+            return -val;
+        case bc::Not:
+            return !val;
+        default:
+            JC_FAIL();
+            break;
+    }
+}
+
 Interpreter::Interpreter()
 {
 }
@@ -103,6 +116,13 @@ jcVariablePtr Interpreter::eval()
             jcVariablePtr left = popStack();
 
             jcVariablePtr result = jcVariable::Create(performArtithmaticOp(op, right->asInt(), left->asInt()));
+            state().mStack.push(result);
+            break;
+        }
+        case bc::Neg:
+        case bc::Not: {
+            jcVariablePtr top = popStack();
+            jcVariablePtr result = jcVariable::Create(performPrefixOp(op, top->asInt()));
             state().mStack.push(result);
             break;
         }

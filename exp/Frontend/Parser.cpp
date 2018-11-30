@@ -37,6 +37,10 @@ std::shared_ptr<Node> Parser::parseLine()
 
 bool Parser::peekExpression()
 {
+    if (peekPrefixOp() != Token::Error) {
+        return true;
+    }
+    
     auto token = peekToken();
     return token == Token::Num ||
            token == Token::LParen ||
@@ -74,6 +78,18 @@ std::shared_ptr<Expression> Parser::getPostfixOps(std::shared_ptr<Expression> ex
         return getPostfixOps(std::make_shared<FunctionCallExpression>(expIn, functionCallArgs));
     }
     return expIn;
+}
+
+std::shared_ptr<Expression> Parser::getPrefixOps(std::shared_ptr<Expression> expIn, Token prefixOp)
+{
+    switch (prefixOp) {
+        case Token::Subtract:
+            return std::make_shared<NegateExpression>(expIn);
+        case Token::Bang:
+            return std::make_shared<NotExpression>(expIn);
+        default:
+            JC_THROW("Invalid prefix operator");
+    }
 }
 
 std::shared_ptr<Expression> Parser::getTerm()
@@ -127,6 +143,19 @@ Token Parser::peekOperator()
         break;
     }
     return Token::Error;
+}
+
+Token Parser::peekPrefixOp()
+{
+    Token token = peekToken();
+    switch (token) {
+        case Token::Subtract:
+            return token;
+        case Token::Bang:
+            return token;
+        default:
+            return Token::Error;
+    }
 }
 
 std::vector<std::string> Parser::getFunctionParams()
@@ -202,7 +231,16 @@ std::shared_ptr<FunctionDecl> Parser::getFunctionDecl()
 
 std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
 {
+    Token prefixOp = peekPrefixOp();
+    if (prefixOp != Token::Error) {
+        nextToken(nullptr);
+    }
+    
     std::shared_ptr<Expression> left = getPostfixOps(getTerm());
+
+    if (prefixOp != Token::Error) {
+        left = getPrefixOps(left, prefixOp);
+    }
 
     while (1) {
         Token op = peekOperator();

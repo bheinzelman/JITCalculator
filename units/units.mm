@@ -41,6 +41,8 @@
              @{@"value": @1, @"exp": @"2 <= 3"},
              @{@"value": @1, @"exp": @"2 <= 2"},
              @{@"value": @1, @"exp": @"2 == 2"},
+             @{@"value": @0, @"exp": @"!(2 == 2)"},
+             @{@"value": @100, @"exp": @"-(10 * -10)"},
              @{@"value": @1, @"exp": @"(1 == 2) == 0"},
              @{@"value": @0, @"exp": @"let x(a,b) | a > b = a | else = b"},
              @{@"value": @2, @"exp": @"x(2,1)"},
@@ -209,7 +211,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         return jcVariable::Create(&collection);
     };
 
-    const int NUM_ITEMS = 10000;
+    const int NUM_ITEMS = 1000;
 
     std::vector<int> valuesToSort;
     while (valuesToSort.size() < NUM_ITEMS) {

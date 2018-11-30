@@ -132,6 +132,34 @@ void VariableExpression::accept(Visitor* v)
     v->visit(this);
 }
 
+NegateExpression::NegateExpression(std::shared_ptr<Expression> exp) : mExpression(exp)
+{
+}
+
+std::shared_ptr<Expression> NegateExpression::getExpression() const
+{
+    return mExpression;
+}
+
+void NegateExpression::accept(Visitor* v)
+{
+    v->visit(this);
+}
+
+NotExpression::NotExpression(std::shared_ptr<Expression> exp) : mExpression(exp)
+{
+}
+
+std::shared_ptr<Expression> NotExpression::getExpression() const
+{
+    return mExpression;
+}
+
+void NotExpression::accept(Visitor* v)
+{
+    v->visit(this);
+}
+
 FunctionCallExpression::FunctionCallExpression(std::shared_ptr<Expression> callee, const std::vector<std::shared_ptr<Expression>> arguments)
     : mCallee(callee)
     , mArguments(arguments)

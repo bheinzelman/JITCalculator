@@ -47,6 +47,9 @@ bool Lexer::getNextToken(Token* token, jcMutableVariablePtr lexeme)
         case '+':
             nextToken = Token::Add;
             break;
+        case '!':
+            nextToken = Token::Bang;
+            break;
         case '-':
             nextToken = Token::Subtract;
             break;

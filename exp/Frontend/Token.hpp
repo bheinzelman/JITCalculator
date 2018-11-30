@@ -11,6 +11,7 @@ enum class Token {
     Greater_Than,
     Less_Than_Equal,
     Greater_Than_Equal,
+    Bang,
     Equals,
     LParen,
     RParen,
