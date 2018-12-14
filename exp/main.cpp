@@ -13,24 +13,6 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
-void evaluate_stream(std::istream& inputStream, std::ostream& outputStream, Runtime& rt, bool printResults)
-{
-    std::vector<jcVariablePtr> output;
-    try {
-        if (!rt.evaluate(inputStream, output)) {
-            outputStream << "Error evaluation" << std::endl;
-            return;
-        }
-        if (printResults) {
-            for (auto outputValue : output) {
-                outputStream << outputValue->stringRepresentation() << std::endl;
-            }
-        }
-    } catch (jcException exception) {
-        outputStream << "jcException..." << exception.getMessage() << std::endl;
-    }
-}
-
 void run_shell(std::ostream& stream)
 {
     stream << "JITCalculator v" << JC_VERSION_STRING << "\n";
@@ -64,10 +46,16 @@ void run_shell(std::ostream& stream)
 
         } else {
             try {
+                std::vector<jcVariablePtr> output;
+
                 std::stringstream stream;
                 stream << exp;
 
-                evaluate_stream(stream, std::cout, runtime, true);
+                runtime.evaluateREPL(stream, output);
+
+                for (auto outputValue : output) {
+                    std::cout << outputValue->stringRepresentation() << std::endl;
+                }
 
             } catch (jcException excecption) {
                 stream << "jcException... " << excecption.getMessage() << std::endl;
@@ -85,8 +73,7 @@ void run_file(std::string filename)
         return;
     }
 
-    Runtime runtime;
-    evaluate_stream(inputStream, std::cout, runtime, false);
+    Runtime::evaluate(inputStream);
 
     inputStream.close();
 }

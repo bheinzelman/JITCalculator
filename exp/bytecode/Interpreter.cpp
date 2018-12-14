@@ -8,7 +8,7 @@
 #include "jc.h"
 #include "builtin.hpp"
 
-static int performArtithmaticOp(bc::Op op, int right, int left)
+static inline int performArtithmaticOp(bc::Op op, int right, int left)
 {
     switch (op) {
     case bc::Add:
@@ -35,7 +35,7 @@ static int performArtithmaticOp(bc::Op op, int right, int left)
     }
 }
 
-static int performPrefixOp(bc::Op op, int val)
+static inline int performPrefixOp(bc::Op op, int val)
 {
     switch (op) {
         case bc::Neg:

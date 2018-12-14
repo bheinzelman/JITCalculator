@@ -60,7 +60,7 @@ static void toStream(NSString *string, std::stringstream& stream) {
 static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expectedValue) {
     try {
         std::vector<jcVariablePtr> output;
-        if (rt.evaluate(stream, output)) {
+        if (rt.evaluateREPL(stream, output)) {
             if (output.size()) {
                 jcVariablePtr value = output.front();
                 std::cout << value->stringRepresentation() << std::endl;
@@ -197,7 +197,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 
     Runtime rt;
     std::vector<jcVariablePtr> output;
-    XCTAssert(rt.evaluate(quickSortFile, output));
+    XCTAssert(rt.evaluateREPL(quickSortFile, output));
     XCTAssert(output.size() == 0);
 
     auto intVecToPtr = [](const std::vector<int> &vector) -> jcVariablePtr {
