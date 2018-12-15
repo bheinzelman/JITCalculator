@@ -21,6 +21,9 @@ using jcMutableVariablePtr = std::shared_ptr<jcMutableVariable>;
 class jcCollection;
 using jcCollectionPtr = std::shared_ptr<jcCollection>;
 
+class jcClosure;
+using jcClosurePtr = std::shared_ptr<jcClosure>;
+
 class jcException : public std::exception {
 public:
     jcException(const std::string& message)

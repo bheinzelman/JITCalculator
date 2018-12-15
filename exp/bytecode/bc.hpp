@@ -129,12 +129,12 @@ namespace vars {
 
 class Instruction {
 public:
-    Instruction(bc::Op op, std::vector<jcVariablePtr> operands);
+    explicit Instruction(bc::Op op, const jcVariablePtr &operand);
     Instruction(bc::Op op);
 
     int numOperands() const;
 
-    jcVariablePtr getOperand(int idx) const;
+    jcVariablePtr getOperand() const;
 
     bc::Op getOp() const;
 
@@ -142,7 +142,7 @@ public:
 
 private:
     bc::Op mOp;
-    std::vector<jcVariablePtr> mOperands;
+    jcVariablePtr mOperand;
 };
 
 /**

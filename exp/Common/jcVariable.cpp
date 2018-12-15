@@ -21,14 +21,14 @@ jcVariablePtr jcVariable::Create(int value)
     return me;
 }
 
-jcVariablePtr jcVariable::Create(jcCollection** collection)
+jcVariablePtr jcVariable::Create(const jcCollectionPtr &collection)
 {
     auto me = jcVariable::Create();
     me->set_Collection(collection);
     return me;
 }
 
-jcVariablePtr jcVariable::Create(const jcClosure& closure)
+jcVariablePtr jcVariable::Create(const jcClosurePtr &closure)
 {
     auto me = jcVariable::Create();
     me->set_Closure(closure);
@@ -42,13 +42,12 @@ jcVariable::jcVariable()
 
 jcVariable::~jcVariable()
 {
-    willSet();
 }
 
 std::string jcVariable::asString() const
 {
     if (mCurrentType == TypeString) {
-        return std::string(mData.mStr);
+        return std::get<std::string>(mData);
     }
     return std::string();
 }
@@ -56,73 +55,49 @@ std::string jcVariable::asString() const
 int jcVariable::asInt() const
 {
     if (mCurrentType == TypeInt) {
-        return mData.mInt;
+        return std::get<int>(mData);
     }
     return 0;
 }
 
-jcClosure* jcVariable::asClosure() const
+jcClosure* jcVariable::asClosureRaw() const
 {
     if (mCurrentType == TypeClosure) {
-        return mData.closure;
+        return std::get<jcClosurePtr>(mData).get();
     }
     return nullptr;
 }
 
-jcCollection* jcVariable::asCollection() const
+jcCollection* jcVariable::asCollectionRaw() const
 {
     if (mCurrentType == TypeCollection) {
-        return mData.collection;
+        return std::get<std::shared_ptr<jcCollection>>(mData).get();
     }
     return nullptr;
 }
 
 void jcVariable::set_String(const std::string& str)
 {
-    willSet();
-
-    mData.mStr = new char[str.length() + 1];
-    strncpy(mData.mStr, str.c_str(), str.length());
-    mData.mStr[str.length()] = '\0';
+    mData = str;
     mCurrentType = TypeString;
 }
 
 void jcVariable::set_Int(const int val)
 {
-    willSet();
-    mData.mInt = val;
+    mData = val;
     mCurrentType = TypeInt;
 }
 
-void jcVariable::set_Closure(const jcClosure &closure)
+void jcVariable::set_Closure(const jcClosurePtr &closure)
 {
-    willSet();
-
-    std::string name = closure.name();
-    std::map<std::string, jcVariablePtr> scope = closure.scope();
-    mData.closure = new jcClosure(name, scope);
+    mData = closure;
     mCurrentType = TypeClosure;
 }
 
-void jcVariable::set_Collection(jcCollection** collection)
+void jcVariable::set_Collection(const jcCollectionPtr &collection)
 {
-    willSet();
-    mData.collection = *collection;
-    *collection = nullptr;
+    mData = collection;
     mCurrentType = TypeCollection;
-}
-
-void jcVariable::willSet()
-{
-    if (mCurrentType == TypeString) {
-        delete[] mData.mStr;
-    }
-    if (mCurrentType == TypeCollection) {
-        delete mData.collection; 
-    }
-    if (mCurrentType == TypeClosure) {
-        delete mData.closure;
-    }
 }
 
 std::string jcVariable::stringRepresentation() const {
@@ -132,9 +107,9 @@ std::string jcVariable::stringRepresentation() const {
         return asString();
     } else if (getType() == TypeCollection) {
         std::string rep = "[";
-        if (asCollection() != nullptr) {
-            int i = (int)asCollection()->size();
-            asCollection()->forEach([&rep, &i](jcVariablePtr element) {
+        if (asCollectionRaw() != nullptr) {
+            int i = (int)asCollectionRaw()->size();
+            asCollectionRaw()->forEach([&rep, &i](jcVariablePtr element) {
                 rep += element->stringRepresentation();
                 if (--i != 0) {
                     rep += ", "; 
@@ -166,9 +141,9 @@ bool jcVariable::equal(const jcVariable &other) const
         case TypeString:
             return asString() == other.asString();
         case TypeCollection:
-            return pointerEqual(asCollection(), other.asCollection());
+            return pointerEqual(asCollectionRaw(), other.asCollectionRaw());
         case TypeClosure:
-            return pointerEqual(asClosure(), other.asClosure());
+            return pointerEqual(asClosureRaw(), other.asClosureRaw());
         default:
             return false;
     }
@@ -185,18 +160,9 @@ void jcMutableVariable::set(const jcVariable &other)
     } else if (other.getType() == TypeString) {
         setString(other.asString());
     } else if (other.getType() == TypeCollection) {
-        if (auto collection = other.asCollection()) {
-            // TODO fix this
-            jcCollection *newCollection = new jcCollection((int)collection->size());
-            collection->forEach([newCollection](jcVariablePtr element) {
-                newCollection->push(element);
-            });
-            setCollection(&newCollection);
-        }
+        setCollection(other.asSharedPtr<jcCollection>());
     } else if (other.getType() == TypeClosure) {
-        if (auto closure = other.asClosure()) {
-            setClosure(*closure);
-        }
+        setClosure(other.asSharedPtr<jcClosure>());
     }
 }
 
@@ -222,12 +188,12 @@ void jcMutableVariable::setInt(const int val)
     set_Int(val);
 }
 
-void jcMutableVariable::setCollection(jcCollection **collection)
+void jcMutableVariable::setCollection(std::shared_ptr<jcCollection> collection)
 {
     set_Collection(collection);
 }
 
-void jcMutableVariable::setClosure(const jcClosure& closure)
+void jcMutableVariable::setClosure(const jcClosurePtr closure)
 {
     set_Closure(closure);
 }

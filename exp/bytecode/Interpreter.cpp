@@ -57,7 +57,7 @@ void Interpreter::mapLabels(std::vector<bc::Instruction> instructions)
     for (int i = 0; i < instructions.size(); i++) {
         bc::Instruction instruction = instructions[i];
         if (instruction.getOp() == bc::Label) {
-            mLabelLut[instruction.getOperand(0)->asString()] = i;
+            mLabelLut[instruction.getOperand()->asString()] = i;
         }
     }
 }
@@ -97,8 +97,9 @@ jcVariablePtr Interpreter::interpret(jcVariablePtr callableObject)
 jcVariablePtr Interpreter::eval()
 {
     bool shouldExit = false;
+    _state& curState = state();
     while (shouldExit == false) {
-        bc::Instruction instruction = mInstructions[state().mIp++];
+        bc::Instruction& instruction = mInstructions[curState.mIp++];
 
         bc::Op op = instruction.getOp();
 
@@ -116,51 +117,51 @@ jcVariablePtr Interpreter::eval()
             jcVariablePtr left = popStack();
 
             jcVariablePtr result = jcVariable::Create(performArtithmaticOp(op, right->asInt(), left->asInt()));
-            state().mStack.push(result);
+            curState.mStack.push(result);
             break;
         }
         case bc::Neg:
         case bc::Not: {
             jcVariablePtr top = popStack();
             jcVariablePtr result = jcVariable::Create(performPrefixOp(op, top->asInt()));
-            state().mStack.push(result);
+            curState.mStack.push(result);
             break;
         }
         case bc::Push: {
-            jcVariablePtr operand = resolveVariable(instruction.getOperand(0));
-            state().mStack.push(operand);
+            jcVariablePtr operand = resolveVariable(instruction.getOperand());
+            curState.mStack.push(operand);
             break;
         }
         case bc::PushC: {
-            std::string closureName = instruction.getOperand(0)->asString();
-            std::map<std::string, jcVariablePtr> scope = state().mVariableLut.top();
+            std::string closureName = instruction.getOperand()->asString();
+            std::map<std::string, jcVariablePtr> scope = curState.mVariableLut.top();
 
-            jcClosure closure = jcClosure(closureName, scope);
+            jcClosurePtr closure = std::make_shared<jcClosure>(closureName, scope);
 
-            state().mStack.push(jcVariable::Create(closure));
+            curState.mStack.push(jcVariable::Create(closure));
             break;
         }
         case bc::Pop: {
-            jcVariablePtr variableName = instruction.getOperand(0);
+            jcVariablePtr variableName = instruction.getOperand();
 
             jcMutableVariablePtr value = jcMutableVariable::Create();
             if (resolveRuntimeVariable(variableName->asString(), value)) {
-                state().mVariableLut.top()[variableName->asString()] = value;
+                curState.mVariableLut.top()[variableName->asString()] = value;
             } else {
-                state().mVariableLut.top()[variableName->asString()] = popStack();
+                curState.mVariableLut.top()[variableName->asString()] = popStack();
             }
 
             break;
         }
         case bc::Call: {
-            state().callCount += 1;
+            curState.callCount += 1;
             callFunction(popStack());
             break;
         }
         case bc::JmpTrue:
         case bc::Jmp: {
             JC_ASSERT_OR_THROW(instruction.numOperands() == 1, "Invalid jmpTrue operands");
-            JC_ASSERT_OR_THROW(instruction.getOperand(0)->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
+            JC_ASSERT_OR_THROW(instruction.getOperand()->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
 
             if (op == bc::JmpTrue) {
                 bool shouldJump = popStack()->asInt();
@@ -169,17 +170,17 @@ jcVariablePtr Interpreter::eval()
                 }
             }
 
-            std::string label = instruction.getOperand(0)->asString();
+            std::string label = instruction.getOperand()->asString();
             JC_ASSERT_OR_THROW(mLabelLut.count(label) > 0, "label " + label + " does not exist");
-            state().mIp = mLabelLut[label];
+            curState.mIp = mLabelLut[label] + 1;
 
             break;
         }
         case bc::Ret: {
             popIp();
-            state().mVariableLut.pop();
+            curState.mVariableLut.pop();
 
-            if ((--state().callCount == 0) && state().callSingleFunction) {
+            if ((--curState.callCount == 0) && curState.callSingleFunction) {
                 shouldExit = true;
             }
             
@@ -208,7 +209,7 @@ void Interpreter::callFunction(jcVariablePtr operand)
                        "Cannot call non-closure or non-id value"
                        );
 
-    auto setupClosure = [&functionName, this](jcClosure *closure) {
+    auto setupClosure = [&functionName, this](jcClosure* closure) {
         JC_ASSERT(closure);
         functionName = closure->name();
 
@@ -220,12 +221,12 @@ void Interpreter::callFunction(jcVariablePtr operand)
     };
 
     if (operand->getType() == jcVariable::TypeClosure) {
-        jcClosure *closure = operand->asClosure();
+        jcClosure* closure = operand->asClosureRaw();
         setupClosure(closure);
     } else if (state().mVariableLut.top().count(operand->asString()) > 0) {
         jcVariablePtr functionVar = state().mVariableLut.top()[operand->asString()];
         if (functionVar->getType() == jcVariable::TypeClosure) {
-            setupClosure(functionVar->asClosure());
+            setupClosure(functionVar->asClosureRaw());
         } else {
             functionName = functionVar->asString();
         }
@@ -252,7 +253,7 @@ void Interpreter::callFunction(jcVariablePtr operand)
     JC_THROW(operand->asString() + " does not exist");
 }
 
-jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
+jcVariablePtr Interpreter::resolveVariable(const jcVariablePtr &var)
 {
     if (var->getType() == jcVariable::TypeInt) {
         return var;
@@ -277,11 +278,11 @@ jcVariablePtr Interpreter::resolveVariable(jcVariablePtr var)
     }
 }
 
-bool Interpreter::functionExists(jcVariablePtr var) const
+bool Interpreter::functionExists(const jcVariablePtr &var) const
 {
     std::string functionName = "";
     if (var->getType() == jcVariable::TypeClosure) {
-        functionName = var->asClosure()->name();
+        functionName = var->asClosureRaw()->name();
     } else {
         functionName = var->asString();
     }
@@ -298,7 +299,7 @@ bool Interpreter::functionExists(jcVariablePtr var) const
     return false;
 }
 
-void Interpreter::setVariable(std::string var, jcVariablePtr to)
+void Interpreter::setVariable(std::string var, jcVariablePtr &to)
 {
     // Check if runtime var
     if (var == bc::vars::ip) {
@@ -309,7 +310,7 @@ void Interpreter::setVariable(std::string var, jcVariablePtr to)
     state().mVariableLut.top()[var] = resolveVariable(to);
 }
 
-bool Interpreter::resolveRuntimeVariable(std::string var, jcMutableVariablePtr output)
+bool Interpreter::resolveRuntimeVariable(std::string var, jcMutableVariablePtr &output)
 {
     if (var == bc::vars::ip) {
         if (output) {
@@ -322,9 +323,10 @@ bool Interpreter::resolveRuntimeVariable(std::string var, jcMutableVariablePtr o
 
 jcVariablePtr Interpreter::popStack()
 {
-    JC_ASSERT(state().mStack.size());
-    auto top = state().mStack.top();
-    state().mStack.pop();
+    _state& curState = state();
+//    JC_ASSERT(curState.mStack.size());
+    auto top = curState.mStack.top();
+    curState.mStack.pop();
     return top;
 }
 

@@ -79,11 +79,11 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         kLibList,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             int numElements = interpreter.popStack()->asInt();
-            jcCollection *elements = new jcCollection(numElements);
+            jcCollectionPtr elements = std::make_shared<jcCollection>(numElements);
             for (int i = 0; i < numElements; i++) {
                 elements->push(interpreter.popStack());
             }
-            return jcVariable::Create(&elements);
+            return jcVariable::Create(elements);
         }
     },
     {
@@ -91,8 +91,8 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             jcVariablePtr arg = interpreter.popStack();
             JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
-            JC_ASSERT(arg->asCollection() != nullptr);
-            return arg->asCollection()->head();
+            JC_ASSERT(arg->asCollectionRaw() != nullptr);
+            return arg->asCollectionRaw()->head();
         }
     },
     {
@@ -100,12 +100,12 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             jcVariablePtr arg = interpreter.popStack();
             JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
-            jcCollection *collection = arg->asCollection();
+            jcCollection* collection = arg->asCollectionRaw();
             JC_ASSERT(collection != nullptr);
 
-            auto tail = collection->tail();
+            jcCollectionPtr tail = std::shared_ptr<jcCollection>(collection->tail());
 
-            return jcVariable::Create(&tail);
+            return jcVariable::Create(tail);
         }
     },
     {
@@ -113,7 +113,7 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             jcVariablePtr arg = interpreter.popStack();;
             JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
-            jcCollection *collection = arg->asCollection();
+            jcCollection* collection = arg->asCollectionRaw();
             JC_ASSERT(collection != nullptr);
 
             return jcVariable::Create((int)collection->size());
@@ -128,14 +128,14 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
             JC_ASSERT(list1->getType() == jcVariable::TypeCollection);
             JC_ASSERT(list2->getType() == jcVariable::TypeCollection);
 
-            jcCollection *collection1 = list1->asCollection();
-            jcCollection *collection2 = list2->asCollection();
+            jcCollection* collection1 = list1->asCollectionRaw();
+            jcCollection* collection2 = list2->asCollectionRaw();
 
             JC_ASSERT(collection1 != nullptr && collection2 != nullptr);
 
-            jcCollection *newCollection = collection1->concat(*collection2);
+            jcCollectionPtr newCollection = std::shared_ptr<jcCollection>(collection1->concat(*collection2));
 
-            return jcVariable::Create(&newCollection);
+            return jcVariable::Create(newCollection);
         }
     },
     {
@@ -146,8 +146,8 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
 
             JC_ASSERT(list->getType() == jcVariable::TypeCollection);
 
-            jcCollection *collection = list->asCollection();
-            jcCollection *newCollection = new jcCollection((int)collection->size() + 1);
+            jcCollection* collection = list->asCollectionRaw();
+            jcCollectionPtr newCollection = std::make_shared<jcCollection>((int)collection->size() + 1);
             newCollection->push(item);
 
             collection->forEach([&newCollection](jcVariablePtr item) {
@@ -156,7 +156,7 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
 
             JC_ASSERT(collection != nullptr);
 
-            return jcVariable::Create(&newCollection);
+            return jcVariable::Create(newCollection);
         }
     },
     {
@@ -166,7 +166,7 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
 
             JC_ASSERT(list->getType() == jcVariable::TypeCollection);
 
-            jcCollection *collection = list->asCollection();
+            jcCollection* collection = list->asCollectionRaw();
 
             JC_ASSERT(collection != nullptr);
 

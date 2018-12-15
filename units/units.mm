@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 #include "Runtime.hpp"
 #include "jcVariable.hpp"
@@ -121,15 +122,17 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     Runtime rt;
 
     NSString *program = @"concat([1,2,3], [4, 5])";
-    jcCollection* collection = new jcCollection({
-                        jcVariable::Create(1),
-                        jcVariable::Create(2),
-                        jcVariable::Create(3),
-                        jcVariable::Create(4),
-                        jcVariable::Create(5)
-    });
+    std::vector<jcVariablePtr> elems = {
+        jcVariable::Create(1),
+        jcVariable::Create(2),
+        jcVariable::Create(3),
+        jcVariable::Create(4),
+        jcVariable::Create(5)
+    };
 
-    jcVariablePtr expected = jcVariable::Create(&collection);
+    jcCollectionPtr collection = std::make_shared<jcCollection>(elems);
+
+    jcVariablePtr expected = jcVariable::Create(collection);
     std::stringstream stream;
     toStream(program, stream);
 
@@ -143,14 +146,14 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     NSString *program = @"let returnSelf(x, y, z) = [x, y, z] \
                           returnSelf(1, 2, 3) \
     ";
+    std::vector<jcVariablePtr> elems = {
+        jcVariable::Create(1),
+        jcVariable::Create(2),
+        jcVariable::Create(3)
+    };
+    jcCollectionPtr collection = std::make_shared<jcCollection>(elems);
 
-    jcCollection* collection = new jcCollection({
-                            jcVariable::Create(1),
-                            jcVariable::Create(2),
-                            jcVariable::Create(3)
-    });
-
-    jcVariablePtr expected = jcVariable::Create(&collection);
+    jcVariablePtr expected = jcVariable::Create(collection);
     std::stringstream stream;
     toStream(program, stream);
 
@@ -206,9 +209,9 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
             ptrs.push_back(jcVariable::Create(v));
         }
 
-        jcCollection* collection = new jcCollection(ptrs);
+        jcCollectionPtr collection = std::make_shared<jcCollection>(ptrs);
 
-        return jcVariable::Create(&collection);
+        return jcVariable::Create(collection);
     };
 
     const int NUM_ITEMS = 1000;

@@ -69,11 +69,14 @@ void run_file(std::string filename)
     std::ifstream inputStream;
     inputStream.open(filename.c_str(), std::ifstream::in | std::ifstream::binary);
     if (inputStream.is_open() == false) {
-        std::cout << "Could not open file " << filename;
+        std::cerr << "Could not open file " << filename;
         return;
     }
-
-    Runtime::evaluate(inputStream);
+    try {
+        Runtime::evaluate(inputStream);
+    } catch (jcException exception) {
+        std::cerr << "jcException... " << exception.getMessage() << std::endl;
+    }
 
     inputStream.close();
 }

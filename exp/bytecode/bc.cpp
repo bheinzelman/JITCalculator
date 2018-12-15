@@ -55,9 +55,9 @@ static std::string opToString(bc::Op op)
     return "";
 }
 
-Instruction::Instruction(bc::Op op, std::vector<jcVariablePtr> operands)
+Instruction::Instruction(bc::Op op, const jcVariablePtr &operands)
     : mOp(op)
-    , mOperands(operands)
+    , mOperand(operands)
 {
 }
 
@@ -68,13 +68,12 @@ Instruction::Instruction(bc::Op op)
 
 int Instruction::numOperands() const
 {
-    return (int)mOperands.size();
+    return mOperand != nullptr ? 1 : 0;
 }
 
-jcVariablePtr Instruction::getOperand(int idx) const
+jcVariablePtr Instruction::getOperand() const
 {
-    JC_ASSERT(idx < mOperands.size());
-    return mOperands[idx];
+    return mOperand;
 }
 
 bc::Op Instruction::getOp() const
@@ -89,16 +88,12 @@ std::string Instruction::toString() const
         output += opToString(mOp) + " ";
     }
 
-    for (int i = 0; i < mOperands.size(); i++) {
-
-        if (mOperands[i]->getType() == jcVariable::TypeInt) {
-            int operand = mOperands[i]->asInt();
+    if (mOperand) {
+        if (mOperand->getType() == jcVariable::TypeInt) {
+            int operand = mOperand->asInt();
             output += std::to_string(operand);
         } else {
-            output += mOperands[i]->asString();
-        }
-        if (i < mOperands.size() - 1) {
-            output += ", ";
+            output += mOperand->asString();
         }
     }
     return output;
@@ -132,13 +127,13 @@ void Generator::generateClosures()
 
         std::string label = closureLabel(i);
         mCurrentFunctionLabel = label;
-        mOutput.push_back(Instruction(bc::Label, {jcVariable::Create(label)}));
+        mOutput.push_back(Instruction(bc::Label, jcVariable::Create(label)));
 
         // push the current scope into the closure
         for (auto it = scope.rbegin(); it != scope.rend(); ++it) {
             std::string var = *it;
             jcVariablePtr paramVar = jcVariable::Create(var);
-            Instruction popOp = Instruction(bc::Pop, { paramVar });
+            Instruction popOp = Instruction(bc::Pop, paramVar);
             mOutput.push_back(popOp);
         }
 
@@ -159,7 +154,7 @@ void Generator::visit(FunctionBody* functionBody)
 
     for (std::string param : functionBody->getParameters()) {
         jcVariablePtr paramVar = jcVariable::Create(param);
-        Instruction popOp = Instruction(bc::Pop, { paramVar });
+        Instruction popOp = Instruction(bc::Pop, paramVar);
         mOutput.push_back(popOp);
         mScope.insert(param);
     }
@@ -173,13 +168,13 @@ void Generator::visit(FunctionBody* functionBody)
             guard->getGuardExpression()->accept(this);
 
             std::string label = functionName + "." + std::to_string(i);
-            Instruction jmpInstruction = Instruction(bc::JmpTrue, { jcVariable::Create(label) });
+            Instruction jmpInstruction = Instruction(bc::JmpTrue, jcVariable::Create(label));
             mOutput.push_back(jmpInstruction);
         }
 
         // jump to default if none of guards hit
         std::string lastLabel = functionName + "." + std::to_string(functionBody->getGuards().size());
-        mOutput.push_back(Instruction(bc::Jmp, { jcVariable::Create(lastLabel) }));
+        mOutput.push_back(Instruction(bc::Jmp, jcVariable::Create(lastLabel)));
 
         // now do the guard bodies
 
@@ -187,20 +182,20 @@ void Generator::visit(FunctionBody* functionBody)
             std::shared_ptr<Guard> guard = functionBody->getGuards()[i];
             std::string label = functionName + "." + std::to_string(i);
 
-            mOutput.push_back(Instruction(bc::Label, { jcVariable::Create(label) }));
+            mOutput.push_back(Instruction(bc::Label, jcVariable::Create(label)));
             guard->getBodyExpression()->accept(this);
 
-            mOutput.push_back(Instruction(bc::Jmp, { jcVariable::Create(endLabel) }));
+            mOutput.push_back(Instruction(bc::Jmp, jcVariable::Create(endLabel)));
         }
 
-        mOutput.push_back(Instruction(bc::Label, { jcVariable::Create(lastLabel) }));
+        mOutput.push_back(Instruction(bc::Label, jcVariable::Create(lastLabel)));
     }
 
     functionBody->getDefaultExpression()->accept(this);
 
-    mOutput.push_back(Instruction(bc::Label, { jcVariable::Create(endLabel) }));
+    mOutput.push_back(Instruction(bc::Label, jcVariable::Create(endLabel)));
 
-    Instruction returnInstruction = Instruction(bc::Ret, {});
+    Instruction returnInstruction = Instruction(bc::Ret);
     mOutput.push_back(returnInstruction);
 }
 
@@ -208,7 +203,7 @@ void Generator::visit(Closure* closure)
 {
     std::string closureName = closureLabel(mNumClosures++);
 
-    mOutput.push_back(Instruction(bc::PushC, {jcVariable::Create(closureName)}));
+    mOutput.push_back(Instruction(bc::PushC, jcVariable::Create(closureName)));
 
 
     // NEED TO PUSH WHAT IS IN SCOPE SO WE KNOW WHAT WE HAVE IN SCOPE..., NEED TO ADD A PUSHC INSTRUCTION THAT CAN PUSH
@@ -238,7 +233,7 @@ void Generator::visit(FunctionDecl* function)
 
     std::string functionName = function->getId();
 
-    Instruction functionLabel = Instruction(bc::Label, { jcVariable::Create(functionName) });
+    Instruction functionLabel = Instruction(bc::Label, jcVariable::Create(functionName));
     mOutput.push_back(functionLabel);
 
     mCurrentFunctionLabel = functionName;
@@ -256,14 +251,14 @@ void Generator::visit(Guard* guard)
 void Generator::visit(VariableExpression* expression)
 {
     jcVariablePtr varId = jcVariable::Create(expression->getVariableName());
-    Instruction pushOp = Instruction(bc::Push, { varId });
+    Instruction pushOp = Instruction(bc::Push, varId);
     mOutput.push_back(pushOp);
 }
 
 void Generator::visit(BasicExpression* expression)
 {
     jcVariablePtr expressionVal = jcVariable::Create(expression->getValue());
-    Instruction pushOp = Instruction(bc::Push, { expressionVal });
+    Instruction pushOp = Instruction(bc::Push, expressionVal);
     mOutput.push_back(pushOp);
 }
 
@@ -274,10 +269,10 @@ void Generator::visit(ListExpression* list)
     for (auto element : elements) {
         element->accept(this);
     }
-    Instruction pushOp = Instruction(bc::Push, { jcVariable::Create((int)elements.size())});
+    Instruction pushOp = Instruction(bc::Push, jcVariable::Create((int)elements.size()));
     mOutput.push_back(pushOp);
 
-    mOutput.push_back(Instruction(bc::Push, {jcVariable::Create(lib::kLibList)}));
+    mOutput.push_back(Instruction(bc::Push, jcVariable::Create(lib::kLibList)));
     mOutput.push_back(Instruction(bc::Call));
 }
 
@@ -333,7 +328,7 @@ void Generator::visit(BinaryExpression* expression)
         JC_FAIL();
     }
 
-    mOutput.push_back(Instruction(bytecodeOp, {}));
+    mOutput.push_back(Instruction(bytecodeOp));
 }
 
 }

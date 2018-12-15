@@ -39,10 +39,9 @@ private:
     /**
      Resolves variables to literal values..
      */
-    jcVariablePtr resolveVariable(jcVariablePtr var);
-    jcVariablePtr resolveFunction(jcVariablePtr var);
-    bool resolveRuntimeVariable(std::string var, jcMutableVariablePtr output);
-    void setVariable(std::string var, jcVariablePtr to);
+    jcVariablePtr resolveVariable(const jcVariablePtr &var);
+    bool resolveRuntimeVariable(std::string var, jcMutableVariablePtr &output);
+    void setVariable(std::string var, jcVariablePtr &to);
 
     void mapLabels(std::vector<bc::Instruction> instructions);
 
@@ -58,7 +57,7 @@ private:
      */
     void callFunction(jcVariablePtr operand);
 
-    bool functionExists(jcVariablePtr var) const;
+    bool functionExists(const jcVariablePtr &var) const;
 
 private:
 
