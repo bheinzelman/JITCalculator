@@ -40,6 +40,11 @@ let min(a,b)
 ```
 `JITCalculator` will evaluate each guard until it finds one that evaluates to true, then it will execute and return the corresponding expression. If no guards evaluate to true, the `else` expression will be run. Currently you must have an `else` condition. Guards allow for much more interesting computations, such as ones that require looping/recursion.
 
+## Ternary Expressions
+```
+let min(x, y) = x < y ? x : y
+```
+
 ## Example program
 ```
  let factorial(n) 
