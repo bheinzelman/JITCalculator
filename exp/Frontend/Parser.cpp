@@ -244,10 +244,6 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
     }
 
     while (1) {
-//        if (peekToken() == Token::Colon) {
-//            return left;
-//        }
-
         Token op = peekOperator();
         if (op != Token::Error && jcToken::getOperatorPrecedence(op) < prevPrec) {
             break;
