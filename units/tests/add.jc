@@ -1,12 +1,1 @@
-let fact(ab) 
-| ab > 1 = fact(ab - 1) * ab 
-| else = 1 
-
-print(fact(10))
-print(fact(3))
-
-let min(a,b) 
-| a < b = a
-| else = b
-
-print(min(2,3))
+print(2 > 3 ? (100 > 99 ? 1000 : 101) : 900)

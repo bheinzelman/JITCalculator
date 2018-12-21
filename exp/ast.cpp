@@ -214,3 +214,30 @@ std::vector<std::shared_ptr<Expression>> ListExpression::getElements() const
 {
     return mElements;
 }
+
+TernaryExpresssion::TernaryExpresssion(const std::shared_ptr<Expression> conditionalExpression,
+                   const std::shared_ptr<Expression> trueExpression,
+                   const std::shared_ptr<Expression> falseExpression)
+: mConditionalExpression(conditionalExpression), mTrueExpression(trueExpression), mFalseExpression(falseExpression)
+{
+}
+
+std::shared_ptr<Expression> TernaryExpresssion::getConditionalExpression() const
+{
+    return mConditionalExpression;
+}
+
+std::shared_ptr<Expression> TernaryExpresssion::getTrueExpression() const
+{
+    return mTrueExpression;
+}
+
+std::shared_ptr<Expression> TernaryExpresssion::getFalseExpression() const
+{
+    return mFalseExpression;
+}
+
+void TernaryExpresssion::accept(Visitor *v)
+{
+    v->visit(this);
+}

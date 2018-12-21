@@ -28,6 +28,8 @@ enum class Token {
     LeftBrace,
     RightBrace,
     EndOfStream,
+    QuestionMark,
+    Colon,
     None
 };
 

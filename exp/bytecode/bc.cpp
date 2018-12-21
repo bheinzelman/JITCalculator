@@ -146,6 +146,15 @@ std::string Generator::closureLabel(int idx) const
     return std::string("c.") + std::to_string(idx);
 }
 
+
+/**
+ Used for making non-closure labels
+ */
+std::string Generator::labelMaker()
+{
+    return std::string(".") + std::to_string(numLabels++);
+}
+
 void Generator::visit(FunctionBody* functionBody)
 {
     JC_ASSERT(mCurrentFunctionLabel.size() > 0);
@@ -162,12 +171,16 @@ void Generator::visit(FunctionBody* functionBody)
     std::string endLabel = functionName + ".end";
 
     if (functionBody->getGuards().size()) {
+        std::vector<std::string> labels;
+
         // do guard expressions
         for (int i = 0; i < functionBody->getGuards().size(); i++) {
             std::shared_ptr<Guard> guard = functionBody->getGuards()[i];
             guard->getGuardExpression()->accept(this);
 
-            std::string label = functionName + "." + std::to_string(i);
+            std::string label = labelMaker();
+            labels.push_back(label);
+
             Instruction jmpInstruction = Instruction(bc::JmpTrue, jcVariable::Create(label));
             mOutput.push_back(jmpInstruction);
         }
@@ -180,7 +193,7 @@ void Generator::visit(FunctionBody* functionBody)
 
         for (int i = 0; i < functionBody->getGuards().size(); i++) {
             std::shared_ptr<Guard> guard = functionBody->getGuards()[i];
-            std::string label = functionName + "." + std::to_string(i);
+            std::string label = labels[i];
 
             mOutput.push_back(Instruction(bc::Label, jcVariable::Create(label)));
             guard->getBodyExpression()->accept(this);
@@ -193,7 +206,9 @@ void Generator::visit(FunctionBody* functionBody)
 
     functionBody->getDefaultExpression()->accept(this);
 
-    mOutput.push_back(Instruction(bc::Label, jcVariable::Create(endLabel)));
+    if (functionBody->getGuards().size()) {
+        mOutput.push_back(Instruction(bc::Label, jcVariable::Create(endLabel)));
+    }
 
     Instruction returnInstruction = Instruction(bc::Ret);
     mOutput.push_back(returnInstruction);
@@ -217,6 +232,26 @@ void Generator::visit(NegateExpression* expression)
     expression->getExpression()->accept(this);
     Instruction negate = Instruction(bc::Neg);
     mOutput.push_back(negate);
+}
+
+void Generator::visit(TernaryExpresssion* expression)
+{
+    expression->getConditionalExpression()->accept(this);
+
+    auto trueLabel = labelMaker();
+    auto endLabel = labelMaker();
+
+    mOutput.push_back(Instruction(bc::JmpTrue, jcVariable::Create(trueLabel)));
+
+    // false
+    expression->getFalseExpression()->accept(this);
+    mOutput.push_back(Instruction(bc::Jmp, jcVariable::Create(endLabel)));
+
+    // true
+    mOutput.push_back(Instruction(bc::Label, jcVariable::Create(trueLabel)));
+    expression->getTrueExpression()->accept(this);
+
+    mOutput.push_back(Instruction(bc::Label, jcVariable::Create(endLabel)));
 }
 
 void Generator::visit(NotExpression* expression)

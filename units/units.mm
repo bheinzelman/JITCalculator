@@ -11,6 +11,17 @@
 #include "Runtime.hpp"
 #include "jcVariable.hpp"
 
+class AnswerExpression {
+public:
+    jcVariablePtr answer;
+    std::string expression;
+
+    AnswerExpression(jcVariablePtr answer,
+                     std::string expression) : answer(answer), expression(expression)
+    {
+    }
+};
+
 @interface units : XCTestCase
 
 @end
@@ -24,44 +35,43 @@
     _testDirectory = [[[NSProcessInfo processInfo] environment] objectForKey:@"TEST_DIR"];
 }
 
-- (NSArray<NSDictionary *> *)inlineExpressions
+static std::vector<AnswerExpression> getBasicExpressions()
 {
-	return @[
-			 @{@"value": @2, @"exp": @"1 + 1"},
-			 @{@"value": @11, @"exp": @"5 * 2 + 1"},
-			 @{@"value": @11, @"exp": @"(5 * 2) + 1"},
-			 @{@"value": @2, @"exp": @"2 / 1"},
-			 @{@"value": @20, @"exp": @"(5 - 1) * 5"},
-			 @{@"value": @99, @"exp": @"(5 - 1) * 5 * 5 - 1"},
-             @{@"value": @0, @"exp": @"let add(x123,y) = x123 + y"},
-             @{@"value": @4, @"exp": @"add(add(1,1), add(1,1))"},
-             @{@"value": @0, @"exp": @"2 > 3"},
-             @{@"value": @1, @"exp": @"2 < 3"},
-             @{@"value": @0, @"exp": @"2 >= 3"},
-             @{@"value": @1, @"exp": @"2 >= 1"},
-             @{@"value": @1, @"exp": @"2 <= 3"},
-             @{@"value": @1, @"exp": @"2 <= 2"},
-             @{@"value": @1, @"exp": @"2 == 2"},
-             @{@"value": @0, @"exp": @"!(2 == 2)"},
-             @{@"value": @100, @"exp": @"-(10 * -10)"},
-             @{@"value": @1, @"exp": @"(1 == 2) == 0"},
-             @{@"value": @0, @"exp": @"let x(a,b) | a > b = a | else = b"},
-             @{@"value": @2, @"exp": @"x(2,1)"},
-             @{@"value": @0, @"exp": @"let self(yy) = yy"},
-             @{@"value": @1, @"exp": @"self(1)"},
-             @{@"value": @1, @"exp": @"head([1,2,3])"},
-			 ];
-}
+    return {
+        AnswerExpression(jcVariable::Create(2), "1 + 1"),
+        AnswerExpression(jcVariable::Create(11), "5 * 2 + 1"),
+        AnswerExpression(jcVariable::Create(11), "(5 * 2) + 1"),
+        AnswerExpression(jcVariable::Create(2), "2 / 1"),
+        AnswerExpression(jcVariable::Create(20), "(5 - 1) * 5"),
+        AnswerExpression(jcVariable::Create(99), "(5 - 1) * 5 * 5 - 1"),
+        AnswerExpression(jcVariable::Create(0), "let add(x123,y) = x123 + y"),
+        AnswerExpression(jcVariable::Create(4), "add(add(1,1), add(1,1))"),
+        AnswerExpression(jcVariable::Create(0), "2 > 3"),
+        AnswerExpression(jcVariable::Create(1), "2 < 3"),
+        AnswerExpression(jcVariable::Create(0), "2 >= 3"),
+        AnswerExpression(jcVariable::Create(1), "2 >= 1"),
+        AnswerExpression(jcVariable::Create(1), "2 <= 3"),
+        AnswerExpression(jcVariable::Create(1), "2 <= 2"),
+        AnswerExpression(jcVariable::Create(1), "2 == 2"),
+        AnswerExpression(jcVariable::Create(0), "!(2 == 2)"),
+        AnswerExpression(jcVariable::Create(100), "-(10 * -10)"),
+        AnswerExpression(jcVariable::Create(1), "(1 == 2) == 0"),
+        AnswerExpression(jcVariable::Create(0), "let x(a,b) | a > b = a | else = b"),
+        AnswerExpression(jcVariable::Create(2), "x(2,1)"),
+        AnswerExpression(jcVariable::Create(0), "let self(yy) = yy"),
+        AnswerExpression(jcVariable::Create(1), "self(1)"),
+        AnswerExpression(jcVariable::Create(1), "head([1,2,3])"),
+        AnswerExpression(jcVariable::Create(900), "2 > 3 ? (100 > 99 ? 1000 : 101) : 900")
 
-static void toStream(NSString *string, std::stringstream& stream) {
-    std::string cppStr = std::string(string.UTF8String);
-    stream << cppStr;
+    };
 }
 
 static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expectedValue) {
     try {
         std::vector<jcVariablePtr> output;
-        if (rt.evaluateREPL(stream, output)) {
+        bool result = rt.evaluateREPL(stream, output);
+
+        if (result) {
             if (output.size()) {
                 jcVariablePtr value = output.front();
                 std::cout << value->stringRepresentation() << std::endl;
@@ -79,12 +89,12 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 
 - (void)testBasicExpressions {
     Runtime rt;
-	for (NSDictionary *d in self.inlineExpressions) {
-        jcVariablePtr expected = jcVariable::Create([d[@"value"] intValue]);
-		NSString *expression = d[@"exp"];
+    for (AnswerExpression object : getBasicExpressions()) {
+        jcVariablePtr expected = object.answer;
+        std::string expression = object.expression;
 
         std::stringstream stream;
-        toStream(expression, stream);
+        stream << expression;
 
         XCTAssert(testStream(stream, rt, expected));
 	}
@@ -93,13 +103,13 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 - (void)testListHead {
     Runtime rt;
 
-    NSString *program = @"let list = [1, 2, 3]\
+    std::string program = "let list = [1, 2, 3]\
                         head(list())\
     ";
 
     jcVariablePtr expected = jcVariable::Create(1);
     std::stringstream stream;
-    toStream(program, stream);
+    stream << program;
 
     XCTAssert(testStream(stream, rt, expected));
 }
@@ -107,13 +117,13 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 - (void)testListlen {
     Runtime rt;
 
-    NSString *program = @"let list = [1, 2, 3]\
+    std::string program = "let list = [1, 2, 3]\
                           len(list())\
     ";
 
     jcVariablePtr expected = jcVariable::Create(3);
     std::stringstream stream;
-    toStream(program, stream);
+    stream << program;
 
     XCTAssert(testStream(stream, rt, expected));
 }
@@ -121,7 +131,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 - (void)testListConcat {
     Runtime rt;
 
-    NSString *program = @"concat([1,2,3], [4, 5])";
+    std::string program = "concat([1,2,3], [4, 5])";
     std::vector<jcVariablePtr> elems = {
         jcVariable::Create(1),
         jcVariable::Create(2),
@@ -134,7 +144,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 
     jcVariablePtr expected = jcVariable::Create(collection);
     std::stringstream stream;
-    toStream(program, stream);
+    stream << program;
 
     XCTAssert(testStream(stream, rt, expected));
 }
@@ -143,7 +153,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 {
     Runtime rt;
 
-    NSString *program = @"let returnSelf(x, y, z) = [x, y, z] \
+    std::string program = "let returnSelf(x, y, z) = [x, y, z] \
                           returnSelf(1, 2, 3) \
     ";
     std::vector<jcVariablePtr> elems = {
@@ -155,7 +165,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 
     jcVariablePtr expected = jcVariable::Create(collection);
     std::stringstream stream;
-    toStream(program, stream);
+    stream << program;
 
     XCTAssert(testStream(stream, rt, expected));
 }
@@ -164,7 +174,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 {
     Runtime rt;
 
-    NSString *program = @"let callit(fn) = fn()\
+    std::string program = "let callit(fn) = fn()\
                           let returnNum(num) = callit({() = num})\
                           returnNum(4)\
     ";
@@ -172,7 +182,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     jcVariablePtr expected = jcVariable::Create(4);
 
     std::stringstream stream;
-    toStream(program, stream);
+    stream << program;
 
     XCTAssert(testStream(stream, rt, expected));
 }
@@ -181,7 +191,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 {
     Runtime rt;
 
-    NSString *program = @"let callit(fn) = fn()\
+    std::string program = "let callit(fn) = fn()\
     let four = 4 \
     callit(four) \
     ";
@@ -189,7 +199,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     jcVariablePtr expected = jcVariable::Create(4);
 
     std::stringstream stream;
-    toStream(program, stream);
+    stream << program;
 
     XCTAssert(testStream(stream, rt, expected));
 }
@@ -237,12 +247,12 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 {
     Runtime rt;
 
-    NSString *program = @"{() = 555}()";
+    std::string program = "{() = 555}()";
 
     jcVariablePtr expected = jcVariable::Create(555);
 
     std::stringstream stream;
-    toStream(program, stream);
+    stream << program;
 
     XCTAssert(testStream(stream, rt, expected));
 }
@@ -251,7 +261,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 {
     Runtime rt;
 
-    NSString *program = @"let callit(fn) = fn\
+    std::string program = "let callit(fn) = fn\
     let four = 4 \
     callit(four)() \
     ";
@@ -259,7 +269,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     jcVariablePtr expected = jcVariable::Create(4);
 
     std::stringstream stream;
-    toStream(program, stream);
+    stream << program;
 
     XCTAssert(testStream(stream, rt, expected));
 }

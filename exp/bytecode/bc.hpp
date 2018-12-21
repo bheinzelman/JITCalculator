@@ -148,7 +148,7 @@ private:
 /**
  Walks through the AST and generates bytecode
  */
-class Generator : Visitor {
+class Generator : public Visitor {
 public:
     Generator();
 
@@ -160,6 +160,8 @@ public:
     void visit(BinaryExpression* expression) override;
 
     void visit(NegateExpression* expression) override;
+
+    void visit(TernaryExpresssion* expression) override;
 
     void visit(NotExpression* expression) override;
 
@@ -179,6 +181,7 @@ public:
 
 private:
     void generateClosures();
+    std::string labelMaker();
     std::string closureLabel(int idx) const;
 private:
     std::vector<Instruction> mOutput;
@@ -188,6 +191,7 @@ private:
     std::string mCurrentFunctionLabel;
 
     int mNumClosures=0;
+    int numLabels=0;
 };
 
 }

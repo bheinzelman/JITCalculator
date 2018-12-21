@@ -138,6 +138,7 @@ Token Parser::peekOperator()
     case Token::Less_Than_Equal:
     case Token::Greater_Than_Equal:
     case Token::Equals:
+    case Token::QuestionMark:
         return tok;
     default:
         break;
@@ -243,6 +244,10 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
     }
 
     while (1) {
+//        if (peekToken() == Token::Colon) {
+//            return left;
+//        }
+
         Token op = peekOperator();
         if (op != Token::Error && jcToken::getOperatorPrecedence(op) < prevPrec) {
             break;
@@ -260,9 +265,24 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
         nextToken(nullptr);
 
         int nextPrec = jcToken::getOperatorPrecedence(op) + 1;
-        auto right = getExpression(nextPrec);
-        left = std::make_shared<BinaryExpression>(BinaryExpression(left, op, right));
+
+        // ternary
+        if (op == Token::QuestionMark) {
+            auto trueExpression = getExpression(1);
+
+            eat(Token::Colon);
+
+            auto falseExpression = getExpression(1);
+
+            left = std::make_shared<TernaryExpresssion>(left, trueExpression, falseExpression);
+        } else {
+            auto right = getExpression(nextPrec);
+            left = std::make_shared<BinaryExpression>(BinaryExpression(left, op, right));
+        }
     }
+
+
+
     return left;
 }
 

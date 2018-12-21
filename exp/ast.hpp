@@ -133,6 +133,26 @@ private:
     std::vector<std::shared_ptr<Expression>> mElements;
 };
 
+class TernaryExpresssion : public Expression {
+public:
+    TernaryExpresssion(const std::shared_ptr<Expression> conditionalExpression,
+                       const std::shared_ptr<Expression> trueExpression,
+                       const std::shared_ptr<Expression> falseExpression);
+
+    std::shared_ptr<Expression> getConditionalExpression() const;
+    std::shared_ptr<Expression> getTrueExpression() const;
+    std::shared_ptr<Expression> getFalseExpression() const;
+
+    void accept(Visitor *v) override;
+
+private:
+    std::shared_ptr<Expression> mConditionalExpression;
+    std::shared_ptr<Expression> mTrueExpression;
+    std::shared_ptr<Expression> mFalseExpression;
+
+private:
+};
+
 class Guard : public Node {
 public:
     Guard(const std::shared_ptr<Expression> guardExpression,
