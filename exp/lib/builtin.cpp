@@ -79,7 +79,7 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         kLibList,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             int numElements = interpreter.popStack()->asInt();
-            jcCollectionPtr elements = std::make_shared<jcCollection>(numElements);
+            jcMutableCollectionPtr elements = std::make_shared<jcMutableCollection>(numElements);
             for (int i = 0; i < numElements; i++) {
                 elements->push(interpreter.popStack());
             }
@@ -147,7 +147,7 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
             JC_ASSERT(list->getType() == jcVariable::TypeCollection);
 
             jcCollection* collection = list->asCollectionRaw();
-            jcCollectionPtr newCollection = std::make_shared<jcCollection>((int)collection->size() + 1);
+            jcMutableCollectionPtr newCollection = std::make_shared<jcMutableCollection>((int)collection->size() + 1);
             newCollection->push(item);
 
             collection->forEach([&newCollection](jcVariablePtr item) {

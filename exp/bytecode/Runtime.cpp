@@ -17,14 +17,17 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <fstream>
 
 Runtime::Runtime()
 {
+    mImportDefintions = loadLibrary(JC_STD_LIBRARY_PATH);
 }
 
 std::vector<bc::Instruction> Runtime::instructionsFromDefinitions()
 {
-    std::vector<bc::Instruction> instructions;
+    std::vector<bc::Instruction> instructions(mImportDefintions);
+
     for (auto pair : mReplDefinitions) {
         auto ctx = pair.second;
         instructions.insert(instructions.end(), ctx.function.begin(), ctx.function.end());
@@ -34,10 +37,31 @@ std::vector<bc::Instruction> Runtime::instructionsFromDefinitions()
     return instructions;
 }
 
+std::vector<bc::Instruction> Runtime::loadLibrary(const std::string &path)
+{
+    std::ifstream inputStream;
+    inputStream.open(path.c_str(), std::ifstream::in | std::ifstream::binary);
+    if (inputStream.is_open() == false) {
+        JC_THROW("Unable to load library: " + path);
+        return {};
+    }
+
+    std::vector<bc::Instruction> definitions;
+
+    traverseStream(inputStream,
+       [&definitions](std::string definitionName, std::vector<bc::Instruction> newDefinitions, std::vector<bc::Instruction> closures) {
+            definitions.insert(definitions.end(), newDefinitions.begin(), newDefinitions.end());
+            definitions.insert(definitions.end(), closures.begin(), closures.end());
+       }, [](std::vector<bc::Instruction>, std::vector<bc::Instruction>) {
+
+       });
+    return definitions;
+}
+
 void Runtime::traverseStream(std::istream& stream, DefinitionCallback definitionHandler, ExpressionCallback expressionHandler)
 {
     Lexer lex(stream);
-    Parser parser(std::make_shared<Lexer>(lex));
+    Parser parser(lex);
     std::vector<std::shared_ptr<Node>> nodes = parser.parse();
 
     if (nodes.size() == 0) {
@@ -67,7 +91,8 @@ void Runtime::traverseStream(std::istream& stream, DefinitionCallback definition
 
 void Runtime::evaluate(std::istream& stream)
 {
-    std::vector<bc::Instruction> definitions;
+    std::vector<bc::Instruction> definitions(loadLibrary(JC_STD_LIBRARY_PATH));
+    JC_ASSERT(definitions.size());
     std::vector<bc::Instruction> expressions;
     traverseStream(stream,
        [&definitions](std::string definitionName, std::vector<bc::Instruction> newDefinitions, std::vector<bc::Instruction> closures) {

@@ -14,14 +14,14 @@ class FunctionBody;
 
 class Parser {
 public:
-    Parser(std::shared_ptr<Lexer> lexer);
+    Parser(Lexer& lexer);
 
     std::vector<std::shared_ptr<Node>> parse();
     std::shared_ptr<Node> parseLine();
 
     // private member variables
 private:
-    std::shared_ptr<Lexer> lex;
+    Lexer& lex;
     // private helper functions
 private:
     std::shared_ptr<Expression> getTerm();

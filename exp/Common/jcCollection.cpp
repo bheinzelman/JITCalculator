@@ -23,11 +23,6 @@ jcCollection::jcCollection(const jcCollection &other)
     });
 }
 
-void jcCollection::push(const jcVariablePtr var)
-{
-    mItems.push_back(var);
-}
-
 jcVariablePtr jcCollection::head() const
 {
     JC_ASSERT(mItems.size());
@@ -51,7 +46,7 @@ bool jcCollection::isEmpty() const
 
 jcCollection* jcCollection::concat(const jcCollection &other) const
 {
-    jcCollection* newCollection = new jcCollection((int)size() + (int)other.size());
+    jcMutableCollection* newCollection = new jcMutableCollection((int)size() + (int)other.size());
 
     forEach([&newCollection](jcVariablePtr value) {
         newCollection->push(value);
@@ -98,4 +93,27 @@ bool jcCollection::equal(const jcCollection &other) const
         ++it2;
     }
     return true;
+}
+
+/// jcMutableCollection
+
+jcMutableCollection::jcMutableCollection()
+{
+}
+
+jcMutableCollection::jcMutableCollection(int size) : jcCollection(size)
+{
+}
+
+jcMutableCollection::jcMutableCollection(const jcCollection &other) : jcCollection(other)
+{
+}
+
+jcMutableCollection::jcMutableCollection(const std::vector<jcVariablePtr> &list) : jcCollection(list)
+{
+}
+
+void jcMutableCollection::push(const jcVariablePtr var)
+{
+    mItems.push_back(var);
 }

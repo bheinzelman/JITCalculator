@@ -191,7 +191,6 @@ private:
     std::string mCurrentFunctionLabel;
 
     int mNumClosures=0;
-    int numLabels=0;
 };
 
 }

@@ -21,6 +21,9 @@ using jcMutableVariablePtr = std::shared_ptr<jcMutableVariable>;
 class jcCollection;
 using jcCollectionPtr = std::shared_ptr<jcCollection>;
 
+class jcMutableCollection;
+using jcMutableCollectionPtr = std::shared_ptr<jcMutableCollection>;
+
 class jcClosure;
 using jcClosurePtr = std::shared_ptr<jcClosure>;
 
@@ -67,3 +70,6 @@ private:
             JC_THROW(m); \
         }                         \
     } while (0);
+
+
+#define JC_STD_LIBRARY_PATH std::string(LIB_PATH) + "/std.jc"

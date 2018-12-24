@@ -152,6 +152,7 @@ std::string Generator::closureLabel(int idx) const
  */
 std::string Generator::labelMaker()
 {
+    static int numLabels = 0;
     return std::string(".") + std::to_string(numLabels++);
 }
 

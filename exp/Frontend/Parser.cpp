@@ -8,7 +8,7 @@
 #include "ast.hpp"
 #include "jcVariable.hpp"
 
-Parser::Parser(std::shared_ptr<Lexer> lexer)
+Parser::Parser(Lexer& lexer)
     : lex(lexer)
 {
 }
@@ -285,7 +285,7 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
 Token Parser::peekToken()
 {
     Token tok = Token::Error;
-    JC_ASSERT_OR_THROW(lex->peekToken(&tok), "Bad Token");
+    JC_ASSERT_OR_THROW(lex.peekToken(&tok), "Bad Token");
     JC_ASSERT_OR_THROW(tok != Token::Error, "Bad Token");
     return tok;
 }
@@ -293,7 +293,7 @@ Token Parser::peekToken()
 Token Parser::nextToken(jcMutableVariablePtr lexeme)
 {
     Token tok = Token::Error;
-    JC_ASSERT_OR_THROW(lex->getNextToken(&tok, lexeme) == true, "Bad Token");
+    JC_ASSERT_OR_THROW(lex.getNextToken(&tok, lexeme) == true, "Bad Token");
     JC_ASSERT_OR_THROW(tok != Token::Error, "Bad Token");
     return tok;
 }
