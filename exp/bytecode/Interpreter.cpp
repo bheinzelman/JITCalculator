@@ -148,7 +148,8 @@ jcVariablePtr Interpreter::eval()
             if (resolveRuntimeVariable(variableName->asString(), value)) {
                 curState.mVariableLut.top()[variableName->asString()] = value;
             } else {
-                curState.mVariableLut.top()[variableName->asString()] = popStack();
+                std::string name = variableName->asString();
+                curState.mVariableLut.top()[name] = popStack();
             }
 
             break;
@@ -324,7 +325,7 @@ bool Interpreter::resolveRuntimeVariable(std::string var, jcMutableVariablePtr &
 jcVariablePtr Interpreter::popStack()
 {
     _state& curState = state();
-//    JC_ASSERT(curState.mStack.size());
+    JC_ASSERT_OR_THROW(curState.mStack.size(), "Popping empty vm-stack!");
     auto top = curState.mStack.top();
     curState.mStack.pop();
     return top;

@@ -2,7 +2,10 @@
 
 #pragma once
 
-enum class Token {
+#include "jc.h"
+#include "jcVariable.hpp"
+
+enum class TokenType {
     Add,
     Subtract,
     Multiply,
@@ -34,5 +37,24 @@ enum class Token {
 };
 
 namespace jcToken {
-int getOperatorPrecedence(Token op);
+    int getOperatorPrecedence(TokenType op);
 }
+
+class Token
+{
+public:
+    Token(TokenType type, jcVariablePtr lexeme, int64_t lineNumber)
+    : mTokenType(type), mLexeme(lexeme), mLineNumber(lineNumber)
+    {
+    }
+
+    TokenType getType() const;
+    jcVariablePtr getLexeme() const;
+    int64_t getLineNumber() const;
+
+private:
+    TokenType mTokenType;
+    jcVariablePtr mLexeme;
+    int64_t mLineNumber;
+
+};

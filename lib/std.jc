@@ -5,7 +5,7 @@ let filter(fn, array)
 
 let map(fn, array)
 	| isEmpty(array) = []
-	| else = concat(fn(head(array)), map(tail(array)))
+	| else = cons(fn(head(array)), map(fn, tail(array)))
 
 let min(x, y) = x < y ? x : y
 

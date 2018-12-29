@@ -12,12 +12,15 @@ class Lexer {
 public:
     Lexer(std::istream& inputStream);
 
-    bool peekToken(Token* token, jcMutableVariablePtr lexeme = nullptr);
+    Token peekToken();
 
-    bool getNextToken(Token* token, jcMutableVariablePtr lexeme = nullptr);
+    Token getNextToken();
+
+    void skipToken();
 
 private:
     std::istream& mInput;
+    int64_t mLineNumber=0;
 
 private:
     char peek();
@@ -31,5 +34,5 @@ private:
 
     bool hasMoreChars();
 
-    Token resolveTwoCharOperator(Token firstOperator);
+    TokenType resolveTwoCharOperator(TokenType firstOperator);
 };

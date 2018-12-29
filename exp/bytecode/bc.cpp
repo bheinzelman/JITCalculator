@@ -329,35 +329,35 @@ void Generator::visit(BinaryExpression* expression)
     expression->getLeft()->accept(this);
     expression->getRight()->accept(this);
 
-    Token op = expression->getOperator();
+    TokenType op = expression->getOperator();
     bc::Op bytecodeOp;
 
     switch (op) {
-    case Token::Add:
+    case TokenType::Add:
         bytecodeOp = bc::Add;
         break;
-    case Token::Multiply:
+    case TokenType::Multiply:
         bytecodeOp = bc::Multiply;
         break;
-    case Token::Subtract:
+    case TokenType::Subtract:
         bytecodeOp = bc::Subtract;
         break;
-    case Token::Divide:
+    case TokenType::Divide:
         bytecodeOp = bc::Divide;
         break;
-    case Token::Greater_Than:
+    case TokenType::Greater_Than:
         bytecodeOp = bc::Greater_Than;
         break;
-    case Token::Less_Than:
+    case TokenType::Less_Than:
         bytecodeOp = bc::Less_Than;
         break;
-    case Token::Less_Than_Equal:
+    case TokenType::Less_Than_Equal:
         bytecodeOp = bc::Less_Than_Equal;
         break;
-    case Token::Greater_Than_Equal:
+    case TokenType::Greater_Than_Equal:
         bytecodeOp = bc::Greater_Than_Equal;
         break;
-    case Token::Equals:
+    case TokenType::Equals:
         bytecodeOp = bc::Equals;
         break;
     default:

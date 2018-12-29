@@ -22,7 +22,7 @@ void BasicExpression::accept(Visitor* v)
     v->visit(this);
 }
 
-BinaryExpression::BinaryExpression(std::shared_ptr<Expression> left, Token op, std::shared_ptr<Expression> right)
+BinaryExpression::BinaryExpression(std::shared_ptr<Expression> left, TokenType op, std::shared_ptr<Expression> right)
 {
     this->left = left;
     this->op = op;
@@ -48,7 +48,7 @@ std::shared_ptr<Expression> BinaryExpression::getRight()
     return right;
 }
 
-Token BinaryExpression::getOperator() const
+TokenType BinaryExpression::getOperator() const
 {
     return op;
 }

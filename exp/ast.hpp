@@ -103,7 +103,7 @@ private:
 
 class BinaryExpression : public Expression {
 public:
-    BinaryExpression(std::shared_ptr<Expression> left, Token op, std::shared_ptr<Expression> right);
+    BinaryExpression(std::shared_ptr<Expression> left, TokenType op, std::shared_ptr<Expression> right);
 
     ~BinaryExpression();
 
@@ -113,12 +113,12 @@ public:
 
     std::shared_ptr<Expression> getRight();
 
-    Token getOperator() const;
+    TokenType getOperator() const;
 
 private:
     std::shared_ptr<Expression> left;
     std::shared_ptr<Expression> right;
-    Token op;
+    TokenType op;
 };
 
 class ListExpression : public Expression {
