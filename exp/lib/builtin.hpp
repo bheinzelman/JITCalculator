@@ -58,6 +58,7 @@ const std::string kLibLen = "len";
 const std::string kLibConcat = "concat";
 const std::string kLibCons = "cons";
 const std::string kLibIsEmpty = "isEmpty";
+const std::string kLibFilter = "filter";
 
 struct LibState {
     std::ostream &mStdout;

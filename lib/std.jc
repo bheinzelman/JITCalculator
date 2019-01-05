@@ -1,7 +1,3 @@
-let filter(fn, array)
-	| isEmpty(array) = []
-	| fn(head(array)) = concat([head(array)], filter(fn, tail(array)))
-	| else = filter(fn, tail(array))
 
 let map(fn, array)
 	| isEmpty(array) = []

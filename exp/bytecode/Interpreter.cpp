@@ -76,12 +76,16 @@ jcVariablePtr Interpreter::interpret()
     return value;
 }
 
-jcVariablePtr Interpreter::interpret(jcVariablePtr callableObject)
+jcVariablePtr Interpreter::interpret(jcVariablePtr callableObject, std::vector<jcVariablePtr> args)
 {
     pushState();
     state().callSingleFunction = true;
     state().mIp = -1;
     state().callCount = 1;
+
+    for (auto arg : args) {
+        state().mStack.push(arg);
+    }
 
     callFunction(callableObject);
     jcVariablePtr returnValue = nullptr;
@@ -96,9 +100,8 @@ jcVariablePtr Interpreter::interpret(jcVariablePtr callableObject)
 
 jcVariablePtr Interpreter::eval()
 {
-    bool shouldExit = false;
     _state& curState = state();
-    while (shouldExit == false) {
+    while (1) {
         bc::Instruction& instruction = mInstructions[curState.mIp++];
 
         bc::Op op = instruction.getOp();
@@ -128,6 +131,7 @@ jcVariablePtr Interpreter::eval()
             break;
         }
         case bc::Push: {
+            JC_ASSERT(instruction.getOperand());
             jcVariablePtr operand = resolveVariable(instruction.getOperand());
             curState.mStack.push(operand);
             break;
@@ -182,7 +186,7 @@ jcVariablePtr Interpreter::eval()
             curState.mVariableLut.pop();
 
             if ((--curState.callCount == 0) && curState.callSingleFunction) {
-                shouldExit = true;
+                goto Interpreter_Exit;
             }
             
             break;
@@ -190,14 +194,13 @@ jcVariablePtr Interpreter::eval()
         case bc::Label:
             break;
         case bc::Exit:
-            shouldExit = true;
-            break;
+            goto Interpreter_Exit;
         default:
             JC_FAIL();
             break;
         }
     }
-
+Interpreter_Exit:
     return resolveVariable(popStack());
 }
 
@@ -248,6 +251,7 @@ void Interpreter::callFunction(jcVariablePtr operand)
     {
         jcVariablePtr result = lib::builtin::Shared().execute(functionName, *this);
         state().mStack.push(result);
+        state().callCount -= 1;
         return;
     }
 

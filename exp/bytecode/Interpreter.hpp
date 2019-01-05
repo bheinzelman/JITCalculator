@@ -24,7 +24,7 @@ public:
      Calls the function within the callable object
      and returns the top of the stack
      */
-    jcVariablePtr interpret(jcVariablePtr callableObject);
+    jcVariablePtr interpret(jcVariablePtr callableObject, std::vector<jcVariablePtr> args = {});
 
     void setInstructions(const std::vector<bc::Instruction> &instructions);
 

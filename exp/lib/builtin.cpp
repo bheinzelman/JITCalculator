@@ -63,6 +63,13 @@ std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
             {kLibReturnType, jcVariable::Create(jcVariable::TypeInt)}
         }
     },
+    {
+        kLibFilter,
+        {
+            {kLibParameterNumber, jcVariable::Create(2)},
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
+        }
+    },
 };
 
 std::map<std::string, LibraryFunction> builtin::mFunctions =
@@ -172,6 +179,28 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
 
             return jcVariable::Create(collection->isEmpty());
         }
+    },
+    {
+        kLibFilter,
+        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            jcVariablePtr function = interpreter.popStack();
+            jcVariablePtr list = interpreter.popStack();
+
+            JC_ASSERT(list->getType() == jcVariable::TypeCollection);
+
+            jcMutableCollectionPtr newCollection = std::make_shared<jcMutableCollection>();
+
+            list->asCollectionRaw()->forEach([&interpreter, newCollection, function](jcVariablePtr item) {
+                jcVariablePtr result = interpreter.interpret(function, { item });
+
+                JC_ASSERT(result->getType() == jcVariable::TypeInt);
+
+                if (result->asInt()) {
+                    newCollection->push(item);
+                }
+            });
+            return jcVariable::Create(newCollection);
+        }
     }
 };
 
@@ -204,7 +233,7 @@ std::map<std::string, jcVariablePtr> builtin::info(const std::string &functionNa
     return errorDict;
 }
 
-    jcVariablePtr builtin::execute(const std::string &functionName, Interpreter &interpreter)
+jcVariablePtr builtin::execute(const std::string &functionName, Interpreter &interpreter)
 {
     if (mFunctions.count(functionName)) {
         return mFunctions[functionName](interpreter, state());
