@@ -25,6 +25,11 @@ void Lexer::skipToken()
     getNextToken();
 }
 
+int64_t Lexer::getLineNumber() const
+{
+    return mLineNumber;
+}
+
 Token Lexer::getNextToken()
 {
     TokenType nextToken = TokenType::Error;
@@ -89,6 +94,11 @@ Token Lexer::getNextToken()
         case '?':
             nextToken = TokenType::QuestionMark;
             break;
+        case '#':
+            // comment!
+            skipTillNewline();
+            return getNextToken();
+
         default:
             break;
         }
@@ -198,4 +208,9 @@ bool Lexer::nextNonWhitespaceChar(char* c)
 bool Lexer::hasMoreChars()
 {
     return mInput.eof() == false && peek() != EOF && peek() != '\0';
+}
+
+void Lexer::skipTillNewline()
+{
+    while (nextChar() != '\n' && hasMoreChars());
 }

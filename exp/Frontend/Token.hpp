@@ -38,6 +38,8 @@ enum class TokenType {
 
 namespace jcToken {
     int getOperatorPrecedence(TokenType op);
+    
+    std::string stringRepresentation(TokenType token);
 }
 
 class Token

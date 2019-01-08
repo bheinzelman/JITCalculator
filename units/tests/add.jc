@@ -1,4 +1,7 @@
 let myList = [1, 2, 3]
 
-map({(x) = x + 1}, myList())
+# hello all
+print(map({(x) = x + 1}, myList()))
+
+# i am simply writing comments
 

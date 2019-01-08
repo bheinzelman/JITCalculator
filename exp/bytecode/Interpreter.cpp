@@ -165,8 +165,8 @@ jcVariablePtr Interpreter::eval()
         }
         case bc::JmpTrue:
         case bc::Jmp: {
-            JC_ASSERT_OR_THROW(instruction.numOperands() == 1, "Invalid jmpTrue operands");
-            JC_ASSERT_OR_THROW(instruction.getOperand()->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
+            JC_ASSERT_OR_THROW_VM(instruction.numOperands() == 1, "Invalid jmpTrue operands");
+            JC_ASSERT_OR_THROW_VM(instruction.getOperand()->getType() == jcVariable::TypeString, "Invalid jmpTrue operands");
 
             if (op == bc::JmpTrue) {
                 bool shouldJump = popStack()->asInt();
@@ -176,7 +176,7 @@ jcVariablePtr Interpreter::eval()
             }
 
             std::string label = instruction.getOperand()->asString();
-            JC_ASSERT_OR_THROW(mLabelLut.count(label) > 0, "label " + label + " does not exist");
+            JC_ASSERT_OR_THROW_VM(mLabelLut.count(label) > 0, "label " + label + " does not exist");
             curState.mIp = mLabelLut[label] + 1;
 
             break;
@@ -208,7 +208,7 @@ void Interpreter::callFunction(jcVariablePtr operand)
 {
     std::string functionName = "";
 
-    JC_ASSERT_OR_THROW(operand->getType() == jcVariable::TypeString ||
+    JC_ASSERT_OR_THROW_VM(operand->getType() == jcVariable::TypeString ||
                        operand->getType() == jcVariable::TypeClosure,
                        "Cannot call non-closure or non-id value"
                        );
@@ -255,7 +255,7 @@ void Interpreter::callFunction(jcVariablePtr operand)
         return;
     }
 
-    JC_THROW(operand->asString() + " does not exist");
+    JC_THROW_VM_EXCEPTION(operand->asString() + " does not exist");
 }
 
 jcVariablePtr Interpreter::resolveVariable(const jcVariablePtr &var)
@@ -279,7 +279,7 @@ jcVariablePtr Interpreter::resolveVariable(const jcVariablePtr &var)
             return mutablePtr;
         }
 
-        JC_THROW("undefined variable: " + var->asString());
+        JC_THROW_VM_EXCEPTION("undefined variable: " + var->asString());
     }
 }
 
@@ -311,7 +311,7 @@ void Interpreter::setVariable(std::string var, jcVariablePtr &to)
         state().mIp = resolveVariable(to)->asInt();
         return;
     }
-    JC_ASSERT_OR_THROW(state().mVariableLut.top().count(var) > 0, "Cannot set undefined var");
+    JC_ASSERT_OR_THROW_VM(state().mVariableLut.top().count(var) > 0, "Cannot set undefined var");
     state().mVariableLut.top()[var] = resolveVariable(to);
 }
 
@@ -329,7 +329,7 @@ bool Interpreter::resolveRuntimeVariable(std::string var, jcMutableVariablePtr &
 jcVariablePtr Interpreter::popStack()
 {
     _state& curState = state();
-    JC_ASSERT_OR_THROW(curState.mStack.size(), "Popping empty vm-stack!");
+    JC_ASSERT_OR_THROW_VM(curState.mStack.size(), "Popping empty vm-stack!");
     auto top = curState.mStack.top();
     curState.mStack.pop();
     return top;

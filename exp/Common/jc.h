@@ -29,9 +29,24 @@ using jcClosurePtr = std::shared_ptr<jcClosure>;
 
 class jcException : public std::exception {
 public:
-    jcException(const std::string& message)
-        : mMessage(message)
+    enum class Domain {
+        Parse,
+        Codegen,
+        Vm
+    };
+
+    static jcException ParseError(const std::string &message, int64_t line)
     {
+        return jcException(message, Domain::Parse, line);
+    }
+
+    static jcException CodegenError(const std::string &message)
+    {
+        return jcException(message, Domain::Codegen, -1);
+    }
+
+    static jcException VmError(const std::string &message) {
+        return jcException(message, Domain::Vm, -1);
     }
 
     std::string getMessage() const
@@ -39,7 +54,24 @@ public:
         return mMessage;
     }
 
+    int64_t getLine() const
+    {
+        return mLine;
+    }
+
+    Domain getDomain() const
+    {
+        return mDomain;
+    }
+
 private:
+    jcException(const std::string& message, Domain exceptionDomain, int64_t lineNumber)
+        : mMessage(message), mLine(lineNumber), mDomain(exceptionDomain)
+    {
+    }
+
+    Domain mDomain;
+    int64_t mLine;
     std::string mMessage;
 };
 
@@ -61,14 +93,24 @@ private:
         assert(e);   \
     } while (0);
 
-#define JC_THROW(m) \
-    throw jcException(m)
+#define JC_THROW_PARSE_EXCEPTION(m, l) \
+    throw jcException::ParseError(m, l)
 
-#define JC_ASSERT_OR_THROW(e, m)  \
-    do {                          \
-        if (!(e)) {               \
-            JC_THROW(m); \
-        }                         \
+#define JC_ASSERT_OR_THROW_PARSE(e, m, l)   \
+    do {                                    \
+        if (!(e)) {                         \
+            JC_THROW_PARSE_EXCEPTION(m, l); \
+        }                                   \
+    } while (0);
+
+#define JC_THROW_VM_EXCEPTION(m) \
+    throw jcException::VmError(m)
+
+#define JC_ASSERT_OR_THROW_VM(e, m)   \
+    do {                                    \
+        if (!(e)) {                         \
+            JC_THROW_VM_EXCEPTION(m); \
+        }                                   \
     } while (0);
 
 

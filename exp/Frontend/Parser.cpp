@@ -88,7 +88,7 @@ std::shared_ptr<Expression> Parser::getPrefixOps(std::shared_ptr<Expression> exp
         case TokenType::Bang:
             return std::make_shared<NotExpression>(expIn);
         default:
-            JC_THROW("Invalid prefix operator");
+            JC_THROW_PARSE_EXCEPTION("Invalid prefix operator", lex.getLineNumber());
     }
 }
 
@@ -210,7 +210,7 @@ std::shared_ptr<FunctionBody> Parser::getFunctionBody()
 
     eat(TokenType::Assign);
     auto exp = getExpression();
-    JC_ASSERT_OR_THROW(exp != nullptr, "Function must have expression");
+    JC_ASSERT_OR_THROW_PARSE(exp != nullptr, "Function must have expression", lex.getLineNumber());
 
     return std::make_shared<FunctionBody>(exp, funcParams, guards);
 }
@@ -221,7 +221,7 @@ std::shared_ptr<FunctionDecl> Parser::getFunctionDecl()
 
     Token tok = nextToken();
 
-    JC_ASSERT_OR_THROW(tok.getType() == TokenType::Id, "Expected an ID");
+    JC_ASSERT_OR_THROW_PARSE(tok.getType() == TokenType::Id, "Expected an ID", lex.getLineNumber());
     
     auto decl = std::make_shared<FunctionDecl>(tok.getLexeme()->asString(), getFunctionBody());
     return decl;
@@ -246,7 +246,7 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
             break;
         } else if (op == TokenType::Error) {
             if (peekToken().getType() == TokenType::Error) {
-                JC_THROW("Could not parse expression");
+                JC_THROW_PARSE_EXCEPTION("Could not parse expression", lex.getLineNumber());
             } else {
                 break;
             }
@@ -282,21 +282,27 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
 Token Parser::peekToken()
 {
     Token tokenOut = lex.peekToken();
-    JC_ASSERT_OR_THROW(tokenOut.getType() != TokenType::Error, std::string("Bad Token, line: ") + std::to_string(tokenOut.getLineNumber()));
+    JC_ASSERT_OR_THROW_PARSE(tokenOut.getType() != TokenType::Error, "Bad Token", lex.getLineNumber());
     return tokenOut;
 }
 
 Token Parser::nextToken()
 {
     Token tokenOut = lex.getNextToken();
-    JC_ASSERT_OR_THROW(tokenOut.getType() != TokenType::Error, std::string("Bad Token, line: ") + std::to_string(tokenOut.getLineNumber()));
+    JC_ASSERT_OR_THROW_PARSE(tokenOut.getType() != TokenType::Error, "Bad Token", lex.getLineNumber());
     return tokenOut;
 }
 
 void Parser::eat(TokenType token)
 {
     Token newTok = nextToken();
-    JC_ASSERT_OR_THROW(token == newTok.getType(), std::string("Unexpected Token, line: ") + std::to_string(newTok.getLineNumber()));
+
+    if (token != newTok.getType()) {
+        std::string errorMessage = "Unexpected token, expected '"
+            + jcToken::stringRepresentation(token) + "' got '" + jcToken::stringRepresentation(newTok.getType()) + "'";
+
+        JC_THROW_PARSE_EXCEPTION(errorMessage, lex.getLineNumber());
+    }
 }
 
 void Parser::skipToken()

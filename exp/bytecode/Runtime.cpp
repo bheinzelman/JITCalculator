@@ -42,7 +42,7 @@ std::vector<bc::Instruction> Runtime::loadLibrary(const std::string &path)
     std::ifstream inputStream;
     inputStream.open(path.c_str(), std::ifstream::in | std::ifstream::binary);
     if (inputStream.is_open() == false) {
-        JC_THROW("Unable to load library: " + path);
+        JC_THROW_VM_EXCEPTION("Unable to load library: " + path);
         return {};
     }
 

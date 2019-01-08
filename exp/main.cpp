@@ -13,6 +13,18 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
+std::string getErrorMessage(const jcException &exception)
+{
+    switch (exception.getDomain()) {
+        case jcException::Domain::Vm:
+            return std::string("VM Exception... ") + exception.getMessage();
+        case jcException::Domain::Codegen:
+            return std::string("Codegen Exception... ") + exception.getMessage();
+        case jcException::Domain::Parse:
+            return std::string("Parse Exception... ") + exception.getMessage() + "\nLine: " + std::to_string(exception.getLine());
+    }
+}
+
 void run_shell(std::ostream& stream)
 {
     stream << "JITCalculator v" << JC_VERSION_STRING << "\n";
@@ -57,8 +69,8 @@ void run_shell(std::ostream& stream)
                     std::cout << outputValue->stringRepresentation() << std::endl;
                 }
 
-            } catch (jcException excecption) {
-                stream << "jcException... " << excecption.getMessage() << std::endl;
+            } catch (jcException exception) {
+                stream << getErrorMessage(exception) << std::endl;
             }
         }
     }
@@ -75,7 +87,7 @@ void run_file(std::string filename)
     try {
         Runtime::evaluate(inputStream);
     } catch (jcException exception) {
-        std::cerr << "jcException... " << exception.getMessage() << std::endl;
+        std::cerr << getErrorMessage(exception) << std::endl;
     }
 
     inputStream.close();

@@ -238,7 +238,7 @@ jcVariablePtr builtin::execute(const std::string &functionName, Interpreter &int
     if (mFunctions.count(functionName)) {
         return mFunctions[functionName](interpreter, state());
     }
-    JC_THROW("Library function " + functionName + " undefined");
+    JC_THROW_VM_EXCEPTION("Library function " + functionName + " undefined");
 }
 
 }

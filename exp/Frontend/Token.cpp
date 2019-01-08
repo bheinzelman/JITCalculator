@@ -25,6 +25,68 @@ int getOperatorPrecedence(TokenType op)
     }
 }
 
+std::string stringRepresentation(TokenType token)
+{
+    switch (token) {
+        case TokenType::Add:
+            return "+";
+        case TokenType::Subtract:
+            return "-";
+        case TokenType::Multiply:
+            return "*";
+        case TokenType::Divide:
+            return "/";
+        case TokenType::Less_Than:
+            return "<";
+        case TokenType::Greater_Than:
+            return ">";
+        case TokenType::Less_Than_Equal:
+            return "<=";
+        case TokenType::Greater_Than_Equal:
+            return ">=";
+        case TokenType::Bang:
+            return "!";
+        case TokenType::Equals:
+            return "==";
+        case TokenType::LParen:
+            return "(";
+        case TokenType::RParen:
+            return ")";
+        case TokenType::Num:
+            return "Num";
+        case TokenType::Error:
+            return "Error Token";
+        case TokenType::LetKw:
+            return "let";
+        case TokenType::ElseKw:
+            return "else";
+        case TokenType::Id:
+            return "Id"; 
+        case TokenType::Assign:
+            return "=";
+        case TokenType::Comma:
+            return ",";
+        case TokenType::Pipe:
+            return "|";
+        case TokenType::LeftBracket:
+            return "[";
+        case TokenType::RightBracket:
+            return "]";
+        case TokenType::LeftBrace:
+            return "{";
+        case TokenType::RightBrace:
+            return "}";
+        case TokenType::EndOfStream:
+            return "EOS";
+        case TokenType::QuestionMark:
+            return "?";
+        case TokenType::Colon:
+            return ":";
+        case TokenType::None:
+            return "None";
+    }
+}
+
 }
 
 TokenType Token::getType() const

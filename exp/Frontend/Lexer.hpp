@@ -18,11 +18,16 @@ public:
 
     void skipToken();
 
+    int64_t getLineNumber() const;
+
 private:
     std::istream& mInput;
     int64_t mLineNumber=0;
 
 private:
+
+    void skipTillNewline();
+
     char peek();
 
     char nextChar();

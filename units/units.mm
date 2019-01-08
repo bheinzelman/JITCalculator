@@ -274,6 +274,24 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     XCTAssert(testStream(stream, rt, expected));
 }
 
+- (void)testComment
+{
+    Runtime rt;
+
+    std::string program = "let callit(fn) = fn\
+    # this be a comment, dont mind me \
+    let four = 4 \
+    callit(four)() \
+    ";
+
+    jcVariablePtr expected = jcVariable::Create(4);
+
+    std::stringstream stream;
+    stream << program;
+
+    XCTAssert(testStream(stream, rt, expected));
+}
+
 
 
 @end
