@@ -9,7 +9,8 @@
 #include "jc.h"
 
 /**
- * variant type
+ jcVariable is a non-mutable variant type meant to represent any value that is compatible with
+ the language.
  */
 
 class jcVariable {
@@ -17,6 +18,7 @@ public:
     enum Type {
         TypeString,
         TypeInt,
+        TypeChar,
         TypeArray,
         TypeClosure,
         TypeNone
@@ -26,6 +28,7 @@ public:
 
     static jcVariablePtr Create(std::string value);
     static jcVariablePtr Create(int value);
+    static jcVariablePtr Create(char value);
     static jcVariablePtr Create(const jcArrayPtr &array);
     static jcVariablePtr Create(const jcClosurePtr &closure);
 
@@ -35,6 +38,7 @@ public:
 
     std::string asString() const;
     int asInt() const;
+    char asChar() const;
     jcArray* asArrayRaw() const;
     jcClosure* asClosureRaw() const;
 
@@ -73,6 +77,7 @@ protected:
     void set_Int(const int val);
     void set_Array(const jcArrayPtr &array);
     void set_Closure(const jcClosurePtr &closure);
+    void set_Char(const char val);
 
 protected:
     Type mCurrentType;
@@ -80,6 +85,7 @@ protected:
     std::variant<
         std::string,
         int,
+        char,
         jcArrayPtr,
         jcClosurePtr> mData;
 };
@@ -96,6 +102,5 @@ public:
     void setInt(const int val);
     void setArray(jcArrayPtr array);
     void setClosure(const jcClosurePtr closure);
+    void setChar(const char val);
 };
-
-using jcVariableType = jcVariable::Type;

@@ -23,6 +23,13 @@ jcVariablePtr jcVariable::Create(int value)
     return me;
 }
 
+jcVariablePtr jcVariable::Create(char value)
+{
+    auto me = jcVariable::Create();
+    me->set_Char(value);
+    return me;
+}
+
 jcVariablePtr jcVariable::Create(const jcArrayPtr &array)
 {
     auto me = jcVariable::Create();
@@ -63,6 +70,14 @@ std::string jcVariable::asString() const
         return std::get<std::string>(mData);
     }
     return std::string();
+}
+
+char jcVariable::asChar() const
+{
+    if (mCurrentType == TypeChar) {
+        return std::get<char>(mData);
+    }
+    return 0;
 }
 
 int jcVariable::asInt() const
@@ -111,6 +126,12 @@ void jcVariable::set_Int(const int val)
     mCurrentType = TypeInt;
 }
 
+void jcVariable::set_Char(const char val)
+{
+    mData = val;
+    mCurrentType = TypeChar;
+}
+
 void jcVariable::set_Closure(const jcClosurePtr &closure)
 {
     mData = closure;
@@ -128,6 +149,8 @@ std::string jcVariable::stringRepresentation() const {
         return std::to_string(asInt());
     } else if (getType() == TypeString) {
         return asString();
+    } else if (getType() == TypeChar) {
+        return "'" + std::string(1, asChar()) + "'";
     } else if (getType() == TypeArray) {
         std::string rep = "[";
         if (asArrayRaw() != nullptr) {
@@ -161,6 +184,8 @@ bool jcVariable::equal(const jcVariable &other) const
     switch (getType()) {
         case TypeInt:
             return asInt() == other.asInt();
+        case TypeChar:
+            return asChar() == other.asChar();
         case TypeString:
             return asString() == other.asString();
         case TypeArray:
@@ -219,4 +244,9 @@ void jcMutableVariable::setArray(std::shared_ptr<jcArray> array)
 void jcMutableVariable::setClosure(const jcClosurePtr closure)
 {
     set_Closure(closure);
+}
+
+void jcMutableVariable::setChar(const char val)
+{
+    set_Char(val);
 }

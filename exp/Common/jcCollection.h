@@ -52,6 +52,6 @@ public:
      Returns the jcVariable type of the object
      */
 
-    virtual jcVariableType getType() const = 0;
+    virtual jcVariable::Type getType() const = 0;
 };
 
