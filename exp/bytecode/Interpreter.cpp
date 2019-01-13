@@ -4,9 +4,10 @@
 #include <memory>
 
 #include "Interpreter.hpp"
-#include "ast.hpp"
 #include "jc.h"
 #include "builtin.hpp"
+#include "jcClosure.hpp"
+#include "jcArray.hpp"
 
 static inline int performArtithmaticOp(bc::Op op, int right, int left)
 {
@@ -262,7 +263,7 @@ jcVariablePtr Interpreter::resolveVariable(const jcVariablePtr &var)
 {
     if (var->getType() == jcVariable::TypeInt) {
         return var;
-    } else if (var->getType() == jcVariable::TypeCollection) {
+    } else if (var->getType() == jcVariable::TypeArray) {
         return var;
     } else {
         if (state().mVariableLut.top().count(var->asString()) > 0) {

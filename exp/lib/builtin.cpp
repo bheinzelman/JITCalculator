@@ -1,6 +1,8 @@
 //  builtin.cpp
 
 #include "builtin.hpp"
+#include "jcArray.hpp"
+#include "jcClosure.hpp"
 
 #include <functional>
 #include <iostream>
@@ -19,7 +21,7 @@ std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
     {
         kLibList,
         {
-            {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeArray)}
         }
     },
     {
@@ -32,7 +34,7 @@ std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
         kLibTail,
         {
             {kLibParameterNumber, jcVariable::Create(1)},
-            {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeArray)}
         }
     },
     {
@@ -46,14 +48,14 @@ std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
         kLibConcat,
         {
             {kLibParameterNumber, jcVariable::Create(2)},
-            {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeArray)}
         }
     },
     {
         kLibCons,
         {
             {kLibParameterNumber, jcVariable::Create(2)},
-            {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeArray)}
         }
     },
     {
@@ -67,7 +69,7 @@ std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
         kLibFilter,
         {
             {kLibParameterNumber, jcVariable::Create(2)},
-            {kLibReturnType, jcVariable::Create(jcVariable::TypeCollection)}
+            {kLibReturnType, jcVariable::Create(jcVariable::TypeArray)}
         }
     },
 };
@@ -86,7 +88,7 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         kLibList,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             int numElements = interpreter.popStack()->asInt();
-            jcMutableCollectionPtr elements = std::make_shared<jcMutableCollection>(numElements);
+            jcMutableArrayPtr elements = std::make_shared<jcMutableArray>(numElements);
             for (int i = 0; i < numElements; i++) {
                 elements->push(interpreter.popStack());
             }
@@ -97,31 +99,28 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         kLibHead,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             jcVariablePtr arg = interpreter.popStack();
-            JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
-            JC_ASSERT(arg->asCollectionRaw() != nullptr);
-            return arg->asCollectionRaw()->head();
+            JC_ASSERT(arg->asCollection() != nullptr);
+            return arg->asCollection()->head();
         }
     },
     {
         kLibTail,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             jcVariablePtr arg = interpreter.popStack();
-            JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
-            jcCollection* collection = arg->asCollectionRaw();
-            JC_ASSERT(collection != nullptr);
+            JC_ASSERT(arg->asCollection() != nullptr);
+            jcCollection* array = arg->asCollection();
 
-            jcCollectionPtr tail = std::shared_ptr<jcCollection>(collection->tail());
+            auto tail = std::shared_ptr<jcCollection>(array->tail());
 
-            return jcVariable::Create(tail);
+            return jcVariable::CreateFromCollection(tail);
         }
     },
     {
         kLibLen,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
-            jcVariablePtr arg = interpreter.popStack();;
-            JC_ASSERT(arg->getType() == jcVariable::TypeCollection);
-            jcCollection* collection = arg->asCollectionRaw();
-            JC_ASSERT(collection != nullptr);
+            jcVariablePtr arg = interpreter.popStack();
+            JC_ASSERT(arg->asCollection() != nullptr);
+            jcCollection* collection = arg->asCollection();
 
             return jcVariable::Create((int)collection->size());
         }
@@ -129,41 +128,42 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
     {
         kLibConcat,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
-            jcVariablePtr list1 = interpreter.popStack();;
-            jcVariablePtr list2 = interpreter.popStack();;
+            jcVariablePtr list1 = interpreter.popStack();
+            jcVariablePtr list2 = interpreter.popStack();
 
-            JC_ASSERT(list1->getType() == jcVariable::TypeCollection);
-            JC_ASSERT(list2->getType() == jcVariable::TypeCollection);
 
-            jcCollection* collection1 = list1->asCollectionRaw();
-            jcCollection* collection2 = list2->asCollectionRaw();
+            jcCollection* array1 = list1->asCollection();
+            jcCollection* array2 = list2->asCollection();
 
-            JC_ASSERT(collection1 != nullptr && collection2 != nullptr);
+            JC_ASSERT(array1 != nullptr && array2 != nullptr);
 
-            jcCollectionPtr newCollection = std::shared_ptr<jcCollection>(collection1->concat(*collection2));
+            jcCollectionPtr newCollection = std::shared_ptr<jcCollection>(array1->concat(*array2));
 
-            return jcVariable::Create(newCollection);
+            return jcVariable::CreateFromCollection(newCollection);
         }
     },
     {
         kLibCons,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            // TODO fix to use jcCollection instead
+
             jcVariablePtr item = interpreter.popStack();;
             jcVariablePtr list = interpreter.popStack();;
 
-            JC_ASSERT(list->getType() == jcVariable::TypeCollection);
+            JC_ASSERT(list->getType() == jcVariable::TypeArray);
 
-            jcCollection* collection = list->asCollectionRaw();
-            jcMutableCollectionPtr newCollection = std::make_shared<jcMutableCollection>((int)collection->size() + 1);
-            newCollection->push(item);
+            jcArray* array = list->asArrayRaw();
 
-            collection->forEach([&newCollection](jcVariablePtr item) {
-                newCollection->push(item);
+            JC_ASSERT(array != nullptr);
+
+            jcMutableArrayPtr newArray = std::make_shared<jcMutableArray>((int)array->size() + 1);
+            newArray->push(item);
+
+            array->forEach([&newArray](jcVariablePtr item) {
+                newArray->push(item);
             });
 
-            JC_ASSERT(collection != nullptr);
-
-            return jcVariable::Create(newCollection);
+            return jcVariable::Create(newArray);
         }
     },
     {
@@ -171,35 +171,34 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
             jcVariablePtr list = interpreter.popStack();
 
-            JC_ASSERT(list->getType() == jcVariable::TypeCollection);
+             JC_ASSERT(list->asCollection() != nullptr);
 
-            jcCollection* collection = list->asCollectionRaw();
+            jcCollection* array = list->asCollection();
 
-            JC_ASSERT(collection != nullptr);
-
-            return jcVariable::Create(collection->isEmpty());
+            return jcVariable::Create(array->isEmpty());
         }
     },
     {
         kLibFilter,
         [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
+            // TODO this should return the same type that came in..
             jcVariablePtr function = interpreter.popStack();
             jcVariablePtr list = interpreter.popStack();
 
-            JC_ASSERT(list->getType() == jcVariable::TypeCollection);
+            JC_ASSERT(list->asCollection() != nullptr);
 
-            jcMutableCollectionPtr newCollection = std::make_shared<jcMutableCollection>();
+            jcMutableArrayPtr newArray = std::make_shared<jcMutableArray>();
 
-            list->asCollectionRaw()->forEach([&interpreter, newCollection, function](jcVariablePtr item) {
+            list->asCollection()->forEach([&interpreter, newArray, function](jcVariablePtr item) {
                 jcVariablePtr result = interpreter.interpret(function, { item });
 
                 JC_ASSERT(result->getType() == jcVariable::TypeInt);
 
                 if (result->asInt()) {
-                    newCollection->push(item);
+                    newArray->push(item);
                 }
             });
-            return jcVariable::Create(newCollection);
+            return jcVariable::Create(newArray);
         }
     }
 };

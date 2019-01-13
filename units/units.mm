@@ -10,6 +10,9 @@
 
 #include "Runtime.hpp"
 #include "jcVariable.hpp"
+#include "jcUtils.hpp"
+#include "jcArray.hpp"
+
 
 class AnswerExpression {
 public:
@@ -69,12 +72,17 @@ static std::vector<AnswerExpression> getBasicExpressions()
 static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expectedValue) {
     try {
         std::vector<jcVariablePtr> output;
-        bool result = rt.evaluateREPL(stream, output);
+        bool result = false;
+
+        double timeElapsed = jc::measureElapsedTime([&result, &rt, &stream, &output]() {
+            result = rt.evaluateREPL(stream, output);
+        });
+
+        std::cout << "Execution time: " << timeElapsed << std::endl;
 
         if (result) {
             if (output.size()) {
                 jcVariablePtr value = output.front();
-                std::cout << value->stringRepresentation() << std::endl;
                 JC_ASSERT(value != nullptr && expectedValue != nullptr);
                 return value->equal(*expectedValue);
             }
@@ -140,9 +148,9 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         jcVariable::Create(5)
     };
 
-    jcCollectionPtr collection = std::make_shared<jcCollection>(elems);
+    jcArrayPtr array = std::make_shared<jcArray>(elems);
 
-    jcVariablePtr expected = jcVariable::Create(collection);
+    jcVariablePtr expected = jcVariable::Create(array);
     std::stringstream stream;
     stream << program;
 
@@ -161,7 +169,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         jcVariable::Create(2),
         jcVariable::Create(3)
     };
-    jcCollectionPtr collection = std::make_shared<jcCollection>(elems);
+    jcArrayPtr collection = std::make_shared<jcArray>(elems);
 
     jcVariablePtr expected = jcVariable::Create(collection);
     std::stringstream stream;
@@ -219,12 +227,12 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
             ptrs.push_back(jcVariable::Create(v));
         }
 
-        jcCollectionPtr collection = std::make_shared<jcCollection>(ptrs);
+        jcArrayPtr collection = std::make_shared<jcArray>(ptrs);
 
         return jcVariable::Create(collection);
     };
 
-    const int NUM_ITEMS = 1000;
+    const int NUM_ITEMS = 10000;
 
     std::vector<int> valuesToSort;
     while (valuesToSort.size() < NUM_ITEMS) {
@@ -291,7 +299,5 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 
     XCTAssert(testStream(stream, rt, expected));
 }
-
-
 
 @end

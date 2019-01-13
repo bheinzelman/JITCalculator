@@ -28,10 +28,10 @@
 		3CF2B62D1FE635250039F40B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2B62C1FE635250039F40B /* main.cpp */; };
 		4E0A7F9721914FBB00130C6B /* builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A7F9521914FBB00130C6B /* builtin.cpp */; };
 		4E0A7F98219153E000130C6B /* builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A7F9521914FBB00130C6B /* builtin.cpp */; };
-		4E6C0E7C2182CDA900A4F0D8 /* jcCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */; };
+		4E6C0E7C2182CDA900A4F0D8 /* jcArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcArray.cpp */; };
 		4E907E33219E82C7003519CC /* jcClosure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E907E31219E82C7003519CC /* jcClosure.cpp */; };
 		4E907E34219E8F2F003519CC /* jcClosure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E907E31219E82C7003519CC /* jcClosure.cpp */; };
-		4EFAF74321928CF700407EB1 /* jcCollection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */; };
+		4EFAF74321928CF700407EB1 /* jcArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcArray.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -71,10 +71,12 @@
 		3C8E3BBD200DC1BC004DFF87 /* Interpreter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Interpreter.hpp; sourceTree = "<group>"; };
 		3CF2B6291FE635250039F40B /* exp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exp; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CF2B62C1FE635250039F40B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4E05A59921E5B9CB008F0CB4 /* jcUtils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcUtils.hpp; sourceTree = "<group>"; };
+		4E05A59A21E5BE7B008F0CB4 /* jcCollection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jcCollection.h; sourceTree = "<group>"; };
 		4E0A7F9521914FBB00130C6B /* builtin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = builtin.cpp; sourceTree = "<group>"; };
 		4E0A7F9621914FBB00130C6B /* builtin.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = builtin.hpp; sourceTree = "<group>"; };
-		4E6C0E7A2182CB6300A4F0D8 /* jcCollection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcCollection.hpp; sourceTree = "<group>"; };
-		4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcCollection.cpp; sourceTree = "<group>"; };
+		4E6C0E7A2182CB6300A4F0D8 /* jcArray.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcArray.hpp; sourceTree = "<group>"; };
+		4E6C0E7B2182CDA900A4F0D8 /* jcArray.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcArray.cpp; sourceTree = "<group>"; };
 		4E907E31219E82C7003519CC /* jcClosure.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcClosure.cpp; sourceTree = "<group>"; };
 		4E907E32219E82C7003519CC /* jcClosure.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcClosure.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -168,10 +170,12 @@
 				3C3CA70C215C0FAD00956902 /* jc.h */,
 				3C3CA75A215D4BE000956902 /* jcVariable.cpp */,
 				3C3CA75B215D4BE000956902 /* jcVariable.hpp */,
-				4E6C0E7A2182CB6300A4F0D8 /* jcCollection.hpp */,
-				4E6C0E7B2182CDA900A4F0D8 /* jcCollection.cpp */,
+				4E6C0E7A2182CB6300A4F0D8 /* jcArray.hpp */,
+				4E6C0E7B2182CDA900A4F0D8 /* jcArray.cpp */,
 				4E907E31219E82C7003519CC /* jcClosure.cpp */,
 				4E907E32219E82C7003519CC /* jcClosure.hpp */,
+				4E05A59921E5B9CB008F0CB4 /* jcUtils.hpp */,
+				4E05A59A21E5BE7B008F0CB4 /* jcCollection.h */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -289,7 +293,7 @@
 			files = (
 				3C3CA71E215C2B0F00956902 /* Token.cpp in Sources */,
 				3C3CA720215C2B1500956902 /* ast.cpp in Sources */,
-				4EFAF74321928CF700407EB1 /* jcCollection.cpp in Sources */,
+				4EFAF74321928CF700407EB1 /* jcArray.cpp in Sources */,
 				4E907E34219E8F2F003519CC /* jcClosure.cpp in Sources */,
 				3C3CA718215C297200956902 /* units.mm in Sources */,
 				3C3CA71F215C2B1200956902 /* Lexer.cpp in Sources */,
@@ -307,7 +311,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3C8E3BB1200DBC38004DFF87 /* Token.cpp in Sources */,
-				4E6C0E7C2182CDA900A4F0D8 /* jcCollection.cpp in Sources */,
+				4E6C0E7C2182CDA900A4F0D8 /* jcArray.cpp in Sources */,
 				3C8E3BB8200DBE10004DFF87 /* ast.cpp in Sources */,
 				4E907E33219E82C7003519CC /* jcClosure.cpp in Sources */,
 				3CF2B62D1FE635250039F40B /* main.cpp in Sources */,

@@ -1,6 +1,8 @@
 //  jcVariable.cpp
 
 #include "jcVariable.hpp"
+#include "jcArray.hpp"
+#include "jcClosure.hpp"
 
 jcVariablePtr jcVariable::Create()
 {
@@ -21,10 +23,10 @@ jcVariablePtr jcVariable::Create(int value)
     return me;
 }
 
-jcVariablePtr jcVariable::Create(const jcCollectionPtr &collection)
+jcVariablePtr jcVariable::Create(const jcArrayPtr &array)
 {
     auto me = jcVariable::Create();
-    me->set_Collection(collection);
+    me->set_Array(array);
     return me;
 }
 
@@ -33,6 +35,17 @@ jcVariablePtr jcVariable::Create(const jcClosurePtr &closure)
     auto me = jcVariable::Create();
     me->set_Closure(closure);
     return me;
+}
+
+jcVariablePtr jcVariable::CreateFromCollection(const jcCollectionPtr &collection)
+{
+    JC_ASSERT(collection);
+    switch (collection->getType()) {
+        case jcVariable::TypeArray:
+            return jcVariable::Create(std::static_pointer_cast<jcArray>(collection));
+        default:
+            return nullptr;
+    }
 }
 
 jcVariable::jcVariable()
@@ -68,12 +81,22 @@ jcClosure* jcVariable::asClosureRaw() const
     return nullptr;
 }
 
-jcCollection* jcVariable::asCollectionRaw() const
+jcArray* jcVariable::asArrayRaw() const
 {
-    if (mCurrentType == TypeCollection) {
-        return std::get<std::shared_ptr<jcCollection>>(mData).get();
+    if (mCurrentType == TypeArray) {
+        return std::get<std::shared_ptr<jcArray>>(mData).get();
     }
     return nullptr;
+}
+
+jcCollection* jcVariable::asCollection() const
+{
+    switch (getType()) {
+        case TypeArray:
+            return asArrayRaw();
+        default:
+            return nullptr;
+    }
 }
 
 void jcVariable::set_String(const std::string& str)
@@ -94,10 +117,10 @@ void jcVariable::set_Closure(const jcClosurePtr &closure)
     mCurrentType = TypeClosure;
 }
 
-void jcVariable::set_Collection(const jcCollectionPtr &collection)
+void jcVariable::set_Array(const jcArrayPtr &array)
 {
-    mData = collection;
-    mCurrentType = TypeCollection;
+    mData = array;
+    mCurrentType = TypeArray;
 }
 
 std::string jcVariable::stringRepresentation() const {
@@ -105,11 +128,11 @@ std::string jcVariable::stringRepresentation() const {
         return std::to_string(asInt());
     } else if (getType() == TypeString) {
         return asString();
-    } else if (getType() == TypeCollection) {
+    } else if (getType() == TypeArray) {
         std::string rep = "[";
-        if (asCollectionRaw() != nullptr) {
-            int i = (int)asCollectionRaw()->size();
-            asCollectionRaw()->forEach([&rep, &i](jcVariablePtr element) {
+        if (asArrayRaw() != nullptr) {
+            int i = (int)asArrayRaw()->size();
+            asArrayRaw()->forEach([&rep, &i](jcVariablePtr element) {
                 rep += element->stringRepresentation();
                 if (--i != 0) {
                     rep += ", "; 
@@ -140,8 +163,8 @@ bool jcVariable::equal(const jcVariable &other) const
             return asInt() == other.asInt();
         case TypeString:
             return asString() == other.asString();
-        case TypeCollection:
-            return pointerEqual(asCollectionRaw(), other.asCollectionRaw());
+        case TypeArray:
+            return pointerEqual(asArrayRaw(), other.asArrayRaw());
         case TypeClosure:
             return pointerEqual(asClosureRaw(), other.asClosureRaw());
         default:
@@ -159,8 +182,8 @@ void jcMutableVariable::set(const jcVariable &other)
         setInt(other.asInt());
     } else if (other.getType() == TypeString) {
         setString(other.asString());
-    } else if (other.getType() == TypeCollection) {
-        setCollection(other.asSharedPtr<jcCollection>());
+    } else if (other.getType() == TypeArray) {
+        setArray(other.asSharedPtr<jcArray>());
     } else if (other.getType() == TypeClosure) {
         setClosure(other.asSharedPtr<jcClosure>());
     }
@@ -188,9 +211,9 @@ void jcMutableVariable::setInt(const int val)
     set_Int(val);
 }
 
-void jcMutableVariable::setCollection(std::shared_ptr<jcCollection> collection)
+void jcMutableVariable::setArray(std::shared_ptr<jcArray> array)
 {
-    set_Collection(collection);
+    set_Array(array);
 }
 
 void jcMutableVariable::setClosure(const jcClosurePtr closure)

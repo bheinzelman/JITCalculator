@@ -18,14 +18,17 @@ using jcVariablePtr = std::shared_ptr<jcVariable>;
 class jcMutableVariable;
 using jcMutableVariablePtr = std::shared_ptr<jcMutableVariable>;
 
-class jcCollection;
-using jcCollectionPtr = std::shared_ptr<jcCollection>;
+class jcArray;
+using jcArrayPtr = std::shared_ptr<jcArray>;
 
-class jcMutableCollection;
-using jcMutableCollectionPtr = std::shared_ptr<jcMutableCollection>;
+class jcMutableArray;
+using jcMutableArrayPtr = std::shared_ptr<jcMutableArray>;
 
 class jcClosure;
 using jcClosurePtr = std::shared_ptr<jcClosure>;
+
+class jcCollection;
+using jcCollectionPtr = std::shared_ptr<jcCollection>;
 
 class jcException : public std::exception {
 public:
