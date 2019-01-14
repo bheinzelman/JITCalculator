@@ -56,11 +56,6 @@ size_t jcArray::size() const
     return mEndIndex - mStartIndex;
 }
 
-bool jcArray::isEmpty() const
-{
-    return size() == 0;
-}
-
 jcCollection* jcArray::concat(const jcCollection &other) const
 {
     JC_ASSERT(getType() == other.getType());

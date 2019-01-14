@@ -8,27 +8,64 @@
 #include <string>
 
 ///////////////////////////////////
+// Macros
+///////////////////////////////////
+#define JC_VERSION_STRING "0.0.0"
+
+#define JC_FAIL() assert(0);
+
+#define JC_FAIL_AND_RETURN_NULL() \
+    do {                          \
+        JC_FAIL();                \
+        return nullptr;           \
+    } while (0);
+
+#define JC_ASSERT(e) \
+    do {             \
+        assert(e);   \
+    } while (0);
+
+#define JC_THROW_PARSE_EXCEPTION(m, l) \
+    throw jcException::ParseError(m, l)
+
+#define JC_ASSERT_OR_THROW_PARSE(e, m, l)   \
+    do {                                    \
+        if (!(e)) {                         \
+            JC_THROW_PARSE_EXCEPTION(m, l); \
+        }                                   \
+    } while (0);
+
+#define JC_THROW_VM_EXCEPTION(m) \
+    throw jcException::VmError(m)
+
+#define JC_ASSERT_OR_THROW_VM(e, m)   \
+    do {                                    \
+        if (!(e)) {                         \
+            JC_THROW_VM_EXCEPTION(m); \
+        }                                   \
+    } while (0);
+
+
+#define JC_STD_LIBRARY_PATH std::string(LIB_PATH) + "/std.jc"
+
+#define JC_CLASS(classname) \
+    class classname; \
+    using classname##Ptr = std::shared_ptr<classname>;
+
+///////////////////////////////////
 // Types
 ///////////////////////////////////
 using fourcc = int32_t;
 
-class jcVariable;
-using jcVariablePtr = std::shared_ptr<jcVariable>;
+/// Define ptr types
 
-class jcMutableVariable;
-using jcMutableVariablePtr = std::shared_ptr<jcMutableVariable>;
-
-class jcArray;
-using jcArrayPtr = std::shared_ptr<jcArray>;
-
-class jcMutableArray;
-using jcMutableArrayPtr = std::shared_ptr<jcMutableArray>;
-
-class jcClosure;
-using jcClosurePtr = std::shared_ptr<jcClosure>;
-
-class jcCollection;
-using jcCollectionPtr = std::shared_ptr<jcCollection>;
+JC_CLASS(jcVariable);
+JC_CLASS(jcMutableVariable);
+JC_CLASS(jcArray);
+JC_CLASS(jcMutableArray);
+JC_CLASS(jcClosure);
+JC_CLASS(jcString);
+JC_CLASS(jcCollection);
 
 class jcException : public std::exception {
 public:
@@ -69,7 +106,7 @@ public:
 
 private:
     jcException(const std::string& message, Domain exceptionDomain, int64_t lineNumber)
-        : mMessage(message), mLine(lineNumber), mDomain(exceptionDomain)
+    : mMessage(message), mLine(lineNumber), mDomain(exceptionDomain)
     {
     }
 
@@ -77,44 +114,3 @@ private:
     int64_t mLine;
     std::string mMessage;
 };
-
-///////////////////////////////////
-// Macros
-///////////////////////////////////
-#define JC_VERSION_STRING "0.0.0"
-
-#define JC_FAIL() assert(0);
-
-#define JC_FAIL_AND_RETURN_NULL() \
-    do {                          \
-        JC_FAIL();                \
-        return nullptr;           \
-    } while (0);
-
-#define JC_ASSERT(e) \
-    do {             \
-        assert(e);   \
-    } while (0);
-
-#define JC_THROW_PARSE_EXCEPTION(m, l) \
-    throw jcException::ParseError(m, l)
-
-#define JC_ASSERT_OR_THROW_PARSE(e, m, l)   \
-    do {                                    \
-        if (!(e)) {                         \
-            JC_THROW_PARSE_EXCEPTION(m, l); \
-        }                                   \
-    } while (0);
-
-#define JC_THROW_VM_EXCEPTION(m) \
-    throw jcException::VmError(m)
-
-#define JC_ASSERT_OR_THROW_VM(e, m)   \
-    do {                                    \
-        if (!(e)) {                         \
-            JC_THROW_VM_EXCEPTION(m); \
-        }                                   \
-    } while (0);
-
-
-#define JC_STD_LIBRARY_PATH std::string(LIB_PATH) + "/std.jc"

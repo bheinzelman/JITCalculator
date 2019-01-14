@@ -16,7 +16,6 @@ public:
     jcArray(const std::vector<jcVariablePtr> &list);
 
     size_t size() const override;
-    bool isEmpty() const override;
 
     jcVariablePtr head() const override;
 

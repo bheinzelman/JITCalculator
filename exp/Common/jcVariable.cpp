@@ -3,6 +3,7 @@
 #include "jcVariable.hpp"
 #include "jcArray.hpp"
 #include "jcClosure.hpp"
+#include "jcString.hpp"
 
 jcVariablePtr jcVariable::Create()
 {
@@ -44,20 +45,29 @@ jcVariablePtr jcVariable::Create(const jcClosurePtr &closure)
     return me;
 }
 
+jcVariablePtr jcVariable::Create(const jcStringPtr &value)
+{
+    auto me = jcVariable::Create();
+    me->set_jcString(value);
+    return me;
+}
+
+jcVariable::jcVariable()
+    : mCurrentType(TypeNone)
+{
+}
+
 jcVariablePtr jcVariable::CreateFromCollection(const jcCollectionPtr &collection)
 {
     JC_ASSERT(collection);
     switch (collection->getType()) {
         case jcVariable::TypeArray:
             return jcVariable::Create(std::static_pointer_cast<jcArray>(collection));
+        case jcVariable::TypeString:
+            return jcVariable::Create(std::static_pointer_cast<jcString>(collection));
         default:
             return nullptr;
     }
-}
-
-jcVariable::jcVariable()
-    : mCurrentType(TypeNone)
-{
 }
 
 jcVariable::~jcVariable()
@@ -67,7 +77,7 @@ jcVariable::~jcVariable()
 std::string jcVariable::asString() const
 {
     if (mCurrentType == TypeString) {
-        return std::get<std::string>(mData);
+        return std::get<jcStringPtr>(mData)->asStdString();
     }
     return std::string();
 }
@@ -104,6 +114,14 @@ jcArray* jcVariable::asArrayRaw() const
     return nullptr;
 }
 
+jcString* jcVariable::asJcStringRaw() const
+{
+    if (mCurrentType == TypeString) {
+        return std::get<jcStringPtr>(mData).get();
+    }
+    return nullptr;
+}
+
 jcCollection* jcVariable::asCollection() const
 {
     switch (getType()) {
@@ -116,7 +134,7 @@ jcCollection* jcVariable::asCollection() const
 
 void jcVariable::set_String(const std::string& str)
 {
-    mData = str;
+    mData = jcString::Create(str);
     mCurrentType = TypeString;
 }
 
@@ -142,6 +160,12 @@ void jcVariable::set_Array(const jcArrayPtr &array)
 {
     mData = array;
     mCurrentType = TypeArray;
+}
+
+void jcVariable::set_jcString(const jcStringPtr &string)
+{
+    mData = string;
+    mCurrentType = TypeString;
 }
 
 std::string jcVariable::stringRepresentation() const {

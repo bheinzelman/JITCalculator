@@ -31,8 +31,9 @@ public:
     static jcVariablePtr Create(char value);
     static jcVariablePtr Create(const jcArrayPtr &array);
     static jcVariablePtr Create(const jcClosurePtr &closure);
+    static jcVariablePtr Create(const jcStringPtr &value);
 
-    static jcVariablePtr CreateFromCollection(const jcCollectionPtr &collection);
+     static jcVariablePtr CreateFromCollection(const jcCollectionPtr &collection);
 
     ~jcVariable();
 
@@ -41,7 +42,7 @@ public:
     char asChar() const;
     jcArray* asArrayRaw() const;
     jcClosure* asClosureRaw() const;
-
+    jcString* asJcStringRaw() const;
     jcCollection *asCollection() const;
 
     /**
@@ -78,16 +79,17 @@ protected:
     void set_Array(const jcArrayPtr &array);
     void set_Closure(const jcClosurePtr &closure);
     void set_Char(const char val);
+    void set_jcString(const jcStringPtr &string);
 
 protected:
     Type mCurrentType;
 
     std::variant<
-        std::string,
         int,
         char,
         jcArrayPtr,
-        jcClosurePtr> mData;
+        jcClosurePtr,
+        jcStringPtr> mData;
 };
 
 class jcMutableVariable : public jcVariable

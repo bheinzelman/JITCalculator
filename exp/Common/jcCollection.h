@@ -21,7 +21,10 @@ public:
     /**
      Returns if the collection is empty or not
      */
-    virtual bool isEmpty() const = 0;
+    virtual bool isEmpty() const
+    {
+        return size() == 0;
+    }
 
     /**
      Returns the first element in the collection
