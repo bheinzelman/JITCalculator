@@ -1,0 +1,2 @@
+let h = "hello"
+head(h())

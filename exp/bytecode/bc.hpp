@@ -165,7 +165,9 @@ public:
     std::vector<Instruction> getInstructions(std::shared_ptr<Node> root);
     std::vector<Instruction> getClosureInstructions();
 
-    void visit(BasicExpression* expression) override;
+    void visit(IntExpression* expression) override;
+
+    void visit(StringExpression* expression) override;
 
     void visit(BinaryExpression* expression) override;
 

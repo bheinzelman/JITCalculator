@@ -2,14 +2,14 @@
 
 #include "jcString.hpp"
 
-jcString::jcString(const std::string &value)
-: mData(value)
+jcString::jcString(const std::string &value, Context ctx)
+: mData(value), mCtx(ctx)
 {
 }
 
-jcStringPtr jcString::Create(const std::string &value)
+jcStringPtr jcString::Create(const std::string &value, Context ctx)
 {
-    return std::make_shared<jcString>(value);
+    return std::make_shared<jcString>(value, ctx);
 }
 
 const std::string& jcString::asStdString() const
@@ -50,7 +50,7 @@ jcCollection* jcString::concat(const jcCollection &other) const
 
     std::string str = std::string(asStdString()) + std::string(otherString.asStdString());
 
-    return new jcString(str);
+    return new jcString(str, getContext());
 }
 
 void jcString::forEach(std::function<void(jcVariablePtr)> callback) const
@@ -63,7 +63,7 @@ void jcString::forEach(std::function<void(jcVariablePtr)> callback) const
 jcCollection* jcString::slice(int startIdx, int endIdx) const
 {
     JC_ASSERT(startIdx >= 0 && endIdx <= mData.size() && startIdx <= endIdx);
-    return new jcString(std::string(mData.begin() + startIdx, mData.begin() + endIdx));
+    return new jcString(std::string(mData.begin() + startIdx, mData.begin() + endIdx), getContext());
 }
 
 jcVariable::Type jcString::getType() const

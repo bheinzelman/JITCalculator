@@ -290,10 +290,17 @@ void Generator::visit(VariableExpression* expression)
     mOutput.push_back(pushOp);
 }
 
-void Generator::visit(BasicExpression* expression)
+void Generator::visit(IntExpression* expression)
 {
     jcVariablePtr expressionVal = jcVariable::Create(expression->getValue());
     Instruction pushOp = Instruction(bc::Push, expressionVal);
+    mOutput.push_back(pushOp);
+}
+
+void Generator::visit(StringExpression* expression)
+{
+    jcVariablePtr string = jcVariable::Create(expression->getValue());
+    Instruction pushOp = Instruction(bc::Push, string);
     mOutput.push_back(pushOp);
 }
 

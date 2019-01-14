@@ -146,6 +146,8 @@ jcCollection* jcVariable::asCollection() const
             return asArrayRaw();
         case TypeList:
             return asListRaw();
+        case TypeString:
+            return asJcStringRaw();
         default:
             return nullptr;
     }
@@ -153,7 +155,7 @@ jcCollection* jcVariable::asCollection() const
 
 void jcVariable::set_String(const std::string& str)
 {
-    mData = jcString::Create(str);
+    mData = jcString::Create(str, jcString::StringContextId);
     mCurrentType = TypeString;
 }
 
@@ -196,7 +198,11 @@ std::string jcVariable::stringRepresentation() const {
     if (getType() == TypeInt) {
         return std::to_string(asInt());
     } else if (getType() == TypeString) {
-        return asString();
+        if (asJcStringRaw()->getContext() == jcString::StringContextValue) {
+            return "\"" + asString() + "\"";
+        } else {
+            return asString();
+        }
     } else if (getType() == TypeChar) {
         return "'" + std::string(1, asChar()) + "'";
     } else if (asCollection()) {

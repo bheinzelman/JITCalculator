@@ -38,8 +38,8 @@
 - (void)testJcString
 {
     std::string theString = "Hello, World!";
-    jcStringPtr string = jcString::Create(theString);
-    jcString otherString = jcString(theString);
+    jcStringPtr string = jcString::Create(theString, jcString::StringContextValue);
+    jcString otherString = jcString(theString, jcString::StringContextValue);
 
     jcMutableVariable head;
     head.setChar('H');

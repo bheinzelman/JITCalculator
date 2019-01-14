@@ -13,13 +13,13 @@ public:
 
     enum Context
     {
-        Value,
-        Id
+        StringContextValue,
+        StringContextId
     };
 
-    jcString(const std::string &value);
+    jcString(const std::string &value, Context ctx);
 
-    static jcStringPtr Create(const std::string &value);
+    static jcStringPtr Create(const std::string &value, Context ctx);
 
     const std::string& asStdString() const;
 
@@ -28,7 +28,7 @@ public:
     // TODO, fix this
     Context getContext() const
     {
-        return Id;
+        return mCtx;
     }
 
     /**
@@ -44,4 +44,5 @@ public:
 
 private:
     std::string mData;
+    Context mCtx;
 };

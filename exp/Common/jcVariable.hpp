@@ -54,7 +54,8 @@ public:
     template<typename T>
     std::shared_ptr<T> asSharedPtr() const {
         static_assert(std::is_same<std::shared_ptr<T>, jcArrayPtr>().value ||
-                      std::is_same<std::shared_ptr<T>, jcClosurePtr>().value, "Invalid shared ptr type");
+                      std::is_same<std::shared_ptr<T>, jcClosurePtr>().value ||
+                      std::is_same<std::shared_ptr<T>, jcStringPtr>().value, "Invalid shared ptr type");
         
         return std::get<std::shared_ptr<T>>(mData);
     }

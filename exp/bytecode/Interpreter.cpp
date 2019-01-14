@@ -9,6 +9,7 @@
 #include "jcClosure.hpp"
 #include "jcArray.hpp"
 #include "jcList.hpp"
+#include "jcString.hpp"
 
 static inline int performArtithmaticOp(bc::Op op, int right, int left)
 {
@@ -171,6 +172,8 @@ jcVariablePtr Interpreter::eval()
         }
         case bc::Pop: {
             jcVariablePtr variableName = instruction.getOperand();
+            JC_ASSERT(variableName->asJcStringRaw());
+            JC_ASSERT(variableName->asJcStringRaw()->getContext() == jcString::StringContextId);
 
             jcMutableVariablePtr value = jcMutableVariable::Create();
             if (resolveRuntimeVariable(variableName->asString(), value)) {
@@ -284,11 +287,19 @@ void Interpreter::callFunction(jcVariablePtr operand)
 
 jcVariablePtr Interpreter::resolveVariable(const jcVariablePtr &var)
 {
-    if (var->getType() == jcVariable::TypeInt) {
+    jcVariable::Type type = var->getType();
+    if (type == jcVariable::TypeInt ||
+        type == jcVariable::TypeArray ||
+        type == jcVariable::TypeChar ||
+        var->getType() == jcVariable::TypeList) {
         return var;
-    } else if (var->getType() == jcVariable::TypeArray || var->getType() == jcVariable::TypeList) {
-        return var;
+    } else if (type == jcVariable::TypeClosure) {
+        JC_ASSERT_OR_THROW_VM(false, "Hi dev, please do not use resolveVariable for jcClosures. thx.");
     } else {
+        if (var->asJcStringRaw()->getContext() == jcString::StringContextValue) {
+            return var;
+        }
+
         if (state().mVariableLut.top().count(var->asString()) > 0) {
             return state().mVariableLut.top()[var->asString()];
         }
