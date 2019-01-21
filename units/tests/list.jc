@@ -1,12 +1,9 @@
-let x = [1, 2, 3]
+#let x = [1, 2, 3]
 
-print(x())
-print(List(3, 5, 2, 4))
+#print(x())
 
-let sum(x) 
-	| len(x) > 0 = head(x) + sum(tail(x))
-	| else = 0
-
-print(sum([1,2,3]))
-
-print(concat([1,2,3], [1,2,3]))
+#print(isEmpty(x()))
+#print(len(x()))
+#print(concat(x(), [4,5,6]))
+print(1 :: 2 + 2 :: [])
+#print(1 + 1 + 3)

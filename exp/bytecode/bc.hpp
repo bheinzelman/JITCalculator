@@ -114,6 +114,16 @@ enum Op {
     Jmp,
 
     /**
+     Adds an item to the beginning of a list.
+     */
+    Cons,
+
+    /**
+     Adds two lists together.
+     */
+    Concat,
+
+    /**
      Exit the program
      */
     Exit,

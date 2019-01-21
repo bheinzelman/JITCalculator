@@ -82,7 +82,6 @@ void Runtime::traverseStream(std::istream& stream, DefinitionCallback definition
 
                 definitionHandler(functionDecl->getId(), output, closures);
             } else {
-                output.push_back(bc::Instruction(bc::Exit, {}));
                 expressionHandler(output, closures);
             }
         }
@@ -103,7 +102,7 @@ void Runtime::evaluate(std::istream& stream)
            expressions.insert(expressions.end(), newExpressions.begin(), newExpressions.end());
            definitions.insert(definitions.end(), closures.begin(), closures.end());
        });
-
+    expressions.push_back(bc::Instruction(bc::Exit, {}));
     expressions.insert(expressions.end(), definitions.begin(), definitions.end());
 
     Interpreter interpreter;
@@ -135,7 +134,6 @@ bool Runtime::evaluateREPL(std::istream& stream, std::vector<jcVariablePtr>& out
 
         // add closures
         expressions.insert(expressions.end(), closures.begin(), closures.end());
-
 
         interpreter.setInstructions(expressions);
 

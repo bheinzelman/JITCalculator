@@ -146,7 +146,6 @@ std::string Generator::closureLabel(int idx) const
     return std::string("c.") + std::to_string(idx);
 }
 
-
 /**
  Used for making non-closure labels
  */
@@ -301,7 +300,6 @@ void Generator::visit(BasicExpression* expression)
 void Generator::visit(ListExpression* list)
 {
     auto elements = list->getElements();
-    std::reverse(std::begin(elements), std::end(elements));
     for (auto element : elements) {
         element->accept(this);
     }
@@ -359,6 +357,12 @@ void Generator::visit(BinaryExpression* expression)
         break;
     case TokenType::Equals:
         bytecodeOp = bc::Equals;
+        break;
+    case TokenType::Cons:
+        bytecodeOp = bc::Cons;
+        break;
+    case TokenType::Concat:
+        bytecodeOp = bc::Concat;
         break;
     default:
         JC_FAIL();

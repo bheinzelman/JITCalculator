@@ -21,6 +21,7 @@ public:
         TypeChar,
         TypeArray,
         TypeClosure,
+        TypeList,
         TypeNone
     };
 
@@ -32,6 +33,7 @@ public:
     static jcVariablePtr Create(const jcArrayPtr &array);
     static jcVariablePtr Create(const jcClosurePtr &closure);
     static jcVariablePtr Create(const jcStringPtr &value);
+    static jcVariablePtr Create(const jcListPtr &value);
 
      static jcVariablePtr CreateFromCollection(const jcCollectionPtr &collection);
 
@@ -43,6 +45,7 @@ public:
     jcArray* asArrayRaw() const;
     jcClosure* asClosureRaw() const;
     jcString* asJcStringRaw() const;
+    jcList* asListRaw() const;
     jcCollection *asCollection() const;
 
     /**
@@ -80,6 +83,7 @@ protected:
     void set_Closure(const jcClosurePtr &closure);
     void set_Char(const char val);
     void set_jcString(const jcStringPtr &string);
+    void set_List(const jcListPtr &list);
 
 protected:
     Type mCurrentType;
@@ -89,7 +93,8 @@ protected:
         char,
         jcArrayPtr,
         jcClosurePtr,
-        jcStringPtr> mData;
+        jcStringPtr,
+        jcListPtr> mData;
 };
 
 class jcMutableVariable : public jcVariable

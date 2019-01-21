@@ -152,16 +152,26 @@ TokenType Lexer::resolveTwoCharOperator(TokenType firstOperator)
 {
     TokenType returnToken = firstOperator;
     Token peeked = peekToken();
+    bool foundTwoCharOp = false;
     if (peeked.getType() != TokenType::Error) {
         if (firstOperator == TokenType::Greater_Than && peeked.getType() == TokenType::Assign) {
             returnToken = TokenType::Greater_Than_Equal;
+            foundTwoCharOp = true;
         } else if (firstOperator == TokenType::Less_Than && peeked.getType() == TokenType::Assign) {
             returnToken = TokenType::Less_Than_Equal;
+            foundTwoCharOp = true;
         } else if (firstOperator == TokenType::Assign && peeked.getType() == TokenType::Assign) {
             returnToken = TokenType::Equals;
+            foundTwoCharOp = true;
+        } else if (firstOperator == TokenType::Colon && peeked.getType() == TokenType::Colon) {
+            returnToken = TokenType::Cons;
+            foundTwoCharOp = true;
+        } else if (firstOperator == TokenType::Add && peeked.getType() == TokenType::Add) {
+            returnToken = TokenType::Concat;
+            foundTwoCharOp = true;
         }
     }
-    if (returnToken != firstOperator) {
+    if (foundTwoCharOp) {
         skipToken();
     }
     return returnToken;

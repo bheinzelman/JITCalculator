@@ -1,20 +1,5 @@
 let qs(array) 
 	| isEmpty(array) = []
-	| else = concat
-		(
-			concat(
-				qs(
-					filter(
-						{(x) = x < head(array)}, 
-						tail(array)
-					)
-				), 
-				[head(array)]
-			), 
-			qs(
-				filter(
-					{(x) = x >= head(array)}, 
-					tail(array)
-				)
-			)
-		)
+	| else = qs(filter({(x) = x < head(array)}, tail(array))) 
+		++ [head(array)] ++
+		qs(filter({(x) = x >= head(array)}, tail(array)))

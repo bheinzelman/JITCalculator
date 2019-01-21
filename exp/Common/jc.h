@@ -65,6 +65,7 @@ JC_CLASS(jcArray);
 JC_CLASS(jcMutableArray);
 JC_CLASS(jcClosure);
 JC_CLASS(jcString);
+JC_CLASS(jcList);
 JC_CLASS(jcCollection);
 
 class jcException : public std::exception {

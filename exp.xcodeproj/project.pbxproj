@@ -28,6 +28,8 @@
 		3CF2B62D1FE635250039F40B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3CF2B62C1FE635250039F40B /* main.cpp */; };
 		4E0A7F9721914FBB00130C6B /* builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A7F9521914FBB00130C6B /* builtin.cpp */; };
 		4E0A7F98219153E000130C6B /* builtin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A7F9521914FBB00130C6B /* builtin.cpp */; };
+		4E66283721F42DA600DA809A /* jcList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E66283521F42DA600DA809A /* jcList.cpp */; };
+		4E66283821F431C300DA809A /* jcList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E66283521F42DA600DA809A /* jcList.cpp */; };
 		4E6C0E7C2182CDA900A4F0D8 /* jcArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E6C0E7B2182CDA900A4F0D8 /* jcArray.cpp */; };
 		4E907E33219E82C7003519CC /* jcClosure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E907E31219E82C7003519CC /* jcClosure.cpp */; };
 		4E907E34219E8F2F003519CC /* jcClosure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E907E31219E82C7003519CC /* jcClosure.cpp */; };
@@ -78,6 +80,8 @@
 		4E05A59A21E5BE7B008F0CB4 /* jcCollection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jcCollection.h; sourceTree = "<group>"; };
 		4E0A7F9521914FBB00130C6B /* builtin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = builtin.cpp; sourceTree = "<group>"; };
 		4E0A7F9621914FBB00130C6B /* builtin.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = builtin.hpp; sourceTree = "<group>"; };
+		4E66283521F42DA600DA809A /* jcList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcList.cpp; sourceTree = "<group>"; };
+		4E66283621F42DA600DA809A /* jcList.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcList.hpp; sourceTree = "<group>"; };
 		4E6C0E7A2182CB6300A4F0D8 /* jcArray.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jcArray.hpp; sourceTree = "<group>"; };
 		4E6C0E7B2182CDA900A4F0D8 /* jcArray.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcArray.cpp; sourceTree = "<group>"; };
 		4E907E31219E82C7003519CC /* jcClosure.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jcClosure.cpp; sourceTree = "<group>"; };
@@ -185,6 +189,8 @@
 				4E05A59A21E5BE7B008F0CB4 /* jcCollection.h */,
 				4E9F052F21EBF45900032C45 /* jcString.cpp */,
 				4E9F053021EBF45900032C45 /* jcString.hpp */,
+				4E66283521F42DA600DA809A /* jcList.cpp */,
+				4E66283621F42DA600DA809A /* jcList.hpp */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -311,6 +317,7 @@
 				3C3CA721215C2B1800956902 /* Parser.cpp in Sources */,
 				3C3CA75D215D4ECC00956902 /* jcVariable.cpp in Sources */,
 				3C3CA727215C316A00956902 /* bc.cpp in Sources */,
+				4E66283821F431C300DA809A /* jcList.cpp in Sources */,
 				3C3CA722215C2B1A00956902 /* Interpreter.cpp in Sources */,
 				4E9F052E21EBF24F00032C45 /* jcUnits.mm in Sources */,
 				3C3CA71D215C2B0B00956902 /* Runtime.cpp in Sources */,
@@ -333,6 +340,7 @@
 				3C8E3BBE200DC1BC004DFF87 /* Interpreter.cpp in Sources */,
 				4E9F053121EBF45900032C45 /* jcString.cpp in Sources */,
 				3C17CCBD1FEA2B5100BE0474 /* Runtime.cpp in Sources */,
+				4E66283721F42DA600DA809A /* jcList.cpp in Sources */,
 				4E0A7F9721914FBB00130C6B /* builtin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

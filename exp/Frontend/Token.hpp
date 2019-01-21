@@ -33,6 +33,8 @@ enum class TokenType {
     EndOfStream,
     QuestionMark,
     Colon,
+    Cons,
+    Concat,
     None
 };
 

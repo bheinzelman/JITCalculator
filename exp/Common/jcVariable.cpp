@@ -4,6 +4,7 @@
 #include "jcArray.hpp"
 #include "jcClosure.hpp"
 #include "jcString.hpp"
+#include "jcList.hpp"
 
 jcVariablePtr jcVariable::Create()
 {
@@ -52,6 +53,13 @@ jcVariablePtr jcVariable::Create(const jcStringPtr &value)
     return me;
 }
 
+jcVariablePtr jcVariable::Create(const jcListPtr &value)
+{
+    auto me = jcVariable::Create();
+    me->set_List(value);
+    return me;
+}
+
 jcVariable::jcVariable()
     : mCurrentType(TypeNone)
 {
@@ -65,6 +73,8 @@ jcVariablePtr jcVariable::CreateFromCollection(const jcCollectionPtr &collection
             return jcVariable::Create(std::static_pointer_cast<jcArray>(collection));
         case jcVariable::TypeString:
             return jcVariable::Create(std::static_pointer_cast<jcString>(collection));
+        case jcVariable::TypeList:
+            return jcVariable::Create(std::static_pointer_cast<jcList>(collection));
         default:
             return nullptr;
     }
@@ -122,11 +132,20 @@ jcString* jcVariable::asJcStringRaw() const
     return nullptr;
 }
 
+jcList* jcVariable::asListRaw() const {
+    if (mCurrentType == TypeList) {
+        return std::get<jcListPtr>(mData).get();
+    }
+    return nullptr;
+}
+
 jcCollection* jcVariable::asCollection() const
 {
     switch (getType()) {
         case TypeArray:
             return asArrayRaw();
+        case TypeList:
+            return asListRaw();
         default:
             return nullptr;
     }
@@ -168,6 +187,11 @@ void jcVariable::set_jcString(const jcStringPtr &string)
     mCurrentType = TypeString;
 }
 
+void jcVariable::set_List(const jcListPtr &list) {
+    mData = list;
+    mCurrentType = TypeList;
+}
+
 std::string jcVariable::stringRepresentation() const {
     if (getType() == TypeInt) {
         return std::to_string(asInt());
@@ -175,17 +199,17 @@ std::string jcVariable::stringRepresentation() const {
         return asString();
     } else if (getType() == TypeChar) {
         return "'" + std::string(1, asChar()) + "'";
-    } else if (getType() == TypeArray) {
+    } else if (asCollection()) {
         std::string rep = "[";
-        if (asArrayRaw() != nullptr) {
-            int i = (int)asArrayRaw()->size();
-            asArrayRaw()->forEach([&rep, &i](jcVariablePtr element) {
-                rep += element->stringRepresentation();
-                if (--i != 0) {
-                    rep += ", "; 
-                }
-            });
-        }
+
+        int i = (int)asCollection()->size();
+        asCollection()->forEach([&rep, &i](jcVariablePtr element) {
+            rep += element->stringRepresentation();
+            if (--i != 0) {
+                rep += ", ";
+            }
+        });
+
         return rep + "]";
     }
     return "";
@@ -216,6 +240,8 @@ bool jcVariable::equal(const jcVariable &other) const
             return pointerEqual(asArrayRaw(), other.asArrayRaw());
         case TypeClosure:
             return pointerEqual(asClosureRaw(), other.asClosureRaw());
+        case TypeList:
+            return pointerEqual(asListRaw(), other.asListRaw());
         default:
             return false;
     }

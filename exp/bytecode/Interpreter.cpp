@@ -8,6 +8,7 @@
 #include "builtin.hpp"
 #include "jcClosure.hpp"
 #include "jcArray.hpp"
+#include "jcList.hpp"
 
 static inline int performArtithmaticOp(bc::Op op, int right, int left)
 {
@@ -129,6 +130,28 @@ jcVariablePtr Interpreter::eval()
             jcVariablePtr top = popStack();
             jcVariablePtr result = jcVariable::Create(performPrefixOp(op, top->asInt()));
             curState.mStack.push(result);
+            break;
+        }
+        case bc::Cons: {
+            jcVariablePtr list = popStack();
+            jcVariablePtr item = popStack();
+
+            JC_ASSERT_OR_THROW_VM(list->getType() == jcVariable::TypeList, "Must cons to list");
+
+            jcListPtr newList = std::shared_ptr<jcList>(list->asListRaw()->cons(item));
+            curState.mStack.push(jcVariable::CreateFromCollection(newList));
+            break;
+        }
+        case bc::Concat: {
+            jcVariablePtr var1 = popStack();
+            jcVariablePtr var2 = popStack();
+            JC_ASSERT_OR_THROW_VM(var1->asCollection() && var2->asCollection(), "Concat params must be collections");
+
+            jcCollection *collection1 = var1->asCollection();
+            jcCollection *collection2 = var2->asCollection();
+
+            std::shared_ptr<jcCollection> newCollection = std::shared_ptr<jcCollection>(collection2->concat(*collection1));
+            curState.mStack.push(jcVariable::CreateFromCollection(newCollection));
             break;
         }
         case bc::Push: {
@@ -263,7 +286,7 @@ jcVariablePtr Interpreter::resolveVariable(const jcVariablePtr &var)
 {
     if (var->getType() == jcVariable::TypeInt) {
         return var;
-    } else if (var->getType() == jcVariable::TypeArray) {
+    } else if (var->getType() == jcVariable::TypeArray || var->getType() == jcVariable::TypeList) {
         return var;
     } else {
         if (state().mVariableLut.top().count(var->asString()) > 0) {

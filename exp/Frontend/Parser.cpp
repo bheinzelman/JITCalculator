@@ -138,6 +138,8 @@ TokenType Parser::peekOperator()
     case TokenType::Greater_Than_Equal:
     case TokenType::Equals:
     case TokenType::QuestionMark:
+    case TokenType::Cons:
+    case TokenType::Concat:
         return tok;
     default:
         break;
@@ -257,7 +259,9 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
         // skip the token
         skipToken();
 
-        int nextPrec = jcToken::getOperatorPrecedence(op) + 1;
+        // Cons is right associative..
+        int nextPrec = op != TokenType::Cons ?
+            jcToken::getOperatorPrecedence(op) + 1 : jcToken::getOperatorPrecedence(op);
 
         // ternary
         if (op == TokenType::QuestionMark) {

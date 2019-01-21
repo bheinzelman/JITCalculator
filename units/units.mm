@@ -12,6 +12,7 @@
 #include "jcVariable.hpp"
 #include "jcUtils.hpp"
 #include "jcArray.hpp"
+#include "jcList.hpp"
 
 
 class AnswerExpression {
@@ -74,15 +75,19 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         std::vector<jcVariablePtr> output;
         bool result = false;
 
-        double timeElapsed = jc::measureElapsedTime([&result, &rt, &stream, &output]() {
+//        double timeElapsed = jc::measureElapsedTime([&result, &rt, &stream, &output]() {
             result = rt.evaluateREPL(stream, output);
-        });
+//        });
 
-        std::cout << "Execution time: " << timeElapsed << std::endl;
+//        std::cout << "Execution time: " << timeElapsed << std::endl;
 
         if (result) {
             if (output.size()) {
                 jcVariablePtr value = output.front();
+//                std::cout << value->stringRepresentation() << std::endl;
+//                std::cout << expectedValue->stringRepresentation() << std::endl;
+
+
                 JC_ASSERT(value != nullptr && expectedValue != nullptr);
                 return value->equal(*expectedValue);
             }
@@ -139,7 +144,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
 - (void)testListConcat {
     Runtime rt;
 
-    std::string program = "concat([1,2,3], [4, 5])";
+    std::string program = "[1,2,3] ++ [4, 5]";
     std::vector<jcVariablePtr> elems = {
         jcVariable::Create(1),
         jcVariable::Create(2),
@@ -148,9 +153,9 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         jcVariable::Create(5)
     };
 
-    jcArrayPtr array = std::make_shared<jcArray>(elems);
+    jcListPtr list = jcList::buildList(elems);
 
-    jcVariablePtr expected = jcVariable::Create(array);
+    jcVariablePtr expected = jcVariable::Create(list);
     std::stringstream stream;
     stream << program;
 
@@ -169,7 +174,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         jcVariable::Create(2),
         jcVariable::Create(3)
     };
-    jcArrayPtr collection = std::make_shared<jcArray>(elems);
+    jcListPtr collection = jcList::buildList(elems);
 
     jcVariablePtr expected = jcVariable::Create(collection);
     std::stringstream stream;
@@ -227,7 +232,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
             ptrs.push_back(jcVariable::Create(v));
         }
 
-        jcArrayPtr collection = std::make_shared<jcArray>(ptrs);
+        jcListPtr collection = jcList::buildList(ptrs);
 
         return jcVariable::Create(collection);
     };

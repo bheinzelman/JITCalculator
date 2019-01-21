@@ -1,7 +1,13 @@
+# params function, list
+
+let filter(fn, list) 
+	| isEmpty(list) = []
+	| fn(head(list)) = head(list) :: filter(fn, tail(list))
+	| else = filter(fn, tail(list))
 
 let map(fn, array)
 	| isEmpty(array) = []
-	| else = cons(fn(head(array)), map(fn, tail(array)))
+    | else = fn(head(array)) :: map(fn, tail(array))
 
 let min(x, y) = x < y ? x : y
 

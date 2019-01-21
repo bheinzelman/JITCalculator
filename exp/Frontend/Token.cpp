@@ -6,20 +6,24 @@ namespace jcToken {
 int getOperatorPrecedence(TokenType op)
 {
     switch (op) {
-    case TokenType::QuestionMark:
+    case TokenType::Concat:
         return 1;
+    case TokenType::Cons:
+        return 2;
+    case TokenType::QuestionMark:
+        return 3;
     case TokenType::Less_Than:
     case TokenType::Greater_Than:
     case TokenType::Less_Than_Equal:
     case TokenType::Greater_Than_Equal:
     case TokenType::Equals:
-        return 2;
+        return 4;
     case TokenType::Add:
     case TokenType::Subtract:
-        return 3;
+        return 5;
     case TokenType::Multiply:
     case TokenType::Divide:
-        return 4;
+        return 6;
     default:
         return -1;
     }
@@ -82,6 +86,10 @@ std::string stringRepresentation(TokenType token)
             return "?";
         case TokenType::Colon:
             return ":";
+        case TokenType::Cons:
+            return "::";
+        case TokenType::Concat:
+            return "++";
         case TokenType::None:
             return "None";
     }
