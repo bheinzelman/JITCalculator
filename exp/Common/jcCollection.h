@@ -44,7 +44,7 @@ public:
     /**
      Iterates over the array calling the given callback for every element
      */
-    virtual void forEach(std::function<void(jcVariablePtr)> callback) const = 0;
+    virtual void forEach(std::function<void(jcVariablePtr&)> callback) const = 0;
 
     /**
      Returns a slice of the collection

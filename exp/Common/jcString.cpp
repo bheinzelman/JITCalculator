@@ -53,10 +53,11 @@ jcCollection* jcString::concat(const jcCollection &other) const
     return new jcString(str, getContext());
 }
 
-void jcString::forEach(std::function<void(jcVariablePtr)> callback) const
+void jcString::forEach(std::function<void(jcVariablePtr&)> callback) const
 {
     for (auto it = mData.begin(); it != mData.end(); ++it) {
-        callback(jcVariable::Create(*it));
+        auto val = jcVariable::Create(*it);
+        callback(val);
     }
 }
 

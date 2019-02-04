@@ -175,13 +175,8 @@ jcVariablePtr Interpreter::eval()
             JC_ASSERT(variableName->asJcStringRaw());
             JC_ASSERT(variableName->asJcStringRaw()->getContext() == jcString::StringContextId);
 
-            jcMutableVariablePtr value = jcMutableVariable::Create();
-            if (resolveRuntimeVariable(variableName->asString(), value)) {
-                curState.mVariableLut.top()[variableName->asString()] = value;
-            } else {
-                std::string name = variableName->asString();
-                curState.mVariableLut.top()[name] = popStack();
-            }
+            std::string name = variableName->asString();
+            curState.mVariableLut.top()[name] = popStack();
 
             break;
         }
@@ -274,7 +269,7 @@ void Interpreter::callFunction(jcVariablePtr operand)
     }
 
     auto builtinFunctionInfo = lib::builtin::Shared().info(functionName);
-    if (builtinFunctionInfo.count(lib::kLibError) == 0)
+    if (builtinFunctionInfo != nullptr)
     {
         jcVariablePtr result = lib::builtin::Shared().execute(functionName, *this);
         state().mStack.push(result);
@@ -309,11 +304,6 @@ jcVariablePtr Interpreter::resolveVariable(const jcVariablePtr &var)
             return var;
         }
 
-        jcMutableVariablePtr mutablePtr = jcMutableVariable::Create();
-        if (resolveRuntimeVariable(var->asString(), mutablePtr)) {
-            return mutablePtr;
-        }
-
         JC_THROW_VM_EXCEPTION("undefined variable: " + var->asString());
     }
 }
@@ -332,32 +322,10 @@ bool Interpreter::functionExists(const jcVariablePtr &var) const
     }
 
     auto info = lib::builtin::Shared().info(functionName);
-    if (info.count(lib::kLibError) == 0) {
+    if (info) {
         return true;
     }
 
-    return false;
-}
-
-void Interpreter::setVariable(std::string var, jcVariablePtr &to)
-{
-    // Check if runtime var
-    if (var == bc::vars::ip) {
-        state().mIp = resolveVariable(to)->asInt();
-        return;
-    }
-    JC_ASSERT_OR_THROW_VM(state().mVariableLut.top().count(var) > 0, "Cannot set undefined var");
-    state().mVariableLut.top()[var] = resolveVariable(to);
-}
-
-bool Interpreter::resolveRuntimeVariable(std::string var, jcMutableVariablePtr &output)
-{
-    if (var == bc::vars::ip) {
-        if (output) {
-            output->setInt(state().mIp);
-        }
-        return true;
-    }
     return false;
 }
 
