@@ -2,7 +2,8 @@
 
 #pragma once
 
-class BasicExpression;
+class IntExpression;
+class StringExpression;
 class VariableExpression;
 class BinaryExpression;
 class FunctionCallExpression;
@@ -18,7 +19,8 @@ class TernaryExpresssion;
 
 class Visitor {
 public:
-    virtual void visit(BasicExpression* expression) = 0;
+    virtual void visit(IntExpression* expression) = 0;
+    virtual void visit(StringExpression* expression) = 0;
     virtual void visit(VariableExpression* expression) = 0;
     virtual void visit(FunctionCallExpression* expression) = 0;
     virtual void visit(BinaryExpression* expression) = 0;

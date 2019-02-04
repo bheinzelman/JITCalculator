@@ -3,6 +3,7 @@
 #include "bc.hpp"
 #include "jc.h"
 #include "builtin.hpp"
+#include "jcList.hpp"
 
 #include <algorithm>
 #include <string>
@@ -290,10 +291,17 @@ void Generator::visit(VariableExpression* expression)
     mOutput.push_back(pushOp);
 }
 
-void Generator::visit(BasicExpression* expression)
+void Generator::visit(IntExpression* expression)
 {
     jcVariablePtr expressionVal = jcVariable::Create(expression->getValue());
     Instruction pushOp = Instruction(bc::Push, expressionVal);
+    mOutput.push_back(pushOp);
+}
+
+void Generator::visit(StringExpression* expression)
+{
+    jcVariablePtr string = jcVariable::Create(expression->getValue());
+    Instruction pushOp = Instruction(bc::Push, string);
     mOutput.push_back(pushOp);
 }
 
@@ -303,11 +311,17 @@ void Generator::visit(ListExpression* list)
     for (auto element : elements) {
         element->accept(this);
     }
-    Instruction pushOp = Instruction(bc::Push, jcVariable::Create((int)elements.size()));
-    mOutput.push_back(pushOp);
 
-    mOutput.push_back(Instruction(bc::Push, jcVariable::Create(lib::kLibList)));
-    mOutput.push_back(Instruction(bc::Call));
+    mOutput.push_back(Instruction(bc::Push, jcVariable::Create(std::make_shared<jcList>())));
+    for (int i = 0; i < elements.size(); i++) {
+        mOutput.push_back(Instruction(bc::Cons));
+    }
+
+//    Instruction pushOp = Instruction(bc::Push, jcVariable::Create((int)elements.size()));
+//    mOutput.push_back(pushOp);
+//
+//    mOutput.push_back(Instruction(bc::Push, jcVariable::Create(lib::kLibList)));
+//    mOutput.push_back(Instruction(bc::Call));
 }
 
 void Generator::visit(FunctionCallExpression* expression)

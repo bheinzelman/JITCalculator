@@ -58,6 +58,8 @@ std::string stringRepresentation(TokenType token)
             return ")";
         case TokenType::Num:
             return "Num";
+        case TokenType::String:
+            return "String";
         case TokenType::Error:
             return "Error Token";
         case TokenType::LetKw:

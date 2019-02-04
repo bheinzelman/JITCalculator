@@ -40,8 +40,6 @@ private:
      Resolves variables to literal values..
      */
     jcVariablePtr resolveVariable(const jcVariablePtr &var);
-    bool resolveRuntimeVariable(std::string var, jcMutableVariablePtr &output);
-    void setVariable(std::string var, jcVariablePtr &to);
 
     void mapLabels(std::vector<bc::Instruction> instructions);
 

@@ -37,11 +37,11 @@ public:
     }
 };
 
-class BasicExpression : public Expression {
+class IntExpression : public Expression {
 public:
-    BasicExpression(int value);
+    IntExpression(int value);
 
-    ~BasicExpression();
+    ~IntExpression();
 
     int getValue() const;
 
@@ -49,6 +49,20 @@ public:
 
 private:
     int value;
+};
+
+class StringExpression : public Expression {
+public:
+    StringExpression(const jcStringPtr& value);
+
+    ~StringExpression();
+
+    jcStringPtr getValue() const;
+
+    void accept(Visitor* v) override;
+
+private:
+    jcStringPtr mValue;
 };
 
 class VariableExpression : public Expression {

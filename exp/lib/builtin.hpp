@@ -6,6 +6,7 @@
 
 #include <string>
 #include <functional>
+#include <unordered_map>
 #include <map>
 #include <vector>
 #include <ostream>
@@ -17,7 +18,6 @@ namespace lib
  Keys that populate the info dict
  */
 const std::string kLibParameterNumber = "LibParameterNumber";
-const std::string kLibError = "LibError";
 const std::string kLibReturnType = "LibReturnType";
 
 /**
@@ -51,7 +51,6 @@ const std::string kLibReturnType = "LibReturnType";
  */
 const std::string kLibPrint = "print";
     
-const std::string kLibList = "List";
 const std::string kLibHead = "head";
 const std::string kLibTail = "tail";
 const std::string kLibLen = "len";
@@ -65,7 +64,7 @@ struct LibState {
     LibState();
 };
 
-using LibraryFunction = std::function<jcVariablePtr(Interpreter &, LibState)>;
+using LibraryFunction = std::function<jcVariablePtr(Interpreter&, const LibState&)>;
 
 class builtin {
     builtin();
@@ -75,7 +74,7 @@ public:
      Return function info for given name
      If the function does not exist, the kLibError key will be set
      */
-    std::map<std::string, jcVariablePtr> info(const std::string &functionName);
+    std::map<std::string, jcVariablePtr>* info(const std::string &functionName);
 
     /**
      Runs the given function with the supplied arguments
@@ -83,11 +82,11 @@ public:
      */
     jcVariablePtr execute(const std::string &functionName, Interpreter &interpreter);
 
-    LibState state() const;
+    const LibState& state() const;
 
 private:
-    static std::map<std::string, std::map<std::string, jcVariablePtr>> mInfo;
-    static std::map<std::string, LibraryFunction> mFunctions;
+    static std::unordered_map<std::string, std::map<std::string, jcVariablePtr>> mInfo;
+    static std::unordered_map<std::string, LibraryFunction> mFunctions;
 
     LibState mState;
 };

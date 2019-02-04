@@ -25,7 +25,7 @@ public:
     jcCollection* tail() const override;
     jcCollection* concat(const jcCollection &other) const override;
 
-    void forEach(std::function<void(jcVariablePtr)> callback) const override;
+    void forEach(std::function<void(jcVariablePtr&)> callback) const override;
 
     bool equal(const jcArray &other) const;
 

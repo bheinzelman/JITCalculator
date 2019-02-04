@@ -3,6 +3,7 @@
 #include "Lexer.hpp"
 #include "Token.hpp"
 #include "jc.h"
+#include "jcString.hpp"
 
 Lexer::Lexer(std::istream& inputStream)
     : mInput(inputStream)
@@ -98,7 +99,6 @@ Token Lexer::getNextToken()
             // comment!
             skipTillNewline();
             return getNextToken();
-
         default:
             break;
         }
@@ -139,6 +139,18 @@ Token Lexer::getNextToken()
             }
 
             return Token(TokenType::Id, jcVariable::Create(word), mLineNumber);
+        } else if (next == '"') {
+            std::string stringValue = "";
+            for (char c = nextChar(); c != '"'; c = nextChar()) {
+                // TODO
+                JC_ASSERT_OR_THROW_PARSE(c != '\\',
+                                         "I see you are trying to use an escape character, this has not been implemented!",
+                                         mLineNumber);
+
+                stringValue += c;
+            }
+            jcStringPtr jcStringValue = jcString::Create(stringValue, jcString::StringContextValue);
+            return Token(TokenType::String, jcVariable::Create(jcStringValue), mLineNumber);
         } else {
             return Token(TokenType::Error, nullptr, mLineNumber);
         }

@@ -18,124 +18,117 @@ enum Op {
     /**
      Pushes a value to the argument stack
      */
-    Push,
+    Push = 0,
 
     /**
      Push a closure
      */
-    PushC,
+    PushC = 1,
 
     /**
      Returns control of the function back to the caller
      */
-    Ret,
+    Ret = 2,
 
     /**
      Pop value off argument stack
         - arg - the variable to be placed into
      */
-    Pop,
+    Pop = 3,
 
     /**
      Negates the value on the top of the stack -value
      */
-    Neg,
+    Neg = 4,
 
     /**
      Inverts the value on the top of the stack !value
      */
-    Not,
+    Not = 5,
 
     /**
      Adds the top two values in the argument stack
      */
-    Add,
+    Add = 6,
 
     /**
      Subtracts the top two values in the argument stack
      */
-    Subtract,
+    Subtract = 7,
 
     /**
      Multiplies the top two values in the argument stack
      */
-    Multiply,
+    Multiply = 8,
 
     /**
      Divides the top two values in the argument stack
      */
-    Divide,
+    Divide = 9,
 
     /**
      Computes less than for top to values in the argument stack
      */
-    Less_Than,
+    Less_Than = 10,
 
     /**
      Computes greater than for top to values in the argument stack
      */
-    Greater_Than,
+    Greater_Than = 11,
 
     /**
      Computes less than or equal for top to values in the argument stack
      */
-    Less_Than_Equal,
+    Less_Than_Equal = 12,
 
     /**
      Computes greater than or equal for top to values in the argument stack
      */
-    Greater_Than_Equal,
+    Greater_Than_Equal = 13,
 
     /**
      Computes equality for top to values in the argument stack
      */
-    Equals,
+    Equals = 14,
 
     /**
      Calls the function at the given label or line number
      Note, does not take arguments, will call the function/closure that is at the top
      of the stack
      */
-    Call,
+    Call = 15,
 
     /**
      Defines a label
      */
-    Label,
+    Label = 16,
 
     /**
      Conditionally jump if the top of the stack is TRUE
      */
-    JmpTrue,
+    JmpTrue = 17,
 
     /**
      Jump to label
      */
-    Jmp,
+    Jmp = 18,
 
     /**
      Adds an item to the beginning of a list.
      */
-    Cons,
+    Cons = 19,
 
     /**
      Adds two lists together.
      */
-    Concat,
+    Concat = 20,
 
     /**
      Exit the program
      */
-    Exit,
+    Exit = 21,
 };
 
-/**
- runtime variables
- */
-namespace vars {
-    // instruction pointer
-    const std::string ip = "$ip";
-}
 
 class Instruction {
 public:
@@ -165,7 +158,9 @@ public:
     std::vector<Instruction> getInstructions(std::shared_ptr<Node> root);
     std::vector<Instruction> getClosureInstructions();
 
-    void visit(BasicExpression* expression) override;
+    void visit(IntExpression* expression) override;
+
+    void visit(StringExpression* expression) override;
 
     void visit(BinaryExpression* expression) override;
 

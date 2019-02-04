@@ -10,19 +10,13 @@
 
 namespace lib {
 
-std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
+std::unordered_map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
 {
     {
         kLibPrint,
         {
             {kLibParameterNumber, jcVariable::Create(1)},
             {kLibReturnType, jcVariable::Create(jcVariable::TypeInt)}
-        }
-    },
-    {
-        kLibList,
-        {
-            {kLibReturnType, jcVariable::Create(jcVariable::TypeArray)}
         }
     },
     {
@@ -61,7 +55,7 @@ std::map<std::string, std::map<std::string, jcVariablePtr>> builtin::mInfo =
     },
 };
 
-std::map<std::string, LibraryFunction> builtin::mFunctions =
+std::unordered_map<std::string, LibraryFunction> builtin::mFunctions =
 {
     {
         kLibPrint,
@@ -69,22 +63,6 @@ std::map<std::string, LibraryFunction> builtin::mFunctions =
             jcVariablePtr arg = interpreter.popStack();
             state.mStdout << arg->stringRepresentation() << std::endl;
             return jcVariable::Create(0);
-        }
-    },
-    {
-        kLibList,
-        [](Interpreter &interpreter, LibState state) -> jcVariablePtr {
-            int numElements = interpreter.popStack()->asInt();
-//            jcMutableArrayPtr elements = std::make_shared<jcMutableArray>(numElements);
-//            for (int i = 0; i < numElements; i++) {
-//                elements->push(interpreter.popStack());
-//            }
-            jcListPtr list = std::make_shared<jcList>();
-            for (int i = 0; i < numElements; i++) {
-                std::shared_ptr<jcCollection> newCollection = std::shared_ptr<jcCollection>(list->cons(interpreter.popStack()));
-                list = std::static_pointer_cast<jcList>(newCollection);
-            }
-            return jcVariable::Create(list);
         }
     },
     {
@@ -167,20 +145,18 @@ builtin builtin::Shared() {
     return sharedInstance;
 }
 
-LibState builtin::state() const
+const LibState& builtin::state() const
 {
     return mState;
 }
 
-std::map<std::string, jcVariablePtr> builtin::info(const std::string &functionName)
+std::map<std::string, jcVariablePtr>* builtin::info(const std::string &functionName)
 {
     if (mInfo.count(functionName) > 0) {
-        return mInfo[functionName];
+        return &mInfo[functionName];
     }
 
-    std::map<std::string, jcVariablePtr> errorDict;
-    errorDict[kLibError] = jcVariable::Create(functionName + " undefined");
-    return errorDict;
+    return nullptr;
 }
 
 jcVariablePtr builtin::execute(const std::string &functionName, Interpreter &interpreter)

@@ -19,6 +19,7 @@ enum class TokenType {
     LParen,
     RParen,
     Num,
+    String,
     Error,
     LetKw,
     ElseKw,

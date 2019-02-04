@@ -84,8 +84,8 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         if (result) {
             if (output.size()) {
                 jcVariablePtr value = output.front();
-//                std::cout << value->stringRepresentation() << std::endl;
-//                std::cout << expectedValue->stringRepresentation() << std::endl;
+                std::cout << value->stringRepresentation() << std::endl;
+                std::cout << expectedValue->stringRepresentation() << std::endl;
 
 
                 JC_ASSERT(value != nullptr && expectedValue != nullptr);

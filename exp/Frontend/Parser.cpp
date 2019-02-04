@@ -46,7 +46,8 @@ bool Parser::peekExpression()
            token == TokenType::LParen ||
            token == TokenType::Id ||
            token == TokenType::LeftBracket ||
-           token == TokenType::LeftBrace;
+           token == TokenType::LeftBrace ||
+           token == TokenType::String;
 }
 
 std::vector<std::shared_ptr<Expression>> Parser::getFunctionCallArgs()
@@ -96,13 +97,15 @@ std::shared_ptr<Expression> Parser::getTerm()
 {
     Token tok = nextToken();
     if (tok.getType() == TokenType::Num) {
-        return std::make_shared<BasicExpression>(BasicExpression(tok.getLexeme()->asInt()));
+        return std::make_shared<IntExpression>(IntExpression(tok.getLexeme()->asInt()));
     } else if (tok.getType() == TokenType::LParen) {
         auto exp = getExpression();
         eat(TokenType::RParen);
         return exp;
     } else if (tok.getType() == TokenType::Id) {
         return std::make_shared<VariableExpression>(tok.getLexeme()->asString());
+    } else if (tok.getType() == TokenType::String) {
+        return std::make_shared<StringExpression>(tok.getLexeme()->asSharedPtr<jcString>());
     } else if (tok.getType() == TokenType::LeftBracket) {
         std::vector<std::shared_ptr<Expression>> elements;
         while (1) {
@@ -277,9 +280,6 @@ std::shared_ptr<Expression> Parser::getExpression(int prevPrec)
             left = std::make_shared<BinaryExpression>(BinaryExpression(left, op, right));
         }
     }
-
-
-
     return left;
 }
 

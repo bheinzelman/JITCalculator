@@ -3,21 +3,40 @@
 #include "ast.hpp"
 #include "Token.hpp"
 
-BasicExpression::BasicExpression(int value)
+IntExpression::IntExpression(int value)
     : value(value)
 {
 }
 
-BasicExpression::~BasicExpression()
+IntExpression::~IntExpression()
 {
 }
 
-int BasicExpression::getValue() const
+int IntExpression::getValue() const
 {
     return value;
 }
 
-void BasicExpression::accept(Visitor* v)
+void IntExpression::accept(Visitor* v)
+{
+    v->visit(this);
+}
+
+StringExpression::StringExpression(const jcStringPtr& value) : mValue(value)
+{
+}
+
+StringExpression::~StringExpression()
+{
+
+}
+
+jcStringPtr StringExpression::getValue() const
+{
+    return mValue;
+}
+
+void StringExpression::accept(Visitor* v)
 {
     v->visit(this);
 }

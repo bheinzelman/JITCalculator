@@ -110,7 +110,7 @@ jcCollection* jcList::concat(const jcCollection &other) const
     return new jcList(myCopy.mList);
 }
 
-void jcList::forEach(std::function<void(jcVariablePtr)> callback) const
+void jcList::forEach(std::function<void(jcVariablePtr&)> callback) const
 {
     if (mList == nullptr) return;
     JC_ASSERT(mList->endNode != nullptr);

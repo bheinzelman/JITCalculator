@@ -42,7 +42,7 @@ public:
     jcVariablePtr head() const override;
     jcCollection* tail() const override;
     jcCollection* concat(const jcCollection &other) const override;
-    void forEach(std::function<void(jcVariablePtr)> callback) const override;
+    void forEach(std::function<void(jcVariablePtr&)> callback) const override;
     jcCollection* slice(int startIdx, int endIdx) const override;
     jcVariable::Type getType() const override;
 private:
@@ -60,5 +60,4 @@ private:
     };
 
     std::shared_ptr<list> mList;
-    
 };

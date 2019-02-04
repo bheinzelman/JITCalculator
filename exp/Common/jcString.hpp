@@ -13,13 +13,13 @@ public:
 
     enum Context
     {
-        Value,
-        Id
+        StringContextValue,
+        StringContextId
     };
 
-    jcString(const std::string &value);
+    jcString(const std::string &value, Context ctx);
 
-    static jcStringPtr Create(const std::string &value);
+    static jcStringPtr Create(const std::string &value, Context ctx);
 
     const std::string& asStdString() const;
 
@@ -28,7 +28,7 @@ public:
     // TODO, fix this
     Context getContext() const
     {
-        return Id;
+        return mCtx;
     }
 
     /**
@@ -38,10 +38,11 @@ public:
     jcVariablePtr head() const override;
     jcCollection* tail() const override;
     jcCollection* concat(const jcCollection &other) const override;
-    void forEach(std::function<void(jcVariablePtr)> callback) const override;
+    void forEach(std::function<void(jcVariablePtr&)> callback) const override;
     jcCollection* slice(int startIdx, int endIdx) const override;
     jcVariable::Type getType() const override;
 
 private:
     std::string mData;
+    Context mCtx;
 };

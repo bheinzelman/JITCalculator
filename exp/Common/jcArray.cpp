@@ -72,10 +72,10 @@ jcCollection* jcArray::concat(const jcCollection &other) const
     return newArray;
 }
 
-void jcArray::forEach(std::function<void(jcVariablePtr)> callback) const
+void jcArray::forEach(std::function<void(jcVariablePtr&)> callback) const
 {
-    for (auto it = startIt(); it != endIt(); ++it) {
-        callback(*it);
+    for (int i = mStartIndex; i < mEndIndex; i++) {
+        callback((*mItems)[i]);
     }
 }
 
