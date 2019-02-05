@@ -22,7 +22,6 @@ public:
     /**
      You own this sucker, be careful
      */
-    jcCollection* tail() const override;
     jcCollection* concat(const jcCollection &other) const override;
 
     void forEach(std::function<void(jcVariablePtr&)> callback) const override;

@@ -15,14 +15,15 @@ class jcList : public jcCollection
 private:
     struct list;
 
-    jcList(const std::shared_ptr<list>& list)
-        : mList(list)
+    jcList(const std::shared_ptr<list>& list, int size)
+        : mList(list), mSize(size)
     {
     }
 public:
     jcList()
     {
         mList = nullptr;
+        mSize = 0;
     }
 
     // for unit tests only
@@ -40,7 +41,6 @@ public:
     size_t size() const override;
     bool isEmpty() const override;
     jcVariablePtr head() const override;
-    jcCollection* tail() const override;
     jcCollection* concat(const jcCollection &other) const override;
     void forEach(std::function<void(jcVariablePtr&)> callback) const override;
     jcCollection* slice(int startIdx, int endIdx) const override;
@@ -60,4 +60,5 @@ private:
     };
 
     std::shared_ptr<list> mList;
+    int mSize=0;
 };

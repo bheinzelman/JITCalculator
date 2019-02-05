@@ -36,7 +36,6 @@ public:
      */
     size_t size() const override;
     jcVariablePtr head() const override;
-    jcCollection* tail() const override;
     jcCollection* concat(const jcCollection &other) const override;
     void forEach(std::function<void(jcVariablePtr&)> callback) const override;
     jcCollection* slice(int startIdx, int endIdx) const override;

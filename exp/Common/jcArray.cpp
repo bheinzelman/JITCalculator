@@ -40,11 +40,6 @@ jcVariablePtr jcArray::head() const
     return *startIt();
 }
 
-jcCollection* jcArray::tail() const
-{
-    return slice(1, (int)size());
-}
-
 jcCollection* jcArray::slice(int startIdx, int endIdx) const
 {
     JC_ASSERT(startIdx >= 0 && endIdx <= mItems->size() && startIdx <= endIdx);

@@ -19,6 +19,7 @@ jcList::jcList(const jcList& other)
         }
     });
     mList->endNode = tmp;
+    mSize = (int)other.size();
 }
 
 jcListPtr jcList::buildList(const std::vector<jcVariablePtr> &items)
@@ -37,6 +38,7 @@ jcList* jcList::cons(const jcVariablePtr &value) const
 {
     jcList *newList = new jcList;
     newList->mList = std::make_shared<list>(value, mList);
+    newList->mSize = (int)(size() + 1);
     if (mList == nullptr) {
         newList->mList->endNode = newList->mList;
     }
@@ -69,25 +71,13 @@ bool jcList::isEmpty() const
 
 size_t jcList::size() const
 {
-    size_t len = 0;
-    if (mList == nullptr) {
-        return len;
-    }
-    forEach([&len](jcVariablePtr item) {
-        len++;
-    });
-    return len;
+    return mSize;
 }
 
 jcVariablePtr jcList::head() const
 {
     JC_ASSERT(mList != nullptr);
     return mList->item;;
-}
-
-jcCollection* jcList::tail() const
-{
-    return new jcList(mList->tail);
 }
 
 jcCollection* jcList::concat(const jcCollection &other) const
@@ -99,15 +89,15 @@ jcCollection* jcList::concat(const jcCollection &other) const
     jcList otherCopy = jcList(otherList);
 
     if (other.isEmpty()) {
-        return new jcList(myCopy.mList);
+        return new jcList(myCopy.mList, (int)myCopy.size());
     } else if (isEmpty()) {
-        return new jcList(otherCopy.mList);
+        return new jcList(otherCopy.mList, (int)otherCopy.size());
     }
 
     myCopy.mList->endNode->tail = otherCopy.mList;
     myCopy.mList->endNode = otherCopy.mList->endNode;
 
-    return new jcList(myCopy.mList);
+    return new jcList(myCopy.mList, (int)(myCopy.size() + otherCopy.size()));
 }
 
 void jcList::forEach(std::function<void(jcVariablePtr&)> callback) const
@@ -127,10 +117,14 @@ jcCollection* jcList::slice(int startIdx, int endIdx) const
 {
     if (mList == nullptr) return nullptr;
     JC_ASSERT(mList->endNode != nullptr);
-    JC_ASSERT(startIdx >= 0 && endIdx >= startIdx);
+    JC_ASSERT(startIdx >= 0 && endIdx >= startIdx && endIdx <= size());
+
+    if (startIdx == endIdx) return new jcList;
 
     std::shared_ptr<list> startNode = nullptr;
     std::shared_ptr<list> endNode = nullptr;
+
+    if (endIdx == size()) endNode = mList->endNode;
 
     int idx = 0;
 
@@ -141,8 +135,10 @@ jcCollection* jcList::slice(int startIdx, int endIdx) const
         }
         if (idx == endIdx - 1) {
             endNode = tmp;
-            break;
         }
+
+        if (startNode && endNode) break;
+
         tmp = tmp->tail;
         idx++;
     }
@@ -152,7 +148,7 @@ jcCollection* jcList::slice(int startIdx, int endIdx) const
     std::shared_ptr<list> newList = std::make_shared<list>(startNode->item, startNode->tail);
     newList->endNode = endNode;
 
-    return new jcList(newList);
+    return new jcList(newList, endIdx - startIdx);
 }
 
 jcVariable::Type jcList::getType() const

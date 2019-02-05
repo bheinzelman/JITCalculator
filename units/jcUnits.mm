@@ -104,12 +104,21 @@ std::shared_ptr<jcList> buildList(std::vector<int> listVals)
 
         jcListPtr bigList = buildList(concatVals);
         std::unique_ptr<jcCollection> slice = std::unique_ptr<jcCollection>(bigList->slice(2, 5));
+        XCTAssert(slice->size() == 3);
         std::vector<int> vectorSlice = std::vector<int>(concatVals.begin() + 2, concatVals.begin() + 5);
 
         int idx = 0;
         slice->forEach([self, &slice, &vectorSlice, &idx](jcVariablePtr item) {
-            std::cout << item->asInt() << std::endl;
             XCTAssert(item->asInt() == vectorSlice[idx++]);
+        });
+
+        std::unique_ptr<jcCollection> slice2 = std::unique_ptr<jcCollection>(slice->slice(0, 2));
+        std::vector<int> vectorSlice2 = std::vector<int>(vectorSlice.begin(), vectorSlice.begin() + 2);
+
+        idx = 0;
+        XCTAssert(slice2->size() == 2);
+        slice2->forEach([self, &slice, &vectorSlice2, &idx](jcVariablePtr item) {
+            XCTAssert(item->asInt() == vectorSlice2[idx++]);
         });
     }
 
@@ -121,7 +130,13 @@ std::shared_ptr<jcList> buildList(std::vector<int> listVals)
 
         jcListPtr list3 = buildList(otherVals);
         XCTAssert(list1->equal(*list3) == false);
+    }
 
+    {
+        // Test cons
+        jcListPtr list1 = buildList(listVals);
+        std::unique_ptr<jcList> newList = std::unique_ptr<jcList>(list1->cons(jcVariable::Create(100)));
+        XCTAssert(newList->size() == list1->size() + 1);
     }
 }
 

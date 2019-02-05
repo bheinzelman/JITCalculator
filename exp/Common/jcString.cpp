@@ -37,11 +37,6 @@ jcVariablePtr jcString::head() const
     return jcVariable::Create(mData[0]);
 }
 
-jcCollection* jcString::tail() const
-{
-    return slice(1, (int)size());
-}
-
 jcCollection* jcString::concat(const jcCollection &other) const
 {
     JC_ASSERT(getType() == other.getType());

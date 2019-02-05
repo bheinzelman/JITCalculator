@@ -34,7 +34,10 @@ public:
     /**
      Returns the collection with all elements but the first
      */
-    virtual jcCollection* tail() const = 0;
+    virtual jcCollection* tail() const
+    {
+        return slice(1, (int)size());
+    }
 
     /**
      Returns the current collection and the given collection concatenated
