@@ -3,6 +3,8 @@
 #include "ast.hpp"
 #include "Token.hpp"
 
+// MARK: - IntExpression
+
 IntExpression::IntExpression(int value)
     : value(value)
 {
@@ -22,6 +24,8 @@ void IntExpression::accept(Visitor* v)
     v->visit(this);
 }
 
+// MARK: - StringExpression
+
 StringExpression::StringExpression(const jcStringPtr& value) : mValue(value)
 {
 }
@@ -40,6 +44,8 @@ void StringExpression::accept(Visitor* v)
 {
     v->visit(this);
 }
+
+// MARK: - BinaryExpression
 
 BinaryExpression::BinaryExpression(std::shared_ptr<Expression> left, TokenType op, std::shared_ptr<Expression> right)
 {
@@ -71,6 +77,8 @@ TokenType BinaryExpression::getOperator() const
 {
     return op;
 }
+
+// MARK: - FunctionBody
 
 FunctionBody::FunctionBody(std::shared_ptr<Expression> exp,
                            std::vector<std::string> params,
@@ -115,6 +123,8 @@ std::vector<std::shared_ptr<Guard>> FunctionBody::getGuards() const
     return mGuards;
 }
 
+// MARK: - FunctionDecl
+
 FunctionDecl::FunctionDecl(const std::string& id, std::shared_ptr<FunctionBody> body)
     : mId(id)
     , mBody(body)
@@ -136,6 +146,8 @@ std::shared_ptr<FunctionBody> FunctionDecl::getFunctionBody() const
     return mBody;
 }
 
+// MARK: - VariableExpression
+
 VariableExpression::VariableExpression(std::string variableName)
     : mVariableName(variableName)
 {
@@ -150,6 +162,8 @@ void VariableExpression::accept(Visitor* v)
 {
     v->visit(this);
 }
+
+// MARK: - NegateExpression
 
 NegateExpression::NegateExpression(std::shared_ptr<Expression> exp) : mExpression(exp)
 {
@@ -179,6 +193,8 @@ void NotExpression::accept(Visitor* v)
     v->visit(this);
 }
 
+// MARK: - FunctionCallExpression
+
 FunctionCallExpression::FunctionCallExpression(std::shared_ptr<Expression> callee, const std::vector<std::shared_ptr<Expression>> arguments)
     : mCallee(callee)
     , mArguments(arguments)
@@ -200,6 +216,57 @@ void FunctionCallExpression::accept(Visitor* v)
     v->visit(this);
 }
 
+// MARK: - IndexExpression
+
+IndexExpression::IndexExpression(std::shared_ptr<Expression> callee, std::shared_ptr<Expression> index)
+: mCallee(callee), mIndex(index)
+{
+}
+
+std::shared_ptr<Expression> IndexExpression::getCallee() const
+{
+    return mCallee;
+}
+
+std::shared_ptr<Expression> IndexExpression::getIndex() const
+{
+    return mIndex;
+}
+
+void IndexExpression::accept(Visitor* v)
+{
+    v->visit(this);
+}
+
+// MARK: - SliceExpression
+
+SliceExpression::SliceExpression(std::shared_ptr<Expression> callee, std::shared_ptr<Expression> index1, std::shared_ptr<Expression> index2)
+: mCallee(callee), mIndex1(index1), mIndex2(index2)
+{
+}
+
+std::shared_ptr<Expression> SliceExpression::getCallee() const
+{
+    return mCallee;
+}
+
+std::shared_ptr<Expression> SliceExpression::getIndex1() const
+{
+    return mIndex1;
+}
+
+std::shared_ptr<Expression> SliceExpression::getIndex2() const
+{
+    return mIndex2;
+}
+
+void SliceExpression::accept(Visitor* v)
+{
+    v->visit(this);
+}
+
+// MARK: - Guard
+
 Guard::Guard(const std::shared_ptr<Expression> guardExpression, const std::shared_ptr<Expression> body)
     : mGuardExpression(guardExpression)
     , mBodyExpression(body)
@@ -220,6 +287,8 @@ std::shared_ptr<Expression> Guard::getBodyExpression() const
     return mBodyExpression;
 }
 
+// MARK: - ListExpression
+
 ListExpression::ListExpression(const std::vector<std::shared_ptr<Expression>> &elements) : mElements(elements)
 {
 }
@@ -233,6 +302,8 @@ std::vector<std::shared_ptr<Expression>> ListExpression::getElements() const
 {
     return mElements;
 }
+
+// MARK: - TernaryExpression
 
 TernaryExpresssion::TernaryExpresssion(const std::shared_ptr<Expression> conditionalExpression,
                    const std::shared_ptr<Expression> trueExpression,

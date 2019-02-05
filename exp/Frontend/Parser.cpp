@@ -77,6 +77,40 @@ std::shared_ptr<Expression> Parser::getPostfixOps(std::shared_ptr<Expression> ex
     if (peekToken().getType() == TokenType::LParen) {
         auto functionCallArgs = getFunctionCallArgs();
         return getPostfixOps(std::make_shared<FunctionCallExpression>(expIn, functionCallArgs));
+    } else if (peekToken().getType() == TokenType::LeftBracket) {
+        nextToken();
+
+        if (peekToken().getType() == TokenType::Colon) {
+            nextToken();
+
+            std::shared_ptr<Expression> expression2 = nullptr;
+            if (peekToken().getType() != TokenType::RightBracket) {
+                expression2 = getExpression();
+            }
+
+            auto sliceExpression = getPostfixOps(std::make_shared<SliceExpression>(expIn, nullptr, expression2));
+            eat(TokenType::RightBracket);
+            return sliceExpression;
+        }
+
+        auto expression = getExpression();
+
+        if (peekToken().getType() == TokenType::Colon) {
+            nextToken();
+
+            std::shared_ptr<Expression> expression2 = nullptr;
+            if (peekToken().getType() != TokenType::RightBracket) {
+                expression2 = getExpression();
+            }
+
+            auto sliceExpression = getPostfixOps(std::make_shared<SliceExpression>(expIn, expression, expression2));
+            eat(TokenType::RightBracket);
+            return sliceExpression;
+        } else {
+            auto indexExpression = getPostfixOps(std::make_shared<IndexExpression>(expIn, expression));
+            eat(TokenType::RightBracket);
+            return indexExpression;
+        }
     }
     return expIn;
 }

@@ -27,7 +27,7 @@ public:
     }
 
     // for unit tests only
-    static jcListPtr buildList(const std::vector<jcVariablePtr> &items);
+//    static jcListPtr buildList(const std::vector<jcVariablePtr> &items);
 
     jcList(const jcList& other);
 
@@ -40,10 +40,10 @@ public:
      */
     size_t size() const override;
     bool isEmpty() const override;
-    jcVariablePtr head() const override;
     jcCollection* concat(const jcCollection &other) const override;
     void forEach(std::function<void(jcVariablePtr&)> callback) const override;
     jcCollection* slice(int startIdx, int endIdx) const override;
+    jcVariablePtr at(int index) const override;
     jcVariable::Type getType() const override;
 private:
 

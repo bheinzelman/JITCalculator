@@ -22,17 +22,17 @@ jcList::jcList(const jcList& other)
     mSize = (int)other.size();
 }
 
-jcListPtr jcList::buildList(const std::vector<jcVariablePtr> &items)
-{
-    jcListPtr newList = std::make_shared<jcList>();
-    std::vector<jcVariablePtr> cpy = std::vector<jcVariablePtr>(items);
-    std::reverse(std::begin(cpy), std::end(cpy));
-    for (auto item : cpy) {
-        auto newCollection = std::shared_ptr<jcCollection>(newList->cons(item));
-        newList = std::static_pointer_cast<jcList>(newCollection);
-    }
-    return newList;
-}
+//jcListPtr jcList::buildList(const std::vector<jcVariablePtr> &items)
+//{
+//    jcListPtr newList = std::make_shared<jcList>();
+//    std::vector<jcVariablePtr> cpy = std::vector<jcVariablePtr>(items);
+//    std::reverse(std::begin(cpy), std::end(cpy));
+//    for (auto item : cpy) {
+//        auto newCollection = std::shared_ptr<jcCollection>(newList->cons(item));
+//        newList = std::static_pointer_cast<jcList>(newCollection);
+//    }
+//    return newList;
+//}
 
 jcList* jcList::cons(const jcVariablePtr &value) const
 {
@@ -74,12 +74,6 @@ size_t jcList::size() const
     return mSize;
 }
 
-jcVariablePtr jcList::head() const
-{
-    JC_ASSERT(mList != nullptr);
-    return mList->item;;
-}
-
 jcCollection* jcList::concat(const jcCollection &other) const
 {
     JC_ASSERT(getType() == other.getType());
@@ -111,6 +105,18 @@ void jcList::forEach(std::function<void(jcVariablePtr&)> callback) const
         callback(tmp->item);
         tmp = tmp->tail;
     }
+}
+
+jcVariablePtr jcList::at(int index) const
+{
+    JC_ASSERT(index >= 0 && index < size());
+
+    std::shared_ptr<list> tmp = mList;
+    while (index > 0) {
+        tmp = tmp->tail;
+        index--;
+    }
+    return tmp->item;
 }
 
 jcCollection* jcList::slice(int startIdx, int endIdx) const

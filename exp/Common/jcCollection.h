@@ -29,7 +29,10 @@ public:
     /**
      Returns the first element in the collection
      */
-    virtual jcVariablePtr head() const = 0;
+    virtual jcVariablePtr head() const
+    {
+        return at(0);
+    }
 
     /**
      Returns the collection with all elements but the first
@@ -59,5 +62,10 @@ public:
      */
 
     virtual jcVariable::Type getType() const = 0;
+
+    /**
+     Returns the element at the given index.
+     */
+    virtual jcVariablePtr at(int index) const = 0;
 };
 

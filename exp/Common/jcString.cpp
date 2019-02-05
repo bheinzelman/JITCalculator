@@ -31,12 +31,6 @@ size_t jcString::size() const
     return mData.size();
 }
 
-jcVariablePtr jcString::head() const
-{
-    JC_ASSERT(size() > 0);
-    return jcVariable::Create(mData[0]);
-}
-
 jcCollection* jcString::concat(const jcCollection &other) const
 {
     JC_ASSERT(getType() == other.getType());
@@ -60,6 +54,12 @@ jcCollection* jcString::slice(int startIdx, int endIdx) const
 {
     JC_ASSERT(startIdx >= 0 && endIdx <= mData.size() && startIdx <= endIdx);
     return new jcString(std::string(mData.begin() + startIdx, mData.begin() + endIdx), getContext());
+}
+
+jcVariablePtr jcString::at(int index) const
+{
+    JC_ASSERT(index >= 0 && index < size());
+    return jcVariable::Create(mData[index]);
 }
 
 jcVariable::Type jcString::getType() const

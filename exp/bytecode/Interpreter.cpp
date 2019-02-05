@@ -213,6 +213,39 @@ jcVariablePtr Interpreter::eval()
             
             break;
         }
+        case bc::Index: {
+            jcVariablePtr collection = popStack();
+            jcVariablePtr index = popStack();
+
+            JC_ASSERT_OR_THROW_VM(collection->asCollection(), "Cannot index non-collection type.");
+            JC_ASSERT_OR_THROW_VM(index->getType() == jcVariable::TypeInt, "Index expression must be type int.");
+
+            curState.mStack.push(collection->asCollection()->at(index->asInt()));
+
+            break;
+        }
+
+        case bc::Slice: {
+            jcVariablePtr collectionVar = popStack();
+            jcVariablePtr index1 = popStack();
+            jcVariablePtr index2 = popStack();
+
+            JC_ASSERT_OR_THROW_VM(collectionVar->asCollection(), "Cannot index non-collection type.");
+            JC_ASSERT_OR_THROW_VM(index1->getType() == jcVariable::TypeInt, "Index expression must be type int.");
+            JC_ASSERT_OR_THROW_VM(index2->getType() == jcVariable::TypeInt, "Index expression must be type int.");
+
+            jcCollection *collection = collectionVar->asCollection();
+
+            /// Note -1 for startIndex is equivilent to 0 and for endIndex it is equivilent to size()
+            int startIndex = index1->asInt() == -1 ? 0 : index1->asInt();
+            int endIndex = index2->asInt() == -1 ? (int)collection->size() : index2->asInt();
+
+            auto slice = std::shared_ptr<jcCollection>(collection->slice(startIndex, endIndex));
+
+            curState.mStack.push(jcVariable::CreateFromCollection(slice));
+
+            break;
+        }
         case bc::Label:
             break;
         case bc::Exit:

@@ -16,6 +16,8 @@
 #include "jcString.hpp"
 #include "jcList.hpp"
 
+#include "utils.h"
+
 @interface jcUnits : XCTestCase
 @end
 
@@ -59,16 +61,6 @@
     XCTAssert(myConcat->equal(*jcVariable::Create(theString + theString)));
 }
 
-std::shared_ptr<jcList> buildList(std::vector<int> listVals)
-{
-    std::reverse(std::begin(listVals), std::end(listVals));
-    jcListPtr list = std::make_shared<jcList>();
-    for (int i : listVals) {
-        list = std::shared_ptr<jcList>(list->cons(jcVariable::Create(i)));
-    }
-    return list;
-}
-
 - (void)testJcList
 {
     std::vector<int> listVals = {1, 2, 3, 4};
@@ -78,7 +70,7 @@ std::shared_ptr<jcList> buildList(std::vector<int> listVals)
         // Test size
 
         // List with stuff.
-        jcListPtr list = buildList(listVals);
+        jcListPtr list = TestUtils::buildList(listVals);
         XCTAssert(list->size() == listVals.size());
 
         jcList emptyList;
@@ -88,8 +80,8 @@ std::shared_ptr<jcList> buildList(std::vector<int> listVals)
 
     {
         // Test concat
-        jcListPtr list1 = buildList(listVals);
-        jcListPtr list2 = buildList(listVals);
+        jcListPtr list1 = TestUtils::buildList(listVals);
+        jcListPtr list2 = TestUtils::buildList(listVals);
 
         std::unique_ptr<jcCollection> concated = std::unique_ptr<jcCollection>(list1->concat(*list2));
         XCTAssert(concated->size() == concatVals.size());
@@ -102,7 +94,7 @@ std::shared_ptr<jcList> buildList(std::vector<int> listVals)
     {
         // Test slice..
 
-        jcListPtr bigList = buildList(concatVals);
+        jcListPtr bigList = TestUtils::buildList(concatVals);
         std::unique_ptr<jcCollection> slice = std::unique_ptr<jcCollection>(bigList->slice(2, 5));
         XCTAssert(slice->size() == 3);
         std::vector<int> vectorSlice = std::vector<int>(concatVals.begin() + 2, concatVals.begin() + 5);
@@ -124,17 +116,17 @@ std::shared_ptr<jcList> buildList(std::vector<int> listVals)
 
     {
         // equal
-        jcListPtr list1 = buildList(listVals);
-        jcListPtr list2 = buildList(listVals);
+        jcListPtr list1 = TestUtils::buildList(listVals);
+        jcListPtr list2 = TestUtils::buildList(listVals);
         XCTAssert(list1->equal(*list2));
 
-        jcListPtr list3 = buildList(otherVals);
+        jcListPtr list3 = TestUtils::buildList(otherVals);
         XCTAssert(list1->equal(*list3) == false);
     }
 
     {
         // Test cons
-        jcListPtr list1 = buildList(listVals);
+        jcListPtr list1 = TestUtils::buildList(listVals);
         std::unique_ptr<jcList> newList = std::unique_ptr<jcList>(list1->cons(jcVariable::Create(100)));
         XCTAssert(newList->size() == list1->size() + 1);
     }

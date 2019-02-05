@@ -316,12 +316,6 @@ void Generator::visit(ListExpression* list)
     for (int i = 0; i < elements.size(); i++) {
         mOutput.push_back(Instruction(bc::Cons));
     }
-
-//    Instruction pushOp = Instruction(bc::Push, jcVariable::Create((int)elements.size()));
-//    mOutput.push_back(pushOp);
-//
-//    mOutput.push_back(Instruction(bc::Push, jcVariable::Create(lib::kLibList)));
-//    mOutput.push_back(Instruction(bc::Call));
 }
 
 void Generator::visit(FunctionCallExpression* expression)
@@ -334,6 +328,32 @@ void Generator::visit(FunctionCallExpression* expression)
 
     expression->getCallee()->accept(this);
     mOutput.push_back(Instruction(bc::Call));
+}
+
+void Generator::visit(IndexExpression* expression)
+{
+    expression->getIndex()->accept(this);
+    expression->getCallee()->accept(this);
+
+    mOutput.push_back(Instruction(bc::Index));
+}
+
+void Generator::visit(SliceExpression* expression)
+{
+    auto pushIndex = [this](std::shared_ptr<Expression> expression){
+        if (expression) {
+            expression->accept(this);
+        } else {
+            // TODO: move -1 to nil once we get that concept
+            mOutput.push_back(Instruction(bc::Push, jcVariable::Create(-1)));
+        }
+    };
+
+    pushIndex(expression->getIndex2());
+    pushIndex(expression->getIndex1());
+    expression->getCallee()->accept(this);
+
+    mOutput.push_back(Instruction(bc::Slice));
 }
 
 void Generator::visit(BinaryExpression* expression)

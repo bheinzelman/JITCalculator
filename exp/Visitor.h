@@ -16,6 +16,8 @@ class Closure;
 class NegateExpression;
 class NotExpression;
 class TernaryExpresssion;
+class IndexExpression;
+class SliceExpression;
 
 class Visitor {
 public:
@@ -32,4 +34,6 @@ public:
     virtual void visit(FunctionBody* expression) = 0;
     virtual void visit(Closure* expression) = 0;
     virtual void visit(Guard* expression) = 0;
+    virtual void visit(IndexExpression* expression) = 0;
+    virtual void visit(SliceExpression* expression) = 0;
 };

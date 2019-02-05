@@ -14,6 +14,8 @@
 #include "jcArray.hpp"
 #include "jcList.hpp"
 
+#include "utils.h"
+
 
 class AnswerExpression {
 public:
@@ -84,9 +86,8 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         if (result) {
             if (output.size()) {
                 jcVariablePtr value = output.front();
-                std::cout << value->stringRepresentation() << std::endl;
-                std::cout << expectedValue->stringRepresentation() << std::endl;
-
+//                std::cout << value->stringRepresentation() << std::endl;
+//                std::cout << expectedValue->stringRepresentation() << std::endl;
 
                 JC_ASSERT(value != nullptr && expectedValue != nullptr);
                 return value->equal(*expectedValue);
@@ -145,15 +146,9 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     Runtime rt;
 
     std::string program = "[1,2,3] ++ [4, 5]";
-    std::vector<jcVariablePtr> elems = {
-        jcVariable::Create(1),
-        jcVariable::Create(2),
-        jcVariable::Create(3),
-        jcVariable::Create(4),
-        jcVariable::Create(5)
-    };
+    std::vector<int> elems = {1, 2, 3, 4, 5};
 
-    jcListPtr list = jcList::buildList(elems);
+    jcListPtr list = TestUtils::buildList(elems);
 
     jcVariablePtr expected = jcVariable::Create(list);
     std::stringstream stream;
@@ -169,12 +164,8 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     std::string program = "let returnSelf(x, y, z) = [x, y, z] \
                           returnSelf(1, 2, 3) \
     ";
-    std::vector<jcVariablePtr> elems = {
-        jcVariable::Create(1),
-        jcVariable::Create(2),
-        jcVariable::Create(3)
-    };
-    jcListPtr collection = jcList::buildList(elems);
+    std::vector<int> elems = { 1, 2, 3 };
+    jcListPtr collection = TestUtils::buildList(elems);
 
     jcVariablePtr expected = jcVariable::Create(collection);
     std::stringstream stream;
@@ -217,6 +208,22 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     XCTAssert(testStream(stream, rt, expected));
 }
 
+- (void)testIndex
+{
+    Runtime rt;
+
+    std::string program = "let array() = [1,2,3]\
+    array()[0] + array()[1] + array()[2]\
+    ";
+
+    jcVariablePtr expected = jcVariable::Create(6);
+
+    std::stringstream stream;
+    stream << program;
+
+    XCTAssert(testStream(stream, rt, expected));
+}
+
 - (void)testQuicksort
 {
     std::ifstream quickSortFile(std::string([_testDirectory UTF8String]) + "tests/qs.jc");
@@ -226,17 +233,6 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     XCTAssert(rt.evaluateREPL(quickSortFile, output));
     XCTAssert(output.size() == 0);
 
-    auto intVecToPtr = [](const std::vector<int> &vector) -> jcVariablePtr {
-        std::vector<jcVariablePtr> ptrs;
-        for (int v : vector) {
-            ptrs.push_back(jcVariable::Create(v));
-        }
-
-        jcListPtr collection = jcList::buildList(ptrs);
-
-        return jcVariable::Create(collection);
-    };
-
     const int NUM_ITEMS = 10000;
 
     std::vector<int> valuesToSort;
@@ -244,7 +240,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
         valuesToSort.push_back(arc4random() % NUM_ITEMS);
     }
 
-    std::string program = "qs(" + intVecToPtr(valuesToSort)->stringRepresentation() + ")";
+    std::string program = "qs(" + TestUtils::buildListVariable(valuesToSort)->stringRepresentation() + ")";
 
     std::sort(valuesToSort.begin(), valuesToSort.end(), [](int x, int y) {
         return x < y;
@@ -253,7 +249,7 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     std::stringstream stream;
     stream << program;
 
-    XCTAssert(testStream(stream, rt, intVecToPtr(valuesToSort)));
+    XCTAssert(testStream(stream, rt, TestUtils::buildListVariable(valuesToSort)));
 }
 
 - (void)testInlineClosure
@@ -280,6 +276,48 @@ static BOOL testStream(std::istream &stream, Runtime &rt, jcVariablePtr expected
     ";
 
     jcVariablePtr expected = jcVariable::Create(4);
+
+    std::stringstream stream;
+    stream << program;
+
+    XCTAssert(testStream(stream, rt, expected));
+}
+
+- (void)testSlice1
+{
+    Runtime rt;
+
+    std::string program = "[1,2,3][1:]";
+
+    jcVariablePtr expected = TestUtils::buildListVariable<int>({2, 3});
+
+    std::stringstream stream;
+    stream << program;
+
+    XCTAssert(testStream(stream, rt, expected));
+}
+
+- (void)testSlice2
+{
+    Runtime rt;
+
+    std::string program = "[1,2,3][:2]";
+
+    jcVariablePtr expected = TestUtils::buildListVariable<int>({1, 2});
+
+    std::stringstream stream;
+    stream << program;
+
+    XCTAssert(testStream(stream, rt, expected));
+}
+
+- (void)testSlice3
+{
+    Runtime rt;
+
+    std::string program = "[1,2,3][:]";
+
+    jcVariablePtr expected = TestUtils::buildListVariable<int>({1, 2, 3});
 
     std::stringstream stream;
     stream << program;

@@ -115,6 +115,40 @@ private:
     std::vector<std::shared_ptr<Expression>> mArguments;
 };
 
+class IndexExpression : public Expression
+{
+public:
+    IndexExpression(std::shared_ptr<Expression> callee, std::shared_ptr<Expression> index);
+
+    std::shared_ptr<Expression> getCallee() const;
+    std::shared_ptr<Expression> getIndex() const;
+
+    void accept(Visitor* v) override;
+
+private:
+    std::shared_ptr<Expression> mCallee;
+    std::shared_ptr<Expression> mIndex;
+};
+
+class SliceExpression : public Expression
+{
+public:
+    SliceExpression(std::shared_ptr<Expression> callee,
+                    std::shared_ptr<Expression> index1,
+                    std::shared_ptr<Expression> index2);
+
+    std::shared_ptr<Expression> getCallee() const;
+    std::shared_ptr<Expression> getIndex1() const;
+    std::shared_ptr<Expression> getIndex2() const;
+
+    void accept(Visitor* v) override;
+
+private:
+    std::shared_ptr<Expression> mCallee;
+    std::shared_ptr<Expression> mIndex1;
+    std::shared_ptr<Expression> mIndex2;
+};
+
 class BinaryExpression : public Expression {
 public:
     BinaryExpression(std::shared_ptr<Expression> left, TokenType op, std::shared_ptr<Expression> right);

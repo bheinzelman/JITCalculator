@@ -127,6 +127,17 @@ enum Op {
      Exit the program
      */
     Exit = 21,
+
+    /**
+     Returns the element at the given index of a collection.
+     */
+    Index = 22,
+
+
+    /**
+     Returns a slice of the collection
+     */
+    Slice = 23,
 };
 
 
@@ -183,6 +194,10 @@ public:
     void visit(ListExpression* list) override;
 
     void visit(Guard* guard) override;
+
+    void visit(IndexExpression* expression) override;
+
+    void visit(SliceExpression* expression) override;
 
 private:
     void generateClosures();

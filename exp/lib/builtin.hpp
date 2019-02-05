@@ -31,31 +31,14 @@ const std::string kLibReturnType = "LibReturnType";
     - arg ..., elements in the list
     - returns a new list
 
- function: head
-    - arg 1: a list
-    - returns the first element in the list
-
- function: tail
-    - arg 1: a list
-    - returns the list with all elements but the first
-
  function: len
     - arg 1: a list
     - returns the length of the list
 
- function: concat
-    - arg 1: a list
-    - arg 2: a list
-    - returns list 1 and list 2 concatenated
-
  */
 const std::string kLibPrint = "print";
-    
-const std::string kLibHead = "head";
-const std::string kLibTail = "tail";
 const std::string kLibLen = "len";
 const std::string kLibIsEmpty = "isEmpty";
-const std::string kLibFilter = "filter";
 
 struct LibState {
     std::ostream &mStdout;

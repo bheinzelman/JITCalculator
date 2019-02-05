@@ -17,8 +17,6 @@ public:
 
     size_t size() const override;
 
-    jcVariablePtr head() const override;
-
     /**
      You own this sucker, be careful
      */
@@ -29,6 +27,8 @@ public:
     bool equal(const jcArray &other) const;
 
     jcCollection* slice(int startIdx, int endIdx) const override;
+
+    jcVariablePtr at(int index) const override;
 
     jcVariable::Type getType() const override
     {

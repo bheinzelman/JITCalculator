@@ -34,12 +34,6 @@ jcArray::jcArray(const std::shared_ptr<std::vector<jcVariablePtr>> &items, int s
 {
 }
 
-jcVariablePtr jcArray::head() const
-{
-    JC_ASSERT(size());
-    return *startIt();
-}
-
 jcCollection* jcArray::slice(int startIdx, int endIdx) const
 {
     JC_ASSERT(startIdx >= 0 && endIdx <= mItems->size() && startIdx <= endIdx);
@@ -102,6 +96,12 @@ bool jcArray::equal(const jcArray &other) const
         ++it2;
     }
     return true;
+}
+
+jcVariablePtr jcArray::at(int index) const
+{
+    JC_ASSERT(index >= 0 && index < size());
+    return *(startIt() + index);
 }
 
 std::vector<jcVariablePtr>::iterator jcArray::startIt() const
